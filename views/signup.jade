@@ -1,0 +1,41 @@
+extends layout
+
+block content
+	div(class="container")
+		div(class="col-sm-6 col-sm-offset-3")
+			h1
+				span(class="fa fa-sign-in")
+				| &nbsp;Signup
+			
+			form(method="post")
+				div.form-group
+					label First Name
+					input(type="text" class="form-control" name="firstName")
+
+				div.form-group
+					label Last Name
+					input(type="text" class="form-control" name="lastName")
+
+				div.form-group
+					label Middle Name
+					input(type="text" class="form-control" name="middleName")
+
+				div.form-group
+					label Email
+					input(type="email" class="form-control" name="email")
+
+				div.form-group
+					label Password
+					input(type="password" class="form-control" name="password")
+
+				button(type="submit" class="btn btn-warning btn-lg") Signup
+
+			hr
+
+			p Already have an account?&nbsp;
+				a(href="/login") Login
+
+			p Or go&nbsp;
+				a(href="/") Home
+
+			

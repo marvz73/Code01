@@ -1,0 +1,29 @@
+extends layout
+
+block content
+	div(class="container")
+		div(class="col-sm-6 col-sm-offset-3")
+			h1
+				span(class="fa fa-sign-in")
+				| &nbsp;Login
+			p Login or Register with:
+			
+			form(method="POST")
+				div.form-group
+					label Email
+					input(type="email" class="form-control" name="email")
+				div.form-group
+					label Password
+					input(type="password" class="form-control" name="password")
+				button(type="submit" class="btn btn-warning") Login
+
+			hr
+
+			p Need an account?&nbsp;
+				a(href="/signup") Signup
+			p Or go&nbsp;
+				a(href="/") Home
+			p 
+				a(href="/forgot-password") Forgot Password
+
+

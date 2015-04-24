@@ -1,0 +1,23 @@
+{
+  "development": {
+    "username": "root",
+    "password": "seraph23",
+    "database": "poi_development",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  },
+  "test": {
+    "username": "root",
+    "password": "seraph23",
+    "database": "poi_test",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  },
+  "production": {
+    "username": "root",
+    "password": "seraph23",
+    "database": "poi_production",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  }
+}
