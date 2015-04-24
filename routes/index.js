@@ -1,6 +1,7 @@
 var models  = require('../models');
 var express = require('express');
 var router = express.Router();
+var uuid = require('node-uuid');
 
 var nodemailer = require('nodemailer');
 
@@ -66,11 +67,7 @@ module.exports = function(passport) {
             	req.body.password = encrypt(req.body.password)
 
 				models.User.findOrCreate({ where: {email: req.body.email}, defaults: req.body})
-					.spread(function(user, created) {
-					console.log(user.get({
-					  plain: true
-					}))
-
+				.spread(function(user, created) {
 					if(created){
 						var text = req.get('host') + '/verify/' + user.get('token');
 
@@ -93,7 +90,6 @@ module.exports = function(passport) {
 	
 	// render the user verification
     router.get('/verify/:token', function(req, res){
-
         models.User.find({ where: {token: req.params.token} }).then(function(user_model) {
             if(user_model){
             	user_model.set({verified: true, token: ''}).save().then(function(user_model){
@@ -115,6 +111,80 @@ module.exports = function(passport) {
             	res.send('Unknown Token!');
 
         }); 
+    });
+
+    router.route('/forgot-password')
+        .get( 
+            function(req, res){
+                res.render('forgot-password', { title: 'Express' });
+            }
+        )
+        .post( 
+            function(req, res){
+                models.User.find({ where: {email: req.body.email} }).then(function(user_model) {
+                    if(user_model){
+                        var token = uuid.v4();
+                        user_model.set({token: token}).save().then(function(user_model){ 
+                            var text = req.get('host') + '/reset-password/' + token;
+
+                            transporter.sendMail({
+                                from: 'dumingagebpls@gmail.com',
+                                to: req.body.email,
+                                subject: 'Reset Password',
+                                text: text
+                            });
+
+                            res.send('Please check email!.');                   
+                        })
+
+                    }
+                    else
+                        res.send('No email found!');
+
+                }); 
+            }
+        )
+
+    router.route('/reset-password/:token')
+        .get( 
+            function(req, res){
+                models.User.find({ where: {token: req.params.token} }).then(function(user_model) {
+                    if(user_model){
+                        res.render('reset-password', { title: 'Express' });
+                    }
+                    else
+                        res.send('Unknown Token!');
+                }); 
+            }
+        )
+        .post( 
+            function(req, res){
+                models.User.find({ where: {token: req.params.token} }).then(function(user_model) {
+                    if(user_model){
+                        var passwordHash = encrypt(req.body.password);
+
+                        user_model.set({verified: true, token: "", password: passwordHash}).save().then(function(user_model){ 
+                            res.redirect('/login');                 
+                        })
+                    }
+                    else
+                        res.send('Unknown Token!');
+
+                });
+            }
+        )
+
+    router.get('/profile', isAuthenticated, function(req, res, next) {
+        res.render('profile', { title: 'Express', user : req.user });
+    });
+
+    router.get('/home', isAuthenticated, function(req, res, next) {
+        res.render('home', { title: 'Express', user : req.user });
+    });
+
+    router.get('/logout', function(req, res) {
+        req.logout();
+        res.redirect('/');
     });
 
 	return router;

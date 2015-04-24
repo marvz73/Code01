@@ -1,0 +1,59 @@
+extends layout
+
+block content
+	script(type="text/javascript" src="/js/socket.js")
+	div(class="container")
+		div(class="page-header text-center")
+			h1
+				span(class="fa fa-anchor")
+				| &nbsp;Profile Page
+			a(href="/logout" class="btn btn-default btn-sm")
+				| &nbsp;Logout
+
+		div.row
+			div.col-sm-6
+				div.well
+					h3
+						span(class="fa fa-user")
+						| &nbsp; Local
+
+				a(href="/connect/local" class="btn btn-default")
+					| &nbsp;Connect Local
+
+			div.col-sm-6
+				div.well
+					h3
+						span(class="fa fa-facebook")
+						| &nbsp; Facebook
+
+				a(href="/connect/facebook" class="btn btn-primary")
+					| &nbsp;Connect Facebook
+
+		div.row
+			div.col-sm-6
+				div.well
+					h3
+						span(class="fa fa-twitter")
+						| &nbsp; Twitter
+
+				a(href="/connect/twitter" class="btn btn-info")
+					| &nbsp;Connect Twitter
+
+			div.col-sm-6
+				div.well
+					h3
+						span(class="fa fa-google-plus")
+						| &nbsp; Google+
+
+				a(href="/connect/local" class="btn btn-danger")
+					| &nbsp;Connect Google+
+
+		div.text-center
+			p
+				| A demo by&nbsp
+				a(href="http://scotch.io") Scotch
+				| .
+			p
+				| Visit the&nbsp
+				a(href="http://scotch.io/tutorials/javascript/easy-node-authentication-setup-and-local") tutorial
+				| .
