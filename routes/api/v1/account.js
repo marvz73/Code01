@@ -46,33 +46,55 @@ module.exports = function(models) {
 	  	)
 	  	.post(
 	  		function(req, res, next) {
-	  			req.body.id = req.params.accountId;
-	  			new dbmodel.Account(req.body).save().then(function(account_model) {
-	        		if(account_model){
-	        			res.json(account_model.toJSON({shallow: true}));
-
-				  		console.dir(account_model.toJSON());
-	        		}
-				  	else{
+	  			models.Account.find(req.params.accountId).then(function(account) {
+					if(account){
+						models.User.find(req.user.id).then(function(user) {
+							if(user){
+								user.hasAccount(account).then(function(result){
+									if(result){
+										account.updateAttributes(req.body).then(function(account){
+											if(account)
+												res.json(account);
+											else
+												res.json(null);
+										})
+									}
+									else
+										res.json(null);
+								})
+							}else{
+						  		res.json(null);
+						  	}
+						})						
+					}else{
 				  		res.json(null);
-				  		console.log("no data");
 				  	}
-				});
+				})
 	  		}
 	  	)
 	  	.delete(
 	  		function(req, res, next) {
-	  			new dbmodel.Account({id: req.params.accountId}).destroy().then(function(account_model) {
-	        		if(account_model){
-	        			res.json(account_model.toJSON({shallow: true}));
-
-				  		console.dir(account_model.toJSON());
-	        		}
-				  	else{
-				  		res.json(null);
-				  		console.log("no data");
+	  			models.Account.find(req.params.accountId).then(function(account) {
+					if(account){
+						models.User.find(req.user.id).then(function(user) {
+							if(user){
+								user.hasAccount(account).then(function(result){
+									if(result){
+										account.destroy().then(function(){
+											res.send('Record is destroyed!')
+										})
+									}	
+									else
+										res.send('Record is not destroyed!')
+								})
+							}else{
+						  		res.send('Record is not destroyed!')
+						  	}
+						})						
+					}else{
+				  		res.send('Record is not destroyed!')
 				  	}
-				});
+				})
 	  		}
 	  	)
 
@@ -110,14 +132,14 @@ module.exports = function(models) {
 					if(account){
 						models.User.find(req.user.id).then(function(user) {
 							if(user){
-								// user.hasAccount(account).then(function(result){
-									// if(result)
+								user.hasAccount(account).then(function(result){
+									if(result)
 										account.getAccountUsers().then(function(AccountUser){
 											res.json(AccountUser)	
 										})
-									// else
-									// 	res.json(null);
-								// })
+									else
+										res.json(null);
+								})
 							}else{
 						  		res.json(null);
 						  	}
@@ -126,20 +148,6 @@ module.exports = function(models) {
 				  		res.json(null);
 				  	}
 				})
-
-	  	// 		new dbmodel.Account({'id': req.params.accountId}).fetch({
-	   //              withRelated: ['user', 'accountSettings']
-	   //          }).then(function(account_model) {
-	   //      		if(account_model){
-	   //      			if(account_model.related('user').id == req.user.id)
-	   //      				res.json(account_model.related('accountSettings'));
-	   //      			else
-	   //      				res.json(null);
-	   //      		}
-				//   	else{
-				//   		res.json(null);
-				//   	}
-				// });
 	  		}
 		)
 
