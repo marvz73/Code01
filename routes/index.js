@@ -179,7 +179,14 @@ module.exports = function(passport) {
     });
 
     router.get('/home', isAuthenticated, function(req, res, next) {
-        res.render('home', { title: 'Express', user : req.user });
+        models.User.find( { where: {id: req.user.id}, include: [{ all: true, nested: true }] } ).then(function(user_model) {
+            if(user_model){
+                res.render('home', { title: 'Express', user : req.user, bootstrap: user_model});
+            }
+            else
+                res.send('Unknown Token!');
+
+        });
     });
 
     router.get('/logout', function(req, res) {

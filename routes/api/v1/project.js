@@ -7,22 +7,36 @@ module.exports = function(models) {
 	router.route('/')
 		.post( 
 	  		function(req, res, next) {
-	  			req.body.createdBy = req.user.id;
-	  			new dbmodel.Project(req.body).save().then(function(project_model) {
-	        		if(project_model){
-	        			res.json(project_model.toJSON({shallow: true}));
-	        		}
-				  	else{
+	  			req.body.AccountId = req.params.accountId;
+	  			req.body.CreatedById = req.user.id;
+	  			models.Account.find(req.params.accountId).then(function(account) {
+					if(account){
+						models.User.find(req.user.id).then(function(user) {
+							if(user){
+								user.hasAccount(account).then(function(result){
+									if(result){
+										models.Project.create(req.body).then(function(project) {
+											res.json(project)	
+										})
+									}
+									else
+										res.json(null);
+								})
+							}else{
+						  		res.json(null);
+						  	}
+						})						
+					}else{
 				  		res.json(null);
 				  	}
-				});
+				})
 	  		}
 	  	)
 
 	router.route('/:projectId')
 		.get( 
 	  		function(req, res, next) {
-	  			models.Project.find({ where: {'id': req.params.projectId, accountId: req.params.accountId} }).then(function(project) {
+	  			models.Project.find({ where: {'id': req.params.projectId, AccountId: req.params.accountId} }).then(function(project) {
 					if(project){
 						models.Account.find(req.params.accountId).then(function(account) {
 							if(account){
@@ -50,7 +64,7 @@ module.exports = function(models) {
 	  	)
 	  	.post( 
 	  		function(req, res, next) {
-	  			models.Project.find({ where: {'id': req.params.projectId, accountId: req.params.accountId} }).then(function(project) {
+	  			models.Project.find({ where: {'id': req.params.projectId, AccountId: req.params.accountId} }).then(function(project) {
 					if(project){
 						models.Account.find(req.params.accountId).then(function(account) {
 							if(account){
@@ -58,7 +72,7 @@ module.exports = function(models) {
 									if(user){
 										user.hasAccount(account).then(function(result){
 											if(result){
-												project.updateAttributes(req.body).then(function(){
+												project.updateAttributes(req.body).then(function(project){
 													res.json(project)	
 												})
 											}
@@ -81,7 +95,7 @@ module.exports = function(models) {
 	  	)
 	  	.delete( 
 	  		function(req, res, next) {
-	  			models.Project.find({ where: {'id': req.params.projectId, accountId: req.params.accountId} }).then(function(project) {
+	  			models.Project.find({ where: {'id': req.params.projectId, AccountId: req.params.accountId} }).then(function(project) {
 					if(project){
 						models.Account.find(req.params.accountId).then(function(account) {
 							if(account){
@@ -114,7 +128,7 @@ module.exports = function(models) {
 	router.route('/:projectId/tasks')
 		.get(
 			function(req, res, next) {
-				models.Project.find({ where: {'id': req.params.projectId, accountId: req.params.accountId} }).then(function(project) {
+				models.Project.find({ where: {'id': req.params.projectId, AccountId: req.params.accountId} }).then(function(project) {
 					if(project){
 						models.Account.find(req.params.accountId).then(function(account) {
 							if(account){

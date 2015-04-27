@@ -7,24 +7,44 @@ module.exports = function(models) {
 	router.route('/')
 		.post( 
 	  		function(req, res, next) {
-	  			req.body.createdBy = req.user.id;
-	  			new dbmodel.Task(req.body).save().then(function(task_model) {
-	        		if(task_model){
-	        			res.json( task_model.toJSON({shallow: true}) );
-	        		}
-				  	else{
+	  			req.body.ProjectId = req.params.projectId;
+	  			req.body.CreatedById = req.user.id;
+	  			models.Project.find({ where: {'id': req.params.projectId, AccountId: req.params.accountId} }).then(function(project) {
+					if(project){
+						models.Account.find(req.params.accountId).then(function(account) {
+							if(account){
+								models.User.find(req.user.id).then(function(user) {
+									if(user){
+										user.hasAccount(account).then(function(result){
+											if(result){
+												models.Task.create(req.body).then(function(task) {
+													res.json(task)	
+												})
+											}
+											else
+												res.json(null);
+										})
+									}else{
+								  		res.json(null);
+								  	}
+								})						
+							}else{
+						  		res.json(null);
+						  	}
+						})					
+					}else{
 				  		res.json(null);
 				  	}
-				});
+				})
 	  		}
 	  	)
 
 	router.route('/:taskId')
 		.get( 
 	  		function(req, res, next) {
-	  			models.Task.find({ where: {'id': req.params.taskId, projectId: req.params.projectId} }).then(function(task) {
+	  			models.Task.find({ where: {'id': req.params.taskId, ProjectId: req.params.projectId} }).then(function(task) {
 					if(task){
-						models.Project.find({ where: {'id': req.params.projectId, accountId: req.params.accountId} }).then(function(project) {
+						models.Project.find({ where: {'id': req.params.projectId, AccountId: req.params.accountId} }).then(function(project) {
 							if(project){
 								models.Account.find(req.params.accountId).then(function(account) {
 									if(account){
@@ -58,9 +78,9 @@ module.exports = function(models) {
 	  	)
 	  	.post( 
 	  		function(req, res, next) {
-	  			models.Task.find({ where: {'id': req.params.taskId, projectId: req.params.projectId} }).then(function(task) {
+	  			models.Task.find({ where: {'id': req.params.taskId, ProjectId: req.params.projectId} }).then(function(task) {
 					if(task){
-						models.Project.find({ where: {'id': req.params.projectId, accountId: req.params.accountId} }).then(function(project) {
+						models.Project.find({ where: {'id': req.params.projectId, AccountId: req.params.accountId} }).then(function(project) {
 							if(project){
 								models.Account.find(req.params.accountId).then(function(account) {
 									if(account){
@@ -96,9 +116,9 @@ module.exports = function(models) {
 	  	)
 	  	.delete( 
 	  		function(req, res, next) {
-	  			models.Task.find({ where: {'id': req.params.taskId, projectId: req.params.projectId} }).then(function(task) {
+	  			models.Task.find({ where: {'id': req.params.taskId, ProjectId: req.params.projectId} }).then(function(task) {
 					if(task){
-						models.Project.find({ where: {'id': req.params.projectId, accountId: req.params.accountId} }).then(function(project) {
+						models.Project.find({ where: {'id': req.params.projectId, AccountId: req.params.accountId} }).then(function(project) {
 							if(project){
 								models.Account.find(req.params.accountId).then(function(account) {
 									if(account){
@@ -136,9 +156,9 @@ module.exports = function(models) {
 	router.route('/:taskId/histories')
 		.get(
 			function(req, res, next){
-				models.Task.find({ where: {'id': req.params.taskId, projectId: req.params.projectId} }).then(function(task) {
+				models.Task.find({ where: {'id': req.params.taskId, ProjectId: req.params.projectId} }).then(function(task) {
 					if(task){
-						models.Project.find({ where: {'id': req.params.projectId, accountId: req.params.accountId} }).then(function(project) {
+						models.Project.find({ where: {'id': req.params.projectId, AccountId: req.params.accountId} }).then(function(project) {
 							if(project){
 								models.Account.find(req.params.accountId).then(function(account) {
 									if(account){
@@ -177,9 +197,9 @@ module.exports = function(models) {
 	router.route('/:taskId/comments')
 		.get(
 			function(req, res, next){
-				models.Task.find({ where: {'id': req.params.taskId, projectId: req.params.projectId} }).then(function(task) {
+				models.Task.find({ where: {'id': req.params.taskId, ProjectId: req.params.projectId} }).then(function(task) {
 					if(task){
-						models.Project.find({ where: {'id': req.params.projectId, accountId: req.params.accountId} }).then(function(project) {
+						models.Project.find({ where: {'id': req.params.projectId, AccountId: req.params.accountId} }).then(function(project) {
 							if(project){
 								models.Account.find(req.params.accountId).then(function(account) {
 									if(account){
