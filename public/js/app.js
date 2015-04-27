@@ -43,6 +43,11 @@ todo.controller = function () {
         self.list.push(m.prop({id: list.length + 1, count: 1, axisX: '23px', axisY: '25px'}))
     };
 
+
+    this.addProject = function () {
+        return m.request({method:'post', url: 'account/1/project', data: {title: 'title 1'}})
+    };
+
     // socket.on('connect', function () {
     //     socket.emit('getBootstrap', function(data){
     //         console.dir(data);
@@ -198,13 +203,13 @@ todo.view = function (ctrl) {
                                 m("a", { onclick:  ctrl.addAnnotaion }, "Add Annotation")
                             ]),
                             m("li", [
-                                m("a[href='#']", "Project 1")
+                                m("a[href='#']", {onclick: ctrl.addProject}, "Add Project")
                             ]),
                             m("li", [
                                 m("a[href='#']", "Settings")
                             ]),
                             m("li", [
-                                m("a[href='/route1']", {config: m.route}, "Home Test")
+                                m("a[href='/route1']", {config: m.route}, "Home")
                             ])
 
                         ])        
