@@ -104,7 +104,7 @@ module.exports = function() {
         function(req, email, password, done) { // callback with email and password from our form
         	var passwordHash = encrypt(password);
 
-            models.User.find({ where: {email: email, password: passwordHash} }).then(function(user_model) {
+            models.User.find({ where: {email: email, password: passwordHash, verified: true} }).then(function(user_model) {
                 if(user_model){
                     console.log(user_model.toJSON())
                     return done(null, user_model.toJSON()); 

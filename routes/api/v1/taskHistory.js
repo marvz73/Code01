@@ -21,40 +21,47 @@ module.exports = function(models) {
 													user.hasAccount(account).then(function(result){
 														if(result){
 															models.TaskHistory.create(req.body).then(function(TaskHistory) {
-																res.json(TaskHistory)	
+																res.json({
+																	msg : "Return message here...",
+																	data : TaskHistory
+																});		
 															})
 														}
 														else
-															res.json(null);
+															res.status(404).json({
+																msg : "Return message here...",
+																data : null
+															});
 													})
 												}else{
-											  		res.json(null);
+											  		res.status(404).json({
+														msg : "Return message here...",
+														data : null
+													});
 											  	}
 											})
 										})					
 									}else{
-								  		res.json(null);
+								  		res.status(404).json({
+											msg : "Return message here...",
+											data : null
+										});
 								  	}
 								})					
 							}else{
-						  		res.json(null);
+						  		res.status(404).json({
+									msg : "Return message here...",
+									data : null
+								});
 						  	}
 						})
 					}else{
-				  		res.json(null);
+				  		res.status(404).json({
+							msg : "Return message here...",
+							data : null
+						});
 				  	}
 				})
-
-				req.body.createdBy = req.user.id;
-				new dbmodel.TaskHistory(req.body).save().then(function(history_model) {
-	        		if(history_model){
-	        			res.json( history_model.toJSON({shallow: true}) );
-	        		}
-				  	else{
-				  		res.json(null);
-				  	}
-				});
-
 			}
 		)
 
@@ -77,38 +84,65 @@ module.exports = function(models) {
 																	if(user){
 																		user.hasAccount(account).then(function(result){
 																			if(result){
-																				res.json(TaskHistory)	
+																				res.json({
+																					msg : "Return message here...",
+																					data : TaskHistory
+																				});		
 																			}
 																			else
-																				res.json(null);
+																				res.status(404).json({
+																					msg : "Return message here...",
+																					data : null
+																				});
 																		})
 																	}else{
-																  		res.json(null);
+																  		res.status(404).json({
+																			msg : "Return message here...",
+																			data : null
+																		});
 																  	}
 																})
 															}
 															else{
-																res.json(null);
+																res.status(404).json({
+																	msg : "Return message here...",
+																	data : null
+																});
 															}
 														})					
 													}else{
-												  		res.json(null);
+												  		res.status(404).json({
+															msg : "Return message here...",
+															data : null
+														});
 												  	}
 												})			
 											}else{
-												res.json(null);
+												res.status(404).json({
+													msg : "Return message here...",
+													data : null
+												});
 											}
 										})	
 									}else{
-								  		res.json(null);
+								  		res.status(404).json({
+											msg : "Return message here...",
+											data : null
+										});
 								  	}
 								})
 							}else{
-						  		res.json(null);
+						  		res.status(404).json({
+									msg : "Return message here...",
+									data : null
+								});
 						  	}
 						})
 					}else{
-						res.json(null);
+						res.status(404).json({
+							msg : "Return message here...",
+							data : null
+						});
 					}
 				})
 			}
@@ -132,39 +166,66 @@ module.exports = function(models) {
 																		user.hasAccount(account).then(function(result){
 																			if(result){
 																				TaskHistory.updateAttributes(req.body).then(function(TaskHistory){
-																					res.json(TaskHistory)	
+																					res.json({
+																						msg : "Return message here...",
+																						data : TaskHistory
+																					});		
 																				})	
 																			}
 																			else
-																				res.json(null);
+																				res.status(404).json({
+																					msg : "Return message here...",
+																					data : null
+																				});
 																		})
 																	}else{
-																  		res.json(null);
+																  		res.status(404).json({
+																			msg : "Return message here...",
+																			data : null
+																		});
 																  	}
 																})
 															}
 															else{
-																res.json(null);
+																res.status(404).json({
+																	msg : "Return message here...",
+																	data : null
+																});
 															}
 														})					
 													}else{
-												  		res.json(null);
+												  		res.status(404).json({
+															msg : "Return message here...",
+															data : null
+														});
 												  	}
 												})			
 											}else{
-												res.json(null);
+												res.status(404).json({
+													msg : "Return message here...",
+													data : null
+												});
 											}
 										})	
 									}else{
-								  		res.json(null);
+								  		res.status(404).json({
+											msg : "Return message here...",
+											data : null
+										});
 								  	}
 								})
 							}else{
-						  		res.json(null);
+						  		res.status(404).json({
+									msg : "Return message here...",
+									data : null
+								});
 						  	}
 						})
 					}else{
-						res.json(null);
+						res.status(404).json({
+							msg : "Return message here...",
+							data : null
+						});
 					}
 				})
 			}
@@ -188,39 +249,66 @@ module.exports = function(models) {
 																		user.hasAccount(account).then(function(result){
 																			if(result){
 																				TaskHistory.destroy().then(function(){
-																					res.send('Record is destroyed!')
+																					res.json({
+																						msg : 'Record is destroyed!',
+																						data : null
+																					})
 																				})	
 																			}
 																			else
-																				res.send('Record is not destroyed!')
+																				res.status(404).json({
+																					msg : 'Record is not destroyed!',
+																					data : null
+																				});
 																		})
 																	}else{
-																  		res.send('Record is not destroyed!')
+																  		res.status(404).json({
+																			msg : 'Record is not destroyed!',
+																			data : null
+																		});
 																  	}
 																})
 															}
 															else{
-																res.send('Record is not destroyed!')
+																res.status(404).json({
+																	msg : 'Record is not destroyed!',
+																	data : null
+																});
 															}
 														})					
 													}else{
-												  		res.send('Record is not destroyed!')
+												  		res.status(404).json({
+															msg : 'Record is not destroyed!',
+															data : null
+														});
 												  	}
 												})			
 											}else{
-												res.send('Record is not destroyed!')
+												res.status(404).json({
+													msg : 'Record is not destroyed!',
+													data : null
+												});
 											}
 										})	
 									}else{
-								  		res.send('Record is not destroyed!')
+								  		res.status(404).json({
+											msg : 'Record is not destroyed!',
+											data : null
+										});
 								  	}
 								})
 							}else{
-						  		res.send('Record is not destroyed!')
+						  		res.status(404).json({
+									msg : 'Record is not destroyed!',
+									data : null
+								});
 						  	}
 						})
 					}else{
-						res.send('Record is not destroyed!')
+						res.status(404).json({
+							msg : 'Record is not destroyed!',
+							data : null
+						});
 					}
 				})
 			}

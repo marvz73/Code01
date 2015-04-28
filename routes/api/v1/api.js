@@ -16,9 +16,15 @@ module.exports = function(models) {
 			function(req, res){
 				models.User.findAll().then(function(users) {
 					if(users)
-						res.json(users);
+						res.json({
+							msg : "Return message here...",
+							data : users
+						});
 					else{
-				  		res.json(null);
+				  		res.status(404).json({
+							msg : "Return message here...",
+							data : null
+						});
 				  	}
 				})
 			}
@@ -30,10 +36,16 @@ module.exports = function(models) {
 				models.User.find(req.user.id).then(function(user) {
 					if(user){
 						user.getAccounts().then(function(accounts){
-							res.json(accounts)
+							res.json({
+								msg : "Return message here...",
+								data : accounts
+							});
 						})
 					}else{
-				  		res.json(null);
+				  		res.status(404).json({
+							msg : "Return message here...",
+							data : null
+						});
 				  	}
 				})
 	  		}
@@ -48,7 +60,7 @@ function isAuthenticated(req, res, next) {
     if (req.isAuthenticated())
         return next();
 
-    res.redirect('/');
+    res.sendStatus(403);
 }
 
 function isNotAuthenticated(req, res, next) {

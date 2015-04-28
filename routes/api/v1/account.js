@@ -29,17 +29,30 @@ module.exports = function(models) {
 						models.User.find(req.user.id).then(function(user) {
 							if(user){
 								user.hasAccount(account).then(function(result){
-									if(result)
-										res.json(account)	
-									else
-										res.json(null);
+									if(result){
+										res.json({
+											msg : "Return message here...",
+											data : account
+										})	
+									}else{
+										res.status(404).json({
+											msg : "Return message here...",
+											data : null
+										});
+									}
 								})
 							}else{
-						  		res.json(null);
+						  		res.status(404).json({
+									msg : "Return message here...",
+									data : null
+								});
 						  	}
 						})						
 					}else{
-				  		res.json(null);
+				  		res.status(404).json({
+							msg : "Return message here...",
+							data : null
+						});
 				  	}
 				})
 	  		}
@@ -54,20 +67,36 @@ module.exports = function(models) {
 									if(result){
 										account.updateAttributes(req.body).then(function(account){
 											if(account)
-												res.json(account);
+												res.json({
+													msg : "Return message here...",
+													data : account
+												})	
 											else
-												res.json(null);
+												res.status(404).json({
+													msg : "Return message here...",
+													data : null
+												});
 										})
 									}
-									else
-										res.json(null);
+									else{
+										res.status(404).json({
+											msg : "Return message here...",
+											data : null
+										});
+									}
 								})
 							}else{
-						  		res.json(null);
+						  		res.status(404).json({
+									msg : "Return message here...",
+									data : null
+								});
 						  	}
 						})						
 					}else{
-				  		res.json(null);
+				  		res.status(404).json({
+							msg : "Return message here...",
+							data : null
+						});
 				  	}
 				})
 	  		}
@@ -81,18 +110,30 @@ module.exports = function(models) {
 								user.hasAccount(account).then(function(result){
 									if(result){
 										account.destroy().then(function(){
-											res.send('Record is destroyed!')
+											res.json({
+												msg : 'Record is destroyed!',
+												data : null
+											})	
 										})
 									}	
 									else
-										res.send('Record is not destroyed!')
+										res.status(404).json({
+											msg : 'Record is not destroyed!',
+											data : null
+										});
 								})
 							}else{
-						  		res.send('Record is not destroyed!')
+						  		res.status(404).json({
+									msg : 'Record is not destroyed!',
+									data : null
+								});
 						  	}
 						})						
 					}else{
-				  		res.send('Record is not destroyed!')
+				  		res.status(404).json({
+							msg : 'Record is not destroyed!',
+							data : null
+						});
 				  	}
 				})
 	  		}
@@ -109,17 +150,29 @@ module.exports = function(models) {
 								user.hasAccount(account).then(function(result){
 									if(result)
 										account.getProjects().then(function(projects){
-											res.json(projects)	
+											res.json({
+												msg : "Return message here...",
+												data : projects
+											})	
 										})
 									else
-										res.json(null);
+										res.status(404).json({
+											msg : "Return message here...",
+											data : null
+										});
 								})
 							}else{
-						  		res.json(null);
+						  		res.status(404).json({
+									msg : "Return message here...",
+									data : null
+								});
 						  	}
 						})						
 					}else{
-				  		res.json(null);
+				  		res.status(404).json({
+							msg : "Return message here...",
+							data : null
+						});
 				  	}
 				})
 	  		}
@@ -135,17 +188,29 @@ module.exports = function(models) {
 								user.hasAccount(account).then(function(result){
 									if(result)
 										account.getAccountUsers().then(function(AccountUser){
-											res.json(AccountUser)	
+											res.json({
+												msg : "Return message here...",
+												data : AccountUser
+											})		
 										})
 									else
-										res.json(null);
+										res.status(404).json({
+											msg : "Return message here...",
+											data : null
+										});
 								})
 							}else{
-						  		res.json(null);
+						  		res.status(404).json({
+									msg : "Return message here...",
+									data : null
+								});
 						  	}
 						})						
 					}else{
-				  		res.json(null);
+				  		res.status(404).json({
+							msg : "Return message here...",
+							data : null
+						});
 				  	}
 				})
 	  		}

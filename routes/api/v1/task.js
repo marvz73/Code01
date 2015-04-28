@@ -18,22 +18,37 @@ module.exports = function(models) {
 										user.hasAccount(account).then(function(result){
 											if(result){
 												models.Task.create(req.body).then(function(task) {
-													res.json(task)	
+													res.json({
+														msg : "Return message here...",
+														data : task
+													});	
 												})
 											}
 											else
-												res.json(null);
+												res.status(404).json({
+													msg : "Return message here...",
+													data : null
+												});
 										})
 									}else{
-								  		res.json(null);
+								  		res.status(404).json({
+											msg : "Return message here...",
+											data : null
+										});
 								  	}
 								})						
 							}else{
-						  		res.json(null);
+						  		res.status(404).json({
+									msg : "Return message here...",
+									data : null
+								});
 						  	}
 						})					
 					}else{
-				  		res.json(null);
+				  		res.status(404).json({
+							msg : "Return message here...",
+							data : null
+						});
 				  	}
 				})
 	  		}
@@ -53,25 +68,43 @@ module.exports = function(models) {
 												if(user){
 													user.hasAccount(account).then(function(result){
 														if(result)
-															res.json(task)	
+															res.json({
+																msg : "Return message here...",
+																data : task
+															});	
 														else
-															res.json(null);
+															res.status(404).json({
+																msg : "Return message here...",
+																data : null
+															});
 													})
 												}else{
-											  		res.json(null);
+											  		res.status(404).json({
+														msg : "Return message here...",
+														data : null
+													});
 											  	}
 											})
 										})					
 									}else{
-								  		res.json(null);
+								  		res.status(404).json({
+											msg : "Return message here...",
+											data : null
+										});
 								  	}
 								})					
 							}else{
-						  		res.json(null);
+						  		res.status(404).json({
+									msg : "Return message here...",
+									data : null
+								});
 						  	}
 						})
 					}else{
-				  		res.json(null);
+				  		res.status(404).json({
+							msg : "Return message here...",
+							data : null
+						});
 				  	}
 				})
 	  		}
@@ -90,26 +123,44 @@ module.exports = function(models) {
 													user.hasAccount(account).then(function(result){
 														if(result)
 															task.updateAttributes(req.body).then(function(task){
-																res.json(task);
+																res.json({
+																	msg : "Return message here...",
+																	data : task
+																});;
 															})
 														else
-															res.json(null);
+															res.status(404).json({
+																msg : "Return message here...",
+																data : null
+															});
 													})
 												}else{
-											  		res.json(null);
+											  		res.status(404).json({
+														msg : "Return message here...",
+														data : null
+													});
 											  	}
 											})
 										})					
 									}else{
-								  		res.json(null);
+								  		res.status(404).json({
+											msg : "Return message here...",
+											data : null
+										});
 								  	}
 								})					
 							}else{
-						  		res.json(null);
+						  		res.status(404).json({
+									msg : "Return message here...",
+									data : null
+								});
 						  	}
 						})
 					}else{
-				  		res.json(null);
+				  		res.status(404).json({
+							msg : "Return message here...",
+							data : null
+						});
 				  	}
 				})
 	  		}
@@ -128,26 +179,44 @@ module.exports = function(models) {
 													user.hasAccount(account).then(function(result){
 														if(result)
 															task.destroy().then(function(){
-																res.send('Record is destroyed!')
+																res.json({
+																	msg : 'Record is destroyed!',
+																	data : null
+																})
 															})
 														else
-															res.send('Record is not destroyed!')
+															res.status(404).json({
+																msg : 'Record is not destroyed!',
+																data : null
+															});
 													})
 												}else{
-											  		res.send('Record is not destroyed!')
+											  		res.status(404).json({
+														msg : 'Record is not destroyed!',
+														data : null
+													});
 											  	}
 											})
 										})					
 									}else{
-								  		res.send('Record is not destroyed!')
+								  		res.status(404).json({
+											msg : 'Record is not destroyed!',
+											data : null
+										});
 								  	}
 								})					
 							}else{
-						  		res.send('Record is not destroyed!')
+						  		res.status(404).json({
+									msg : 'Record is not destroyed!',
+									data : null
+								});
 						  	}
 						})
 					}else{
-				  		res.send('Record is not destroyed!')
+				  		res.status(404).json({
+							msg : 'Record is not destroyed!',
+							data : null
+						});
 				  	}
 				})
 	  		}
@@ -168,27 +237,45 @@ module.exports = function(models) {
 													user.hasAccount(account).then(function(result){
 														if(result){
 															task.getTaskHistories().then(function(histories){
-																res.json(histories)	
+																res.json({
+																	msg : "Return message here...",
+																	data : histories
+																});
 															})
 														}
 														else
-															res.json(null);
+															res.status(404).json({
+																msg : "Return message here...",
+																data : null
+															});
 													})
 												}else{
-											  		res.json(null);
+											  		res.status(404).json({
+														msg : "Return message here...",
+														data : null
+													});
 											  	}
 											})
 										})					
 									}else{
-								  		res.json(null);
+								  		res.status(404).json({
+											msg : "Return message here...",
+											data : null
+										});
 								  	}
 								})					
 							}else{
-						  		res.json(null);
+						  		res.status(404).json({
+									msg : "Return message here...",
+									data : null
+								});
 						  	}
 						})
 					}else{
-				  		res.json(null);
+				  		res.status(404).json({
+							msg : "Return message here...",
+							data : null
+						});
 				  	}
 				})
 			}
@@ -209,27 +296,45 @@ module.exports = function(models) {
 													user.hasAccount(account).then(function(result){
 														if(result){
 															task.getTaskComments().then(function(comments){
-																res.json(comments)	
+																res.json({
+																	msg : "Return message here...",
+																	data : comments
+																});
 															})
 														}
 														else
-															res.json(null);
+															res.status(404).json({
+																msg : "Return message here...",
+																data : null
+															});
 													})
 												}else{
-											  		res.json(null);
+											  		res.status(404).json({
+														msg : "Return message here...",
+														data : null
+													});
 											  	}
 											})
 										})					
 									}else{
-								  		res.json(null);
+								  		res.status(404).json({
+											msg : "Return message here...",
+											data : null
+										});
 								  	}
 								})					
 							}else{
-						  		res.json(null);
+						  		res.status(404).json({
+									msg : "Return message here...",
+									data : null
+								});
 						  	}
 						})
 					}else{
-				  		res.json(null);
+				  		res.status(404).json({
+							msg : "Return message here...",
+							data : null
+						});
 				  	}
 				})
 			}

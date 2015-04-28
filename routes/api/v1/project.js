@@ -16,18 +16,30 @@ module.exports = function(models) {
 								user.hasAccount(account).then(function(result){
 									if(result){
 										models.Project.create(req.body).then(function(project) {
-											res.json(project)	
+											res.json({
+												msg : "Return message here...",
+												data : project
+											});
 										})
 									}
 									else
-										res.json(null);
+										res.status(404).json({
+											msg : "Return message here...",
+											data : null
+										});
 								})
 							}else{
-						  		res.json(null);
+						  		res.status(404).json({
+									msg : "Return message here...",
+									data : null
+								});
 						  	}
 						})						
 					}else{
-				  		res.json(null);
+				  		res.status(404).json({
+							msg : "Return message here...",
+							data : null
+						});
 				  	}
 				})
 	  		}
@@ -44,20 +56,35 @@ module.exports = function(models) {
 									if(user){
 										user.hasAccount(account).then(function(result){
 											if(result)
-												res.json(project)	
+												res.json({
+													msg : "Return message here...",
+													data : project
+												});
 											else
-												res.json(null);
+												res.status(404).json({
+													msg : "Return message here...",
+													data : null
+												});
 										})
 									}else{
-								  		res.json(null);
+								  		res.status(404).json({
+											msg : "Return message here...",
+											data : null
+										});
 								  	}
 								})						
 							}else{
-						  		res.json(null);
+						  		res.status(404).json({
+									msg : "Return message here...",
+									data : null
+								});
 						  	}
 						})					
 					}else{
-				  		res.json(null);
+				  		res.status(404).json({
+							msg : "Return message here...",
+							data : null
+						});
 				  	}
 				})
 	  		}
@@ -73,22 +100,37 @@ module.exports = function(models) {
 										user.hasAccount(account).then(function(result){
 											if(result){
 												project.updateAttributes(req.body).then(function(project){
-													res.json(project)	
+													res.json({
+														msg : "Return message here...",
+														data : project
+													});	
 												})
 											}
 											else
-												res.json(null);
+												res.status(404).json({
+													msg : "Return message here...",
+													data : null
+												});
 										})
 									}else{
-								  		res.json(null);
+								  		res.status(404).json({
+											msg : "Return message here...",
+											data : null
+										});
 								  	}
 								})						
 							}else{
-						  		res.json(null);
+						  		res.status(404).json({
+									msg : "Return message here...",
+									data : null
+								});
 						  	}
 						})					
 					}else{
-				  		res.json(null);
+				  		res.status(404).json({
+							msg : "Return message here...",
+							data : null
+						});
 				  	}
 				})
 	  		}
@@ -104,22 +146,37 @@ module.exports = function(models) {
 										user.hasAccount(account).then(function(result){
 											if(result){
 												project.destroy().then(function(){
-													res.send('Record is destroyed!')
+													res.json({
+														msg : 'Record is destroyed!',
+														data : account
+													})	
 												})
 											}
 											else
-												res.send('Record is not destroyed!')
+												res.status(404).json({
+													msg : 'Record is not destroyed!',
+													data : null
+												});
 										})
 									}else{
-								  		res.send('Record is not destroyed!')
+								  		res.status(404).json({
+											msg : 'Record is not destroyed!',
+											data : null
+										});
 								  	}
 								})						
 							}else{
-						  		res.send('Record is not destroyed!')
+						  		res.status(404).json({
+									msg : 'Record is not destroyed!',
+									data : null
+								});
 						  	}
 						})					
 					}else{
-				  		res.send('Record is not destroyed!')
+				  		res.status(404).json({
+							msg : 'Record is not destroyed!',
+							data : null
+						});
 				  	}
 				})
 	  		}
@@ -137,22 +194,37 @@ module.exports = function(models) {
 										user.hasAccount(account).then(function(result){
 											if(result){
 												project.getTasks().then(function(tasks){
-													res.json(tasks)	
+													res.json({
+														msg : "Return message here...",
+														data : tasks
+													});	
 												})
 											}
 											else
-												res.json(null);
+												res.status(404).json({
+													msg : "Return message here...",
+													data : null
+												});
 										})
 									}else{
-								  		res.json(null);
+								  		res.status(404).json({
+											msg : "Return message here...",
+											data : null
+										});
 								  	}
 								})						
 							}else{
-						  		res.json(null);
+						  		res.status(404).json({
+									msg : "Return message here...",
+									data : null
+								});
 						  	}
 						})					
 					}else{
-				  		res.json(null);
+				  		res.status(404).json({
+							msg : "Return message here...",
+							data : null
+						});
 				  	}
 				})
 	  		}

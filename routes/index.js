@@ -179,7 +179,7 @@ module.exports = function(passport) {
     });
 
     router.get('/home', isAuthenticated, function(req, res, next) {
-        models.User.find( { where: {id: req.user.id}, include: [{ all: true, nested: true }] } ).then(function(user_model) {
+        models.User.find( { where: {id: req.user.id}, include: [models.Account] } ).then(function(user_model) {
             if(user_model){
                 res.render('home', { title: 'Express', user : req.user, bootstrap: user_model});
             }
