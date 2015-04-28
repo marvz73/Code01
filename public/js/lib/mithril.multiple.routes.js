@@ -12,7 +12,7 @@ m.routes = function mRoutes( defaultRoute, routesMap ){
 
     function subRouter( modules ){
         return function routeChange(){
-            m.redraw.strategy( 'none' );
+            m.redraw.strategy( 'all' );
 
             for( var key in modules ){
                 m.module( document.querySelector( key ), modules[ key ] );
