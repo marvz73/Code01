@@ -1,6 +1,20 @@
 var express = require('express');
 var router = express.Router({mergeParams: true});
 
+router.param(function(name, fn) {
+  if (fn instanceof RegExp) {
+    return function(req, res, next, val) {
+      var captures;
+      if (captures = fn.exec(String(val))) {
+        req.params[name] = captures;
+        next();
+      } else {
+        next('route');
+      }
+    }
+  }
+});
+
 
 module.exports = function(models) {
 
