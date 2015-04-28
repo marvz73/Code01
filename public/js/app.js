@@ -23,51 +23,62 @@ todo.Todo = function (data) {
 
 };
 
-todo.annotationList = function(){
-
-    var json = [
-        {id: 1, count: 1, axisX: '203px', axisY: '178px'},
-        {id: 2, count: 2, axisX: '74px', axisY: '224px'},
-        {id: 3, count: 3, axisX: '348px', axisY: '179px'},
-        {id: 4, count: 4, axisX: '91px', axisY: '684px'},
-        {id: 5, count: 5, axisX: '65px', axisY: '441px'}
-    ];
-    
-    return m.prop(json);
-}
-
-
 todo.getProjectList = function() {
     return m.request({method:'get', url: 'api/v1/account/1/projects'});
 };
 
-
-
+todo.getTaskList = function() {
+    return m.request({method:'get', url: 'api/v1/account/1/project/1/tasks'});
+};
 
 todo.controller = function () {
 
     var self = this;
 
-    var list = todo.annotationList();
+    var ProjectList = todo.getProjectList();
 
-    this.list = list();
-
-    this.ProjectLists  = todo.getProjectList();
-
-    this.addAnnotaion = function () {
-
-        m.request({method:'post', url: 'api/v1/account/1/project/1/task', data: {title:'task 1'}}).then(function(resp){
-            self.list.push(resp.data)
-        })
-
-   
-
+    ProjectList.then(function(resp){
+        if(resp.data.length)
+        {
+            self.ProjectList = resp.data;
+        }else{
+            self.ProjectList = m.prop();
+        }
+    })
     
+    // this.ProjectList = m.prop('');
+
+    // ProjectList.then(function(resp){
+    //     console.log(12312)
+    // // this.TaskList = todo.getTaskList();
+    // })
+
+    this.addTask = function (elm, init, context ) {
+        var jsonData = {
+            'desc' : '',
+            'X': '23px',
+            'Y': '25px'
+        }
+        m.request({method:'post', url: 'api/v1/account/1/project/1/task', data: jsonData}).then(function(resp){
+            self.TaskList().data.push(resp.data)
+            // self.list.push(m.prop({id: list.length + 1, count: 1, axisX: '23px', axisY: '25px'}))
+        })
+    };
+    
+    this.updateTask = function(taskData){
+        console.log(taskData)
+        var jsonData = {
+            Y: taskData.Y,
+            X: taskData.X
+        }
+
+        m.request({method:'post', url: 'api/v1/account/1/project/1/task/' + taskData.id, data: jsonData }).then(function(resp){
+            // self.list.push(resp.data)
+        })
     };
 
-
     this.addProject = function () {
-        return m.request({method:'post', url: 'api/v1/account/1/project', data: {title: 'title 1'}})
+        return m.request({method:'post', url: 'api/v1/account/1/project', data: {title: 'prorject 1'}})
     };
 
     // socket.on('connect', function () {
@@ -75,8 +86,6 @@ todo.controller = function () {
     //         console.dir(data);
     //     })
     // });
-
-
 
     // this.description = m.prop("");
     // this.done = m.prop(false);
@@ -166,20 +175,10 @@ todo.view = function (ctrl) {
                     }
                     
                     var xPosition = 0;
-                    var yPosition = 0; 
+                    var yPosition = 0;
                     var elm = element;
-                    
-                    while(elm) {
-                        console.log(elm.offsetLeft , elm.scrollLeft, elm.clientLeft);
-
-                        xPosition += (elm.offsetLeft - elm.scrollLeft + elm.clientLeft);
-                        yPosition += (elm.offsetTop - elm.scrollTop + elm.clientTop);
-                        elm = elm.offsetParent;
-                    }
-
-                    // ctrl.list[tid].axisY = elm.offsetLeft + "px"
-                    // ctrl.list[tid].axisX = elm.offsetTop + "px"
-                    console.log(tid, xPosition, yPosition)
+                    console.log(tid, element.offsetLeft, element.offsetTop)
+                    ctrl.updateTask({id: tid, X: element.offsetLeft + 'px', Y: element.offsetTop + 'px'});
 
 
 
@@ -220,16 +219,18 @@ todo.view = function (ctrl) {
                         m("span","")
                     ]),
                     m("nav#cd-main-nav", [
-                        m("ul", [
+                        
+                        
 
-                            ctrl.ProjectLists().data.map(function (val, index) {
-                                return m("li", [
-                                    m("a[href='/1/" + m.route.param("aid") + '/' +val.id+ "']", {config: m.route }, val.title)
-                                ])
-                            }),
+                        m("ul", [
+                            // ctrl.ProjectList.map(function (val, index) {
+                            //     return m("li", [
+                            //         m("a[href='/1/" + m.route.param("aid") + '/' +val.id+ "']", {config: m.route }, val.title)
+                            //     ])
+                            // }),
 
                             m("li", [
-                                m("a", { onclick:  ctrl.addAnnotaion }, "Add Annotation")
+                                m("a", { onclick:  ctrl.addTask }, "Add Annotation")
                             ]),
                             m("li", [
                                 m("a[href='#']", {onclick: ctrl.addProject}, "Add Project")
@@ -250,15 +251,17 @@ todo.view = function (ctrl) {
                     m("div#wrapper.cd-product-wrapper", [
                         m("ul", [
 
-                            ctrl.list.map(function (annotation, index) {
+                   
+                                // ctrl.TaskList().data.map(function (t, index) {
 
-                                return m("li#drag-drop.cd-single-point", {"data-index": index, style:{position: 'absolute', left: annotation.axisX,  top: annotation.axisY}, config: draggable}, [
-                                    m("a[href='javascript:void(0)'].cd-btn#cd-btn", [
-                                        m("i.fa.fa-map-marker" )
-                                    ]),
-                                    m("div.cd-more-info.cd-top")
-                                ])
-                            })
+                                //     return m("li#drag-drop.cd-single-point", {"data-index": t.id, style:{position: 'absolute', left: t.X,  top: t.Y}, config: draggable}, [
+                                //         m("a[href='javascript:void(0)'].cd-btn#cd-btn", [
+                                //             m("i.fa.fa-map-marker" )
+                                //         ]),
+                                //         m("div.cd-more-info.cd-top")
+                                //     ])
+                                // })
+                            
 
                         ]),
 
@@ -355,15 +358,12 @@ var project = {
 //setup routes to start w/ the `#` symbol
 m.route.mode = "hash";
 
-m.routes( '/0/'+bootstrap.Accounts[0].id, {
-    '/0/:aid' : {
-        '#app' : todo
-    },
-    '/1/:aid/:pid' : {
+m.routes( '/0/'+bootstrap.Accounts[0].id + '/0', {
+    '/0/:aid/:pid' : {
         '#app' : todo,
         '#project' : project
     },
-    '/2/:aid/:pid' : {
+    '/1/:aid/:pid/:tid' : {
         '#app' : todo,
         '#task' : task
     }

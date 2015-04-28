@@ -3,7 +3,7 @@ jQuery(document).ready(function($){
 
 
 
-
+setTimeout(function(){
 
 
 		// browser window scroll (in pixels) after which the "menu" link is shown
@@ -52,7 +52,14 @@ jQuery(document).ready(function($){
 				}
 			} 
 		}
+},400)
 	});
+
+
+
+
+
+
 
 
 
