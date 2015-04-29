@@ -23,9 +23,9 @@ todo.Todo = function (data) {
 
 };
 
-todo.getProjectList = function() {
-    return m.request({method:'get', url: 'api/v1/account/' + m.route.param('aid') + '/projects'});
-};
+// todo.getProjectList = function() {
+//     return m.request({method:'get', url: 'api/v1/account/' + m.route.param('aid') + '/projects'});
+// };
 
 todo.getProject = function() {
     return m.request({method:'get', url: 'api/v1/account/' + m.route.param('aid') + '/project' + m.route.param('pid')});
@@ -39,45 +39,11 @@ todo.controller = function () {
 
     var self = this;
 
-    var ProjectList = todo.getProjectList();
-    this.ProjectList = m.prop('')
-    this.TaskList = m.prop('')
-
-
-        ProjectList.then(function(projectResp){
-            if(projectResp.data.length)
-            {   
-                //if no default
-                if(m.route.param('pid') == 0){
-                    console.log(projectResp.data[0].id)
-                    m.route('/0/1/' + projectResp.data[0].id)
-                }
-                // console.log(m.route.param('pid'))
-
-                self.ProjectList = projectResp.data;
-                // var TaskList = todo.getTaskList();
-
-                // TaskList.then(function(taskResp){
-                //     if(taskResp.data.length)
-                //     {
-                //         self.TaskList = taskResp.data;
-                //     }
-                // })
-
-            }else{
-                self.ProjectList = m.prop('');
-            }
-        })
-    
-
-
-
-    
     // this.ProjectList = m.prop('');
-
+    this.TaskList = m.prop('');
     // ProjectList.then(function(resp){
     //     console.log(12312)
-    // // this.TaskList = todo.getTaskList();
+    this.TaskList = todo.getTaskList();
     // })
 
     this.addTask = function (elm, init, context ) {
@@ -93,7 +59,7 @@ todo.controller = function () {
     };
     
     this.updateTask = function(taskData){
-        console.log(taskData)
+
         var jsonData = {
             Y: taskData.Y,
             X: taskData.X
@@ -179,48 +145,6 @@ todo.view = function (ctrl) {
 
 
 
-    //Bind an event to the element
-    function draggable(element, init, context){
-     
-        if( !init ){
-            var dragged = 0;
-            var dragdrop = DragDrop.bind(element, {
-                // anchor: anchor,
-                boundingBox: 'offsetParent',
-                dragstart: function() {
-                    console.log('dragstart')
-                    dragged = 1;
-                },
-                dragend: function(){
-                    console.log('dragend')
-
-                    var tid = this.getAttribute("data-index");
-
-                    if(dragged){
-                        m.route('/task/' + tid)
-                        // console.log(ctrl.list[0])
-                    }
-                    
-                    var xPosition = 0;
-                    var yPosition = 0;
-                    var elm = element;
-                    console.log(tid, element.offsetLeft, element.offsetTop)
-                    ctrl.updateTask({id: tid, X: element.offsetLeft + 'px', Y: element.offsetTop + 'px'});
-
-
-
-                },
-                drag: function(){
-                    dragged = 0;
-                    console.log('draggedx')
-                     $('.cd-btn').unbind('click')
-                }
-            });
-
-
-        }
-    }
-
     // function showRightModal(elm, init, context){
 
     //     if( !init ){
@@ -238,61 +162,7 @@ todo.view = function (ctrl) {
     //     }
     // }
 
-
-    //Get project list
-    function projectList(elm, init, context){
-        if(!init)
-        {
-            return ctrl.ProjectList.map(function (val, index) {
-                return m("li", [
-                    m("a[href='/0/" + m.route.param("aid") + '/' +val.id+ "']", {config: m.route }, val.title)
-                ])
-            })     
-        }
-    }
-
-    function taskList(elm, init, context){
-        if(!init){
-            return ctrl.TaskList.map(function (t, index) {
-                return m("li#drag-drop.cd-single-point", {"data-index": t.id, style:{position: 'absolute', left: t.X,  top: t.Y}, config: draggable}, [
-                    m("a[href='javascript:void(0)'].cd-btn#cd-btn", [
-                        m("i.fa.fa-map-marker" )
-                    ]),
-                    m("div.cd-more-info.cd-top")
-                ])
-            })
-        }
-    }
-
     return m("div", [
-
-                //Navigation Menu
-                m("#cd-nav", [
-                    m("a[href='javascript:void(0)'].cd-nav-trigger", {}, "Menu",[
-                        m("span","")
-                    ]),
-                    m("nav#cd-main-nav", [
-                        
-                        m("ul", [
-
-                            ((ctrl.ProjectList.length) ? projectList() : '' ),
-
-                            m("li", [
-                                m("a", { onclick:  ctrl.addTask }, "Add Pin")
-                            ]),
-                            m("li", [
-                                m("a[href='#']", {onclick: ctrl.addProject}, "Add Project")
-                            ]),
-                            m("li", [
-                                m("a[href='#']", "Settings")
-                            ]),
-                            m("li", [
-                                m("a[href='/route1']", {config: m.route}, "Home")
-                            ])
-
-                        ])        
-                    ])
-                ]),
 
                 //pins annotation
                 m("div.cd-product.cd-container", [
@@ -351,10 +221,15 @@ todo.view = function (ctrl) {
 //initialize the application
 // m.module(document.getElementById('app'), todo);
 
-var rightModal = function(){
-    //Right dialog box
 
-}
+
+
+
+
+
+
+
+
 
 var task = {
     controller: function() {
@@ -381,29 +256,188 @@ var task = {
 
 var project = {
     controller: function() {
-        this.id = m.route.param("tid");
+        var self = this;
+        
+        this.TaskList = m.prop('');
+
+        // m.request({method:'get', url: 'api/v1/account/' + m.route.param('aid') + '/project' + m.route.param('pid')});
+
+        m.request({method:'get', url: 'api/v1/account/' + m.route.param('aid') + '/project/' + m.route.param('pid') + '/tasks'}).then(function(taskResp){
+            if(taskResp.data.length){
+                self.TaskList = taskResp.data;
+            }
+        });
+    
+        this.updateTask = function(taskData){
+
+            var jsonData = {
+                Y: taskData.Y,
+                X: taskData.X
+            }
+
+            m.request({method:'post', url: 'api/v1/account/' +m.route.param('aid')+ '/project/' +m.route.param('pid')+ '/task/' + taskData.id, data: jsonData }).then(function(resp){
+                // self.list.push(resp.data)
+            })
+        };
+
     },
-    view: function(controller) {
-        function loaded(){
-            console.log(controller.id)
+    view: function(ctrl) {
+        //Bind an event to the element
+        function draggable(element, init, context){
+         
+            if( !init ){
+                var dragged = 0;
+                var dragdrop = DragDrop.bind(element, {
+                    // anchor: anchor,
+                    boundingBox: 'offsetParent',
+                    dragstart: function() {
+                        console.log('dragstart')
+                        dragged = 1;
+                    },
+                    dragend: function(){
+                        console.log('dragend')
+
+                        var tid = this.getAttribute("data-index");
+
+                        if(dragged){
+                            m.route('/task/' + tid)
+                            // console.log(ctrl.list[0])
+                        }
+                        
+                        var xPosition = 0;
+                        var yPosition = 0;
+                        var elm = element;
+                        console.log(tid, element.offsetLeft, element.offsetTop)
+                        ctrl.updateTask({id: tid, X: element.offsetLeft + 'px', Y: element.offsetTop + 'px'});
+
+                    },
+                    drag: function(){
+                        dragged = 0;
+                        console.log('draggedx')
+                         $('.cd-btn').unbind('click')
+                    }
+                });
+
+            }
         }
-        return  m('h1', 'Projects')
+
+        function taskList(elm, init, context){
+            if(!init){
+                return ctrl.TaskList.map(function (t, index) {
+                    return m("li#drag-drop.cd-single-point", {"data-index": t.id, style:{position: 'absolute', left: t.X,  top: t.Y}, config: draggable}, [
+                        m("a[href='javascript:void(0)'].cd-btn#cd-btn", [
+                            m("i.fa.fa-map-marker" )
+                        ]),
+                        m("div.cd-more-info.cd-top")
+                    ])
+                })
+            }
+        }
+
+        return m("div", [
+                    //pins annotation
+                    m("div.cd-product.cd-container", [
+                        m("div#wrapper.cd-product-wrapper", [
+                            m("ul", [
+                                ((ctrl.TaskList.length) ? taskList() : '' )
+                            ]),
+
+                            //Project images
+                            m("img[src='./images/cd-app-image.jpg']")
+                        ])
+                    ])
+                ]);
     }
 }
 
 
+var navigation = {
+    controller: function() {
+        var self = this;
+        this.ProjectList = m.prop('');
+
+        m.request({method:'get', url: 'api/v1/account/' +bootstrap.Accounts[0].id + '/projects'}).then(function(projectResp){
+            if(projectResp.data.length)
+            {
+                if(m.route.param('pid') == 0){
+                    // m.route('/0/1/' + projectResp.data[0].id)
+                }
+
+                self.ProjectList = projectResp.data;
+            }
+        });
+
+        this.addTask = function (elm, init, context ) {
+
+            var jsonData = {
+                'desc' : '',
+                'X': '23px',
+                'Y': '25px'
+            }
+
+            m.request({method:'post', url: 'api/v1/account/' +m.route.param('aid')+ '/project/' +m.route.param('pid')+ '/task', data: jsonData}).then(function(resp){
+                // self.TaskList().data.push(resp.data)
+            })
+        };
+    
+    },
+    view: function(ctrl) {
+        //Get project list
+        function projectList(elm, init, context){
+            if(!init)
+            {
+                return ctrl.ProjectList.map(function (val, index) {
+                    return m("li", [
+                        m("a[href='/1/" + m.route.param("aid") + '/' +val.id+ "']", {config: m.route }, val.title)
+                    ])
+                })     
+            }
+        }
+
+        //Navigation Menu
+        return m("#cd-nav", [
+            m("a[href='javascript:void(0)'].cd-nav-trigger", {}, "Menu",[
+                m("span","")
+            ]),
+            m("nav#cd-main-nav", [
+                
+                m("ul", [
+
+                    ((ctrl.ProjectList.length) ? projectList() : '' ),
+
+                    m("li", [
+                        m("a", { onclick:  ctrl.addTask }, "Add Pin")
+                    ]),
+                    m("li", [
+                        m("a[href='#']", {onclick: ctrl.addProject}, "Add Project")
+                    ]),
+                    m("li", [
+                        m("a[href='#']", "Settings")
+                    ]),
+                    m("li", [
+                        m("a[href='/0/1']", {config: m.route}, "Home")
+                    ])
+
+                ])        
+            ])
+        ])
+    }
+}
+
 //setup routes to start w/ the `#` symbol
 m.route.mode = "hash";
-console.log(bootstrap.Accounts[0])
-m.routes( '/0', {
-    '/0' : {
-        '#app' : todo,
+
+console.log(bootstrap.Accounts[0]);
+
+m.routes( '/0/' + bootstrap.Accounts[0].id, {
+    '/0/:aid' : {
+        '#navigation' : navigation,
     },  
-    '/0/:aid/:pid' : {
-        '#app' : todo,
+    '/1/:aid/:pid' : {
+        '#navigation' : navigation,
         '#project' : project
     },
-    '/1/:aid/:pid/:tid' : {
+    '/2/:aid/:pid/:tid' : {
         '#app' : todo,
         '#task' : task
     }
