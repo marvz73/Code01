@@ -24,11 +24,15 @@ todo.Todo = function (data) {
 };
 
 todo.getProjectList = function() {
-    return m.request({method:'get', url: 'api/v1/account/1/projects'});
+    return m.request({method:'get', url: 'api/v1/account/' + m.route.param('aid') + '/projects'});
+};
+
+todo.getProject = function() {
+    return m.request({method:'get', url: 'api/v1/account/' + m.route.param('aid') + '/project' + m.route.param('pid')});
 };
 
 todo.getTaskList = function() {
-    return m.request({method:'get', url: 'api/v1/account/1/project/1/tasks'});
+    return m.request({method:'get', url: 'api/v1/account/' + m.route.param('aid') + '/project/' + m.route.param('pid') + '/tasks'});
 };
 
 todo.controller = function () {
@@ -36,15 +40,38 @@ todo.controller = function () {
     var self = this;
 
     var ProjectList = todo.getProjectList();
+    this.ProjectList = m.prop('')
+    this.TaskList = m.prop('')
 
-    ProjectList.then(function(resp){
-        if(resp.data.length)
-        {
-            self.ProjectList = resp.data;
-        }else{
-            self.ProjectList = m.prop();
-        }
-    })
+
+        ProjectList.then(function(projectResp){
+            if(projectResp.data.length)
+            {   
+                //if no default
+                if(m.route.param('pid') == 0){
+                    console.log(projectResp.data[0].id)
+                    m.route('/0/1/' + projectResp.data[0].id)
+                }
+                // console.log(m.route.param('pid'))
+
+                self.ProjectList = projectResp.data;
+                // var TaskList = todo.getTaskList();
+
+                // TaskList.then(function(taskResp){
+                //     if(taskResp.data.length)
+                //     {
+                //         self.TaskList = taskResp.data;
+                //     }
+                // })
+
+            }else{
+                self.ProjectList = m.prop('');
+            }
+        })
+    
+
+
+
     
     // this.ProjectList = m.prop('');
 
@@ -59,7 +86,7 @@ todo.controller = function () {
             'X': '23px',
             'Y': '25px'
         }
-        m.request({method:'post', url: 'api/v1/account/1/project/1/task', data: jsonData}).then(function(resp){
+        m.request({method:'post', url: 'api/v1/account/' +m.route.param('aid')+ '/project/' +m.route.param('pid')+ '/task', data: jsonData}).then(function(resp){
             self.TaskList().data.push(resp.data)
             // self.list.push(m.prop({id: list.length + 1, count: 1, axisX: '23px', axisY: '25px'}))
         })
@@ -72,7 +99,7 @@ todo.controller = function () {
             X: taskData.X
         }
 
-        m.request({method:'post', url: 'api/v1/account/1/project/1/task/' + taskData.id, data: jsonData }).then(function(resp){
+        m.request({method:'post', url: 'api/v1/account/' +m.route.param('aid')+ '/project/' +m.route.param('pid')+ '/task/' + taskData.id, data: jsonData }).then(function(resp){
             // self.list.push(resp.data)
         })
     };
@@ -194,20 +221,46 @@ todo.view = function (ctrl) {
         }
     }
 
-    function showRightModal(elm, init, context){
+    // function showRightModal(elm, init, context){
 
-        if( !init ){
-            document.getElementById("cd-panel").className += " is-visible";
+    //     if( !init ){
+    //         document.getElementById("cd-panel").className += " is-visible";
+    //     }
+
+    // }
+
+    // function hideRightModal(elm, init, context){
+    //     if( !init ){
+    //         var strClass = elm.target.className;
+    //         if(strClass.indexOf('cd-panel') == 0 || strClass.indexOf('cd-panel-close') == 0){
+    //             document.getElementById("cd-panel").className = "cd-panel from-right";
+    //         }
+    //     }
+    // }
+
+
+    //Get project list
+    function projectList(elm, init, context){
+        if(!init)
+        {
+            return ctrl.ProjectList.map(function (val, index) {
+                return m("li", [
+                    m("a[href='/0/" + m.route.param("aid") + '/' +val.id+ "']", {config: m.route }, val.title)
+                ])
+            })     
         }
-
     }
 
-    function hideRightModal(elm, init, context){
-        if( !init ){
-            var strClass = elm.target.className;
-            if(strClass.indexOf('cd-panel') == 0 || strClass.indexOf('cd-panel-close') == 0){
-                document.getElementById("cd-panel").className = "cd-panel from-right";
-            }
+    function taskList(elm, init, context){
+        if(!init){
+            return ctrl.TaskList.map(function (t, index) {
+                return m("li#drag-drop.cd-single-point", {"data-index": t.id, style:{position: 'absolute', left: t.X,  top: t.Y}, config: draggable}, [
+                    m("a[href='javascript:void(0)'].cd-btn#cd-btn", [
+                        m("i.fa.fa-map-marker" )
+                    ]),
+                    m("div.cd-more-info.cd-top")
+                ])
+            })
         }
     }
 
@@ -220,17 +273,12 @@ todo.view = function (ctrl) {
                     ]),
                     m("nav#cd-main-nav", [
                         
-                        
-
                         m("ul", [
-                            // ctrl.ProjectList.map(function (val, index) {
-                            //     return m("li", [
-                            //         m("a[href='/1/" + m.route.param("aid") + '/' +val.id+ "']", {config: m.route }, val.title)
-                            //     ])
-                            // }),
+
+                            ((ctrl.ProjectList.length) ? projectList() : '' ),
 
                             m("li", [
-                                m("a", { onclick:  ctrl.addTask }, "Add Annotation")
+                                m("a", { onclick:  ctrl.addTask }, "Add Pin")
                             ]),
                             m("li", [
                                 m("a[href='#']", {onclick: ctrl.addProject}, "Add Project")
@@ -250,19 +298,8 @@ todo.view = function (ctrl) {
                 m("div.cd-product.cd-container", [
                     m("div#wrapper.cd-product-wrapper", [
                         m("ul", [
-
-                   
-                                // ctrl.TaskList().data.map(function (t, index) {
-
-                                //     return m("li#drag-drop.cd-single-point", {"data-index": t.id, style:{position: 'absolute', left: t.X,  top: t.Y}, config: draggable}, [
-                                //         m("a[href='javascript:void(0)'].cd-btn#cd-btn", [
-                                //             m("i.fa.fa-map-marker" )
-                                //         ]),
-                                //         m("div.cd-more-info.cd-top")
-                                //     ])
-                                // })
+                            ((ctrl.TaskList.length) ? taskList() : '' )
                             
-
                         ]),
 
                         //Project images
@@ -357,8 +394,11 @@ var project = {
 
 //setup routes to start w/ the `#` symbol
 m.route.mode = "hash";
-
-m.routes( '/0/'+bootstrap.Accounts[0].id + '/0', {
+console.log(bootstrap.Accounts[0])
+m.routes( '/0', {
+    '/0' : {
+        '#app' : todo,
+    },  
     '/0/:aid/:pid' : {
         '#app' : todo,
         '#project' : project
