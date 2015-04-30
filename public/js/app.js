@@ -260,6 +260,28 @@ var project = {
         
         this.TaskList = m.prop('');
 
+        socket.on('taskCreate', function(data){
+            console.log("Task Create event fired::", data);
+            self.TaskList.push(data)
+            m.redraw(true)
+        })  
+
+        socket.on('taskUpdate', function(data){
+
+            for(var key in self.TaskList) {
+                var val = self.TaskList[key];
+                if(val.id == data.id)
+                {
+                    self.TaskList[key].Y = data.Y;
+                    self.TaskList[key].X = data.X;
+                    m.redraw(true)
+                }
+                
+            }
+
+            // console.log(data);
+        })
+
         // m.request({method:'get', url: 'api/v1/account/' + m.route.param('aid') + '/project' + m.route.param('pid')});
 
         m.request({method:'get', url: 'api/v1/account/' + m.route.param('aid') + '/project/' + m.route.param('pid') + '/tasks'}).then(function(taskResp){
@@ -267,7 +289,12 @@ var project = {
                 self.TaskList = taskResp.data;
             }
         });
+
+
     
+
+
+
         this.updateTask = function(taskData){
 
             var jsonData = {
@@ -275,10 +302,11 @@ var project = {
                 X: taskData.X
             }
 
-            m.request({method:'post', url: 'api/v1/account/' +m.route.param('aid')+ '/project/' +m.route.param('pid')+ '/task/' + taskData.id, data: jsonData }).then(function(resp){
-                // self.list.push(resp.data)
-            })
+            m.request({method:'post', url: 'api/v1/account/' +m.route.param('aid')+ '/project/' +m.route.param('pid')+ '/task/' + taskData.id, data: jsonData })
+        
         };
+
+
 
     },
     view: function(ctrl) {
@@ -297,7 +325,8 @@ var project = {
                     dragend: function(){
                         console.log('dragend')
 
-                        var tid = this.getAttribute("data-index");
+                        var taskIndex = this.getAttribute("data-index");
+                        var tid = this.getAttribute("data-id");
 
                         if(dragged){
                             m.route('/task/' + tid)
@@ -307,8 +336,8 @@ var project = {
                         var xPosition = 0;
                         var yPosition = 0;
                         var elm = element;
-                        console.log(tid, element.offsetLeft, element.offsetTop)
-                        ctrl.updateTask({id: tid, X: element.offsetLeft + 'px', Y: element.offsetTop + 'px'});
+                        // console.log(tid, element.offsetLeft, element.offsetTop)
+                        ctrl.updateTask({index: taskIndex, id: tid, X: element.offsetLeft + 'px', Y: element.offsetTop + 'px'});
 
                     },
                     drag: function(){
@@ -324,7 +353,7 @@ var project = {
         function taskList(elm, init, context){
             if(!init){
                 return ctrl.TaskList.map(function (t, index) {
-                    return m("li#drag-drop.cd-single-point", {"data-index": t.id, style:{position: 'absolute', left: t.X,  top: t.Y}, config: draggable}, [
+                    return m("li#drag-drop.cd-single-point", {"data-id": t.id, "data-index": index, style:{position: 'absolute', left: t.X,  top: t.Y}, config: draggable}, [
                         m("a[href='javascript:void(0)'].cd-btn#cd-btn", [
                             m("i.fa.fa-map-marker" )
                         ]),
@@ -375,9 +404,8 @@ var navigation = {
                 'Y': '25px'
             }
 
-            m.request({method:'post', url: 'api/v1/account/' +m.route.param('aid')+ '/project/' +m.route.param('pid')+ '/task', data: jsonData}).then(function(resp){
-                // self.TaskList().data.push(resp.data)
-            })
+            m.request({method:'post', url: 'api/v1/account/' +m.route.param('aid')+ '/project/' +m.route.param('pid')+ '/task', data: jsonData});
+
         };
     
     },

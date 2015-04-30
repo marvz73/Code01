@@ -35,9 +35,9 @@ socket.on('taskCreate', function(data){
 	console.log(data);
 })
 
-socket.on('taskUpdate', function(data){
-	console.log(data);
-})
+// socket.on('taskUpdate', function(data){
+// 	console.log(data);
+// })
 
 socket.on('taskDelete', function(data){
 	console.log(data);
