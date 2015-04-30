@@ -258,10 +258,11 @@ var project = {
     controller: function() {
         var self = this;
         
-        this.TaskList = m.prop('');
+        this.TaskList = [];
 
         socket.on('taskCreate', function(data){
             console.log("Task Create event fired::", data);
+            // console.log(self.TaskList)
             self.TaskList.push(data)
             m.redraw(true)
         })  
