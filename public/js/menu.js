@@ -129,7 +129,7 @@ setTimeout(function(){
          * Add Class element(s) from DOM
          * @returns {*}
          */
-        addClass: function (classToAdd) {
+        addClass: function (classToAdd, callback) {
     	 	var len = this.length;
 
             while (len--) {
@@ -144,31 +144,54 @@ setTimeout(function(){
 		        }
             }
 
-
-	        return this;
+	    	if(callback)
+	    		callback(true);
+	    	else
+	        	return this;
         },
 
         /**
          * Add Class element(s) from DOM
          * @returns {*}
          */
-        removeClass: function (classToRemove) {
-	        var currentClassValue = this.className;
-	        if (currentClassValue == classToRemove) {
-	            this.className = "";
-	            return;
-	        }
-	        var classValues = currentClassValue.split(" ");
-	        var filteredList = [];
-	        for (var i = 0 ; i < classValues.length; i++) {
-	            if (classToRemove != classValues[i]) {
-	                filteredList.push(classValues[i]);
-	            }
-	        }
-	        this.className = filteredList.join(" ");
+        removeClass: function (classToRemove, callback) {
 
-	        return this;
-        }   
+    	 	var len = this.length;
+
+            while (len--) {
+
+		        var currentClassValue = this[len].className;
+		        if (currentClassValue == classToRemove) {
+		            this[len].className = "";
+		            return;
+		        }
+		        var classValues = currentClassValue.split(" ");
+		        var filteredList = [];
+		        for (var i = 0 ; i < classValues.length; i++) {
+		            if (classToRemove != classValues[i]) {
+		                filteredList.push(classValues[i]);
+		            }
+		        }
+		        this[len].className = filteredList.join(" ");
+	    	}
+
+	    	if(callback)
+	    		callback(true);
+	    	else
+	        	return this;
+
+        }, 
+
+        //experimental
+        timer: function(delay, callback){
+        	var len = this.length;
+
+            while (len--) {
+		    	window.setTimeout(function(){
+		    		callback(true);
+		    	}, delay)
+		    }
+        }
     };
  
     // Assign our m object to global window object.
