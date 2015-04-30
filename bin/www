@@ -8,6 +8,7 @@ var app = require('../app');
 var debug = require('debug')('sequelize-app:server');
 var http = require('http');
 var models = require("../models");
+var cookieParser = require('cookie-parser');
 var passportSocketIo = require("passport.socketio");
 
 /**
@@ -24,6 +25,25 @@ app.set('port', port);
 var server = http.createServer(app);
 var ioInit = require('socket.io')(server);
 var io = require('../config/socket')(ioInit, models);
+var api_v1 = require('../routes/api/v1/api.js')(models, ioInit);
+app.use('/api/v1', api_v1);
+
+// catch 404 and forward to error handler
+app.use(function(req, res, next) {
+  var err = new Error('Not Found');
+  err.status = 404;
+  next(err);
+});
+
+
+// io.use(passportSocketIo.authorize({
+//   cookieParser: cookieParser,       // the same middleware you registrer in express
+//   key:          'connect.sid',       // the name of the cookie where express/connect stores its session_id
+//   secret:       'mySecretKey',    // the session_secret to parse the cookie
+//   store:        app.locals.store,        // we NEED to use a sessionstore. no memorystore please
+//   success:      onAuthorizeSuccess,  // *optional* callback on success - read more below
+//   fail:         onAuthorizeFail,     // *optional* callback on fail/error - read more below
+// }));
 
 /**
  * Listen on provided port, on all network interfaces.
@@ -96,4 +116,18 @@ function onListening() {
     : 'port ' + addr.port;
   debug('Listening on ' + bind);
   console.log('Listening on ' + bind)
+}
+
+function onAuthorizeSuccess(data, accept){
+  console.log('successful connection to socket.io');
+
+  // If you use socket.io@1.X the callback looks different
+  accept();
+}
+
+function onAuthorizeFail(data, message, error, accept){
+  // If you use socket.io@1.X the callback looks different
+  // If you don't want to accept the connection
+  if(error)
+    accept(new Error(message));
 }

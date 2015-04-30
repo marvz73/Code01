@@ -16,7 +16,7 @@ router.param(function(name, fn) {
 });
 
 
-module.exports = function(models) {
+module.exports = function(models, io) {
 	router.param('taskId', /^\d+$/);
 
 	router.route('/')
@@ -37,6 +37,7 @@ module.exports = function(models) {
 														msg : "Return message here...",
 														data : task
 													});	
+													io.emit('taskCreate', task)
 												})
 											}
 											else
@@ -142,6 +143,7 @@ module.exports = function(models) {
 																	msg : "Return message here...",
 																	data : task
 																});;
+																io.emit('taskUpdate', task)
 															})
 														else
 															res.status(404).json({
@@ -193,11 +195,12 @@ module.exports = function(models) {
 												if(user){
 													user.hasAccount(account).then(function(result){
 														if(result)
-															task.destroy().then(function(){
+															task.destroy().then(function(task){
 																res.json({
 																	msg : 'Record is destroyed!',
-																	data : null
+																	data : task
 																})
+																io.emit('taskDelete', task)
 															})
 														else
 															res.status(404).json({
@@ -355,10 +358,10 @@ module.exports = function(models) {
 			}
 		)
 
-	var history = require('./taskHistory.js')(models);
+	var history = require('./taskHistory.js')(models, io);
 	router.use('/:taskId/history', history);
 
-	var taskComment = require('./taskComment.js')(models);
+	var taskComment = require('./taskComment.js')(models, io);
 	router.use('/:taskId/comment', taskComment);
 
 	return router;

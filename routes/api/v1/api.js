@@ -3,12 +3,12 @@ var router = express.Router();
 
 router.all('*', isAuthenticated)
 
-module.exports = function(models) {
+module.exports = function(models, io) {
 
-	var account = require('./account.js')(models);
+	var account = require('./account.js')(models, io);
 	router.use('/account', account);
 
-	var user = require('./user.js')(models);
+	var user = require('./user.js')(models, io);
 	router.use('/user', user);
 
 	router.route('/users')

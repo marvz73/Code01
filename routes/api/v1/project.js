@@ -16,7 +16,7 @@ router.param(function(name, fn) {
 });
 
 
-module.exports = function(models) {
+module.exports = function(models, io) {
 	router.param('projectId', /^\d+$/);
 
 	router.route('/')
@@ -35,6 +35,7 @@ module.exports = function(models) {
 												msg : "Return message here...",
 												data : project
 											});
+											io.emit('projectCreate', project)
 										})
 									}
 									else
@@ -119,6 +120,7 @@ module.exports = function(models) {
 														msg : "Return message here...",
 														data : project
 													});	
+													io.emit('projectUpdate', project)
 												})
 											}
 											else
@@ -160,11 +162,12 @@ module.exports = function(models) {
 									if(user){
 										user.hasAccount(account).then(function(result){
 											if(result){
-												project.destroy().then(function(){
+												project.destroy().then(function(project){
 													res.json({
 														msg : 'Record is destroyed!',
-														data : null
+														data : project
 													})	
+													io.emit('projectDelete', project)
 												})
 											}
 											else
@@ -245,7 +248,7 @@ module.exports = function(models) {
 	  		}
 		)
 
-	var task = require('./task.js')(models);
+	var task = require('./task.js')(models, io);
 	router.use('/:projectId/task', task);
 
 

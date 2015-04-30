@@ -16,7 +16,7 @@ router.param(function(name, fn) {
 });
 
 
-module.exports = function(models) {
+module.exports = function(models, io) {
 	router.param('historyId', /^\d+$/);
 
 	router.route('/')
@@ -40,6 +40,7 @@ module.exports = function(models) {
 																	msg : "Return message here...",
 																	data : TaskHistory
 																});		
+																io.emit('taskHistoryCreate', TaskHistory)
 															})
 														}
 														else
@@ -185,6 +186,7 @@ module.exports = function(models) {
 																						msg : "Return message here...",
 																						data : TaskHistory
 																					});		
+																					io.emit('taskHistoryUpdate', TaskHistory)
 																				})	
 																			}
 																			else
@@ -263,11 +265,12 @@ module.exports = function(models) {
 																	if(user){
 																		user.hasAccount(account).then(function(result){
 																			if(result){
-																				TaskHistory.destroy().then(function(){
+																				TaskHistory.destroy().then(function(TaskHistory){
 																					res.json({
 																						msg : 'Record is destroyed!',
-																						data : null
+																						data : TaskHistory
 																					})
+																					io.emit('taskHistoryDelete', TaskHistory)
 																				})	
 																			}
 																			else

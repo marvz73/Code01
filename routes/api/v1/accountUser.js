@@ -16,7 +16,7 @@ router.param(function(name, fn) {
 });
 
 
-module.exports = function(models) {
+module.exports = function(models, io) {
 
 	router.route('/')
 		.post( 

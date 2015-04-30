@@ -16,7 +16,7 @@ router.param(function(name, fn) {
 });
 
 
-module.exports = function(models) {
+module.exports = function(models, io) {
 	router.param('accountId', /^\d+$/);
 
 	/*router.route('/')
@@ -81,12 +81,13 @@ module.exports = function(models) {
 								user.hasAccount(account).then(function(result){
 									if(result){
 										account.updateAttributes(req.body).then(function(account){
-											if(account)
+											if(account){
 												res.json({
 													msg : "Return message here...",
 													data : account
 												})	
-											else
+												io.emit('accountUpdate', account)
+											}else
 												res.status(404).json({
 													msg : "Return message here...",
 													data : null
@@ -124,11 +125,12 @@ module.exports = function(models) {
 							if(user){
 								user.hasAccount(account).then(function(result){
 									if(result){
-										account.destroy().then(function(){
+										account.destroy().then(function(account){
 											res.json({
 												msg : 'Record is destroyed!',
-												data : null
+												data : account
 											})	
+											io.emit('accountDelete', account)
 										})
 									}	
 									else
@@ -231,10 +233,10 @@ module.exports = function(models) {
 	  		}
 		)
 
-	var project = require('./project.js')(models);
+	var project = require('./project.js')(models, io);
 	router.use('/:accountId/project', project);
 
-	var accountUser = require('./accountUser.js')(models);
+	var accountUser = require('./accountUser.js')(models, io);
 	router.use('/:accountId/accountUser', accountUser);
 
 

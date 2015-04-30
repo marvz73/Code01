@@ -16,7 +16,7 @@ router.param(function(name, fn) {
 });
 
 
-module.exports = function(models) {
+module.exports = function(models, io) {
 	router.param('commentId', /^\d+$/);
 
 	router.route('/')
@@ -40,6 +40,7 @@ module.exports = function(models) {
 																	msg : "Return message here...",
 																	data : TaskComment
 																});
+																io.emit('taskCommentCreate', TaskComment)
 															})
 														}
 														else
@@ -186,6 +187,7 @@ module.exports = function(models) {
 																						msg : "Return message here...",
 																						data : TaskComment
 																					});	
+																					io.emit('taskCommentUpdate', TaskComment)
 																				})
 																			}
 																			else
@@ -264,11 +266,12 @@ module.exports = function(models) {
 																	if(user){
 																		user.hasAccount(account).then(function(result){
 																			if(result){
-																				TaskComment.destroy().then(function(){
+																				TaskComment.destroy().then(function(TaskComment){
 																					res.json({
 																						msg : 'Record is destroyed!',
-																						data : null
+																						data : TaskComment
 																					})
+																					io.emit('taskCommentDelete', TaskComment)
 																				})
 																			}
 																			else

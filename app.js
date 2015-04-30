@@ -14,7 +14,6 @@ var models = require('./models');
 var passport = require('./config/passport')(passport);
 var routes = require('./routes/index')(passport);
 var users = require('./routes/users');
-var api_v1 = require('./routes/api/v1/api.js')(models);
 
 var app = express();
 
@@ -61,14 +60,6 @@ app.use(flash());
 
 app.use('/', routes);
 app.use('/users', users);
-app.use('/api/v1', api_v1);
-
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  var err = new Error('Not Found');
-  err.status = 404;
-  next(err);
-});
 
 // error handlers
 
