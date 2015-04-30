@@ -70,9 +70,7 @@ todo.controller = function () {
         })
     };
 
-    this.addProject = function () {
-        return m.request({method:'post', url: 'api/v1/account/1/project', data: {title: 'prorject 1'}})
-    };
+
 
     // socket.on('connect', function () {
     //     socket.emit('getBootstrap', function(data){
@@ -169,7 +167,6 @@ todo.view = function (ctrl) {
                     m("div#wrapper.cd-product-wrapper", [
                         m("ul", [
                             ((ctrl.TaskList.length) ? taskList() : '' )
-                            
                         ]),
 
                         //Project images
@@ -236,9 +233,11 @@ var task = {
         this.id = m.route.param("tid");
     },
     view: function(controller) {
+        
         function loaded(){
-            console.log(controller.id)
+            Q('.cd-panel').addClass('is-visible');
         }
+
         return  m("div.cd-panel.from-right#cd-panel", {config: loaded}, [
                     m("header.cd-panel-header.no-touch",[
                         m("h1", "TItle Goes Here"),
@@ -330,7 +329,7 @@ var project = {
                         var tid = this.getAttribute("data-id");
 
                         if(dragged){
-                            m.route('/task/' + tid)
+                            m.route('/2/' + m.route.param('aid') + '/' + m.route.param('pid') + '/' + tid)
                             // console.log(ctrl.list[0])
                         }
                         
@@ -384,7 +383,12 @@ var project = {
 var navigation = {
     controller: function() {
         var self = this;
-        this.ProjectList = m.prop('');
+        this.ProjectList = [];
+
+        socket.on('projectCreate', function(data){
+             self.ProjectList.push(data);
+             m.redraw(true);
+        });
 
         m.request({method:'get', url: 'api/v1/account/' +bootstrap.Accounts[0].id + '/projects'}).then(function(projectResp){
             if(projectResp.data.length)
@@ -408,9 +412,14 @@ var navigation = {
             m.request({method:'post', url: 'api/v1/account/' +m.route.param('aid')+ '/project/' +m.route.param('pid')+ '/task', data: jsonData});
 
         };
+
+        this.addProject = function () {
+            return m.request({method:'post', url: 'api/v1/account/1/project', data: {title: 'Project Title'}})
+        };
     
     },
     view: function(ctrl) {
+
         //Get project list
         function projectList(elm, init, context){
             if(!init)
@@ -467,7 +476,8 @@ m.routes( '/0/' + bootstrap.Accounts[0].id, {
         '#project' : project
     },
     '/2/:aid/:pid/:tid' : {
-        '#app' : todo,
+        '#navigation' : navigation,
+        '#project' : project,
         '#task' : task
     }
 })
