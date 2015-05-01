@@ -85,7 +85,7 @@ module.exports = function(models, io) {
 	router.route('/:commentId')
 		.get(
 			function(req, res, next){
-				models.TaskComment.find({ where: {'id': req.params.commentId, TaskId: req.params.taskId} }).then(function(TaskComment) {
+				models.TaskComment.find({ where: {'id': req.params.commentId, TaskId: req.params.taskId}, include: [ models.User ] }).then(function(TaskComment) {
 					if(TaskComment){
 						models.Task.find({ where: {'id': req.params.taskId, ProjectId: req.params.projectId} }).then(function(task) {
 							if(task){
@@ -166,7 +166,7 @@ module.exports = function(models, io) {
 		)
 		.post(
 			function(req, res, next){
-				models.TaskComment.find({ where: {'id': req.params.commentId, TaskId: req.params.taskId} }).then(function(TaskComment) {
+				models.TaskComment.find({ where: {'id': req.params.commentId, TaskId: req.params.taskId}, include: [ models.User ] }).then(function(TaskComment) {
 					if(TaskComment){
 						models.Task.find({ where: {'id': req.params.taskId, ProjectId: req.params.projectId} }).then(function(task) {
 							if(task){
@@ -250,7 +250,7 @@ module.exports = function(models, io) {
 		)
 		.delete(
 			function(req, res, next){
-				models.TaskComment.find({ where: {'id': req.params.commentId, TaskId: req.params.taskId} }).then(function(TaskComment) {
+				models.TaskComment.find({ where: {'id': req.params.commentId, TaskId: req.params.taskId}, include: [ models.User ] }).then(function(TaskComment) {
 					if(TaskComment){
 						models.Task.find({ where: {'id': req.params.taskId, ProjectId: req.params.projectId} }).then(function(task) {
 							if(task){

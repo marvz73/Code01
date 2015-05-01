@@ -8,7 +8,7 @@ module.exports = function(sequelize, DataTypes) {
     classMethods: {
       associate: function(models) {
         TaskComment.belongsTo(models.Task);
-        TaskComment.belongsTo(models.User, {as: 'CreatedBy'});
+        TaskComment.belongsTo(models.User);
       }
     }
   });

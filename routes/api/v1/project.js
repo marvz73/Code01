@@ -64,7 +64,7 @@ module.exports = function(models, io) {
 	router.route('/:projectId')
 		.get( 
 	  		function(req, res, next) {
-	  			models.Project.find({ where: {'id': req.params.projectId, AccountId: req.params.accountId} }).then(function(project) {
+	  			models.Project.find({ where: {'id': req.params.projectId, AccountId: req.params.accountId}, include: [ models.User ] }).then(function(project) {
 					if(project){
 						models.Account.find(req.params.accountId).then(function(account) {
 							if(account){
@@ -107,7 +107,7 @@ module.exports = function(models, io) {
 	  	)
 	  	.post( 
 	  		function(req, res, next) {
-	  			models.Project.find({ where: {'id': req.params.projectId, AccountId: req.params.accountId} }).then(function(project) {
+	  			models.Project.find({ where: {'id': req.params.projectId, AccountId: req.params.accountId}, include: [ models.User ] }).then(function(project) {
 					if(project){
 						models.Account.find(req.params.accountId).then(function(account) {
 							if(account){
@@ -154,7 +154,7 @@ module.exports = function(models, io) {
 	  	)
 	  	.delete( 
 	  		function(req, res, next) {
-	  			models.Project.find({ where: {'id': req.params.projectId, AccountId: req.params.accountId} }).then(function(project) {
+	  			models.Project.find({ where: {'id': req.params.projectId, AccountId: req.params.accountId}, include: [ models.User ] }).then(function(project) {
 					if(project){
 						models.Account.find(req.params.accountId).then(function(account) {
 							if(account){
@@ -211,7 +211,7 @@ module.exports = function(models, io) {
 									if(user){
 										user.hasAccount(account).then(function(result){
 											if(result){
-												project.getTasks().then(function(tasks){
+												project.getTasks({ include: [ models.User ]}).then(function(tasks){
 													res.json({
 														msg : "Return message here...",
 														data : tasks

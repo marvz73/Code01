@@ -166,7 +166,7 @@ module.exports = function(models, io) {
 							if(user){
 								user.hasAccount(account).then(function(result){
 									if(result)
-										account.getProjects().then(function(projects){
+										account.getProjects({ include: [ models.User ]}).then(function(projects){
 											res.json({
 												msg : "Return message here...",
 												data : projects

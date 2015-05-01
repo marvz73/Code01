@@ -73,7 +73,7 @@ module.exports = function(models, io) {
 	router.route('/:taskId')
 		.get( 
 	  		function(req, res, next) {
-	  			models.Task.find({ where: {'id': req.params.taskId, ProjectId: req.params.projectId} }).then(function(task) {
+	  			models.Task.find({ where: {'id': req.params.taskId, ProjectId: req.params.projectId}, include: [ models.User ] }).then(function(task) {
 					if(task){
 						models.Project.find({ where: {'id': req.params.projectId, AccountId: req.params.accountId} }).then(function(project) {
 							if(project){
@@ -127,7 +127,7 @@ module.exports = function(models, io) {
 	  	)
 	  	.post( 
 	  		function(req, res, next) {
-	  			models.Task.find({ where: {'id': req.params.taskId, ProjectId: req.params.projectId} }).then(function(task) {
+	  			models.Task.find({ where: {'id': req.params.taskId, ProjectId: req.params.projectId}, include: [ models.User ] }).then(function(task) {
 					if(task){
 						models.Project.find({ where: {'id': req.params.projectId, AccountId: req.params.accountId} }).then(function(project) {
 							if(project){
@@ -184,7 +184,7 @@ module.exports = function(models, io) {
 	  	)
 	  	.delete( 
 	  		function(req, res, next) {
-	  			models.Task.find({ where: {'id': req.params.taskId, ProjectId: req.params.projectId} }).then(function(task) {
+	  			models.Task.find({ where: {'id': req.params.taskId, ProjectId: req.params.projectId}, include: [ models.User ] }).then(function(task) {
 					if(task){
 						models.Project.find({ where: {'id': req.params.projectId, AccountId: req.params.accountId} }).then(function(project) {
 							if(project){
@@ -254,7 +254,7 @@ module.exports = function(models, io) {
 												if(user){
 													user.hasAccount(account).then(function(result){
 														if(result){
-															task.getTaskHistories().then(function(histories){
+															task.getTaskHistories({ include: [ models.User ]}).then(function(histories){
 																res.json({
 																	msg : "Return message here...",
 																	data : histories
@@ -313,7 +313,7 @@ module.exports = function(models, io) {
 												if(user){
 													user.hasAccount(account).then(function(result){
 														if(result){
-															task.getTaskComments().then(function(comments){
+															task.getTaskComments({ include: [ models.User ]}).then(function(comments){
 																res.json({
 																	msg : "Return message here...",
 																	data : comments

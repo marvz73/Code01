@@ -10,7 +10,7 @@ module.exports = function(sequelize, DataTypes) {
     classMethods: {
       associate: function(models) {
         Task.belongsTo(models.Project);
-        Task.belongsTo(models.User, {as: 'CreatedBy'});
+        Task.belongsTo(models.User);
         Task.hasMany(models.TaskComment);
         Task.hasMany(models.TaskHistory);
       }

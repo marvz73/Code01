@@ -7,7 +7,7 @@ module.exports = function(sequelize, DataTypes) {
     classMethods: {
       associate: function(models) {
         ProjectHistory.belongsTo(models.Project);
-        ProjectHistory.belongsTo(models.User, {as: 'CreatedBy'});
+        ProjectHistory.belongsTo(models.User);
       }
     }
   });

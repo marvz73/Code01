@@ -84,7 +84,7 @@ module.exports = function(models, io) {
 	router.route('/:historyId')
 		.get(
 			function(req, res, next){
-				models.TaskHistory.find({ where: {'id': req.params.historyId, TaskId: req.params.taskId} }).then(function(TaskHistory) {
+				models.TaskHistory.find({ where: {'id': req.params.historyId, TaskId: req.params.taskId}, include: [ models.User ] }).then(function(TaskHistory) {
 					if(TaskHistory){
 						models.Task.find({ where: {'id': req.params.taskId, ProjectId: req.params.projectId} }).then(function(task) {
 							if(task){
@@ -165,7 +165,7 @@ module.exports = function(models, io) {
 		)
 		.post(
 			function(req, res, next){
-				models.TaskHistory.find({ where: {'id': req.params.historyId, TaskId: req.params.taskId} }).then(function(TaskHistory) {
+				models.TaskHistory.find({ where: {'id': req.params.historyId, TaskId: req.params.taskId}, include: [ models.User ] }).then(function(TaskHistory) {
 					if(TaskHistory){
 						models.Task.find({ where: {'id': req.params.taskId, ProjectId: req.params.projectId} }).then(function(task) {
 							if(task){
@@ -249,7 +249,7 @@ module.exports = function(models, io) {
 		)
 		.delete(
 			function(req, res, next){
-				models.TaskHistory.find({ where: {'id': req.params.historyId, TaskId: req.params.taskId} }).then(function(TaskHistory) {
+				models.TaskHistory.find({ where: {'id': req.params.historyId, TaskId: req.params.taskId}, include: [ models.User ] }).then(function(TaskHistory) {
 					if(TaskHistory){
 						models.Task.find({ where: {'id': req.params.taskId, ProjectId: req.params.projectId} }).then(function(task) {
 							if(task){
