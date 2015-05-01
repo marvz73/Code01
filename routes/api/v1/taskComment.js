@@ -23,7 +23,7 @@ module.exports = function(models, io) {
 		.post(
 			function(req, res, next){
 				req.body.TaskId = req.params.taskId;
-	  			req.body.CreatedById = req.user.id;
+	  			req.body.UserId = req.user.id;
 				models.Task.find({ where: {'id': req.params.taskId, ProjectId: req.params.projectId} }).then(function(task) {
 					if(task){
 						models.Project.find({ where: {'id': req.params.projectId, AccountId: req.params.accountId} }).then(function(project) {

@@ -23,7 +23,7 @@ module.exports = function(models, io) {
 		.post( 
 	  		function(req, res, next) {
 	  			req.body.ProjectId = req.params.projectId;
-	  			req.body.CreatedById = req.user.id;
+	  			req.body.UserId = req.user.id;
 	  			models.Project.find({ where: {'id': req.params.projectId, AccountId: req.params.accountId} }).then(function(project) {
 					if(project){
 						models.Account.find(req.params.accountId).then(function(account) {
