@@ -58,9 +58,9 @@ socket.on('taskHistoryDelete', function(data){
 })
 
 //task comment events
-socket.on('taskCommentCreate', function(data){
-	console.log(data);
-})
+// socket.on('taskCommentCreate', function(data){
+// 	console.log(data);
+// })
 
 socket.on('taskCommentUpdate', function(data){
 	console.log(data);

@@ -70,9 +70,7 @@ todo.controller = function () {
         })
     };
 
-    this.addProject = function () {
-        return m.request({method:'post', url: 'api/v1/account/1/project', data: {title: 'prorject 1'}})
-    };
+
 
     // socket.on('connect', function () {
     //     socket.emit('getBootstrap', function(data){
@@ -169,7 +167,6 @@ todo.view = function (ctrl) {
                     m("div#wrapper.cd-product-wrapper", [
                         m("ul", [
                             ((ctrl.TaskList.length) ? taskList() : '' )
-                            
                         ]),
 
                         //Project images
@@ -233,20 +230,129 @@ todo.view = function (ctrl) {
 
 var task = {
     controller: function() {
-        this.id = m.route.param("tid");
-    },
-    view: function(controller) {
-        function loaded(){
-            console.log(controller.id)
+
+        var self = this;
+
+        this.TaskDetails = {};
+        this.TaskComments = [];
+
+        //Fetch task details
+        m.request({
+            method:'get', 
+            url: 'api/v1/account/' +m.route.param('aid')+ '/project/' +m.route.param('pid')+ '/task/' + m.route.param('tid')
+        })
+        .then(function(resp){
+            self.TaskDetails = resp.data;
+        }).then(function(){
+            m.request({
+                method: 'get',
+                url: 'api/v1/account/' +m.route.param('aid')+ '/project/' +m.route.param('pid')+ '/task/' + m.route.param('tid') + '/comments'
+            }).then(function(commentsResp){
+                self.TaskComments = commentsResp.data;
+            });
+        });
+
+        //Task comment observ
+        socket.on('taskCommentCreate', function(data){
+            self.TaskComments.push(data);
+            m.redraw(true)
+        })
+
+        //Add Comment
+        this.addComment = function(jsonData){
+             m.request({
+                method: 'post',
+                data: jsonData,
+                url: 'api/v1/account/' +m.route.param('aid')+ '/project/' +m.route.param('pid')+ '/task/' + m.route.param('tid') + '/comment'
+            });
         }
-        return  m("div.cd-panel.from-right#cd-panel", {config: loaded}, [
+
+    },
+    view: function(ctrl) {
+        
+        function loaded(elm, init, context){
+            if( !init ){
+                setTimeout(function(){
+
+                    Q('.cd-panel').addClass('is-visible');
+
+                }, 200)
+            }
+        }
+
+        function hideRightModal(elm, init, context){
+            if( !init ){
+                var strClass = elm.target.className;
+                if(strClass.indexOf('cd-panel') == 0 || strClass.indexOf('cd-panel-close') == 0){
+                    // document.getElementById("cd-panel").className = "cd-panel from-right";
+                    Q('.cd-panel').removeClass('is-visible', function(resp){
+                        console.log(1)
+
+                        Q('.cd-panel').timer(500, function(){
+                            m.route('/1/'+ m.route.param('aid') + '/' + m.route.param('pid'))
+                        })
+                    });
+                }
+            }
+        }
+
+        function addComment(elm, init, context){
+            if(!init){
+                if(elm.keyCode == 13)
+                {
+                    var jsonData = {
+                        comment : elm.target.value,
+                        pid : m.route.param('pid'),
+                        tid : m.route.param('tid')
+                    }
+                    ctrl.addComment(jsonData);
+                    elm.target.value = '';
+                }
+            }
+        }
+
+        return  m("div.cd-panel.from-right#cd-panel", {config: loaded, onclick: hideRightModal}, [
                     m("header.cd-panel-header.no-touch",[
-                        m("h1", "TItle Goes Here"),
-                        m("a.cd-panel-close", "Close")
+                        m("h1", ctrl.TaskDetails.id),
+                        m("a.cd-panel-close", {onclick: hideRightModal}, "Close")
                     ]),
                     m("div.cd-panel-container", [
                         m("div.cd-panel-content", [
-                            m("p", "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quam magnam accusamus obcaecati nisi eveniet quo veniam quibusdam veritatis autem accusantium doloribus nam mollitia maxime explicabo nemo quae aspernatur impedit cupiditate dicta molestias consectetur, sint reprehenderit maiores. Tempora, exercitationem, voluptate. Sapiente modi officiis nulla sed ullam, amet placeat, illum necessitatibus, eveniet dolorum et maiores earum tempora, quas iste perspiciatis quibusdam vero accusamus veritatis. Recusandae sunt, repellat incidunt impedit tempore iusto, nostrum eaque necessitatibus sint eos omnis! Beatae, itaque, in. Vel reiciendis consequatur saepe soluta itaque aliquam praesentium, neque tempora. Voluptatibus sit, totam rerum quo ex nemo pariatur tempora voluptatem est repudiandae iusto, architecto perferendis sequi, asperiores dolores doloremque odit. Libero, ipsum fuga repellat quae numquam cumque nobis ipsa voluptates pariatur, a rerum aspernatur aliquid maxime magnam vero dolorum omnis neque fugit laboriosam eveniet veniam explicabo, similique reprehenderit at. Iusto totam vitae blanditiis. Culpa, earum modi rerum velit voluptatum voluptatibus debitis, architecto aperiam vero tempora ratione sint ullam voluptas non! Odit sequi ipsa, voluptatem ratione illo ullam quaerat qui, vel dolorum eligendi similique inventore quisquam perferendis reprehenderit quos officia! Maxime aliquam, soluta reiciendis beatae quisquam. Alias porro facilis obcaecati et id, corporis accusamus? Ab porro fuga consequatur quisquam illo quae quas tenetur.")
+                            
+                            m('form', [
+                                m('textarea[rows="10"][placeholder="Description here..."].form-control', ctrl.TaskDetails.desc)
+                            ]),
+                            m('br'),
+                            m('div.clearfix', [
+
+                                ctrl.TaskComments.map(function(val, index){
+                                
+                                    return m('div.media', [
+                                        m('div.media-left', [
+                                            m('a[href="#"]', [
+                                                m('img[width="60px"][height="60px"][src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9InllcyI/PjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+PGRlZnMvPjxyZWN0IHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgZmlsbD0iI0VFRUVFRSIvPjxnPjx0ZXh0IHg9IjEzLjgxMjUiIHk9IjMyIiBzdHlsZT0iZmlsbDojQUFBQUFBO2ZvbnQtd2VpZ2h0OmJvbGQ7Zm9udC1mYW1pbHk6QXJpYWwsIEhlbHZldGljYSwgT3BlbiBTYW5zLCBzYW5zLXNlcmlmLCBtb25vc3BhY2U7Zm9udC1zaXplOjEwcHQ7ZG9taW5hbnQtYmFzZWxpbmU6Y2VudHJhbCI+NjR4NjQ8L3RleHQ+PC9nPjwvc3ZnPg=="]')
+                                            ])
+                                        ]),
+                                        m('div.media-body', [
+                                            m('h4.media-heading', 'First Name'),
+                                            m('small', val.comment)
+                                        ])
+                                    ])
+                                })
+
+
+
+                            ]),
+                            m('hr'),
+                            m('input[placeholder="Comment here...."].form-control', {onkeypress: addComment})
+                            
+
+
+
+
+
+
+                            // m("p", "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quam magnam accusamus obcaecati nisi eveniet quo veniam quibusdam veritatis autem accusantium doloribus nam mollitia maxime explicabo nemo quae aspernatur impedit cupiditate dicta molestias consectetur, sint reprehenderit maiores. Tempora, exercitationem, voluptate. Sapiente modi officiis nulla sed ullam, amet placeat, illum necessitatibus, eveniet dolorum et maiores earum tempora, quas iste perspiciatis quibusdam vero accusamus veritatis. Recusandae sunt, repellat incidunt impedit tempore iusto, nostrum eaque necessitatibus sint eos omnis! Beatae, itaque, in. Vel reiciendis consequatur saepe soluta itaque aliquam praesentium, neque tempora. Voluptatibus sit, totam rerum quo ex nemo pariatur tempora voluptatem est repudiandae iusto, architecto perferendis sequi, asperiores dolores doloremque odit. Libero, ipsum fuga repellat quae numquam cumque nobis ipsa voluptates pariatur, a rerum aspernatur aliquid maxime magnam vero dolorum omnis neque fugit laboriosam eveniet veniam explicabo, similique reprehenderit at. Iusto totam vitae blanditiis. Culpa, earum modi rerum velit voluptatum voluptatibus debitis, architecto aperiam vero tempora ratione sint ullam voluptas non! Odit sequi ipsa, voluptatem ratione illo ullam quaerat qui, vel dolorum eligendi similique inventore quisquam perferendis reprehenderit quos officia! Maxime aliquam, soluta reiciendis beatae quisquam. Alias porro facilis obcaecati et id, corporis accusamus? Ab porro fuga consequatur quisquam illo quae quas tenetur.")
                         ])
                     ])
                 ])
@@ -260,6 +366,7 @@ var project = {
         
         this.TaskList = [];
 
+        //Task create observ
         socket.on('taskCreate', function(data){
             console.log("Task Create event fired::", data);
             // console.log(self.TaskList)
@@ -267,8 +374,8 @@ var project = {
             m.redraw(true)
         })  
 
+        //Task update observ
         socket.on('taskUpdate', function(data){
-
             for(var key in self.TaskList) {
                 var val = self.TaskList[key];
                 if(val.id == data.id)
@@ -276,28 +383,20 @@ var project = {
                     self.TaskList[key].Y = data.Y;
                     self.TaskList[key].X = data.X;
                     m.redraw(true)
-                }
-                
+                }                
             }
-
-            // console.log(data);
         })
 
-        // m.request({method:'get', url: 'api/v1/account/' + m.route.param('aid') + '/project' + m.route.param('pid')});
-
+        //Fetch project task
         m.request({method:'get', url: 'api/v1/account/' + m.route.param('aid') + '/project/' + m.route.param('pid') + '/tasks'}).then(function(taskResp){
             if(taskResp.data.length){
                 self.TaskList = taskResp.data;
             }
         });
 
-
-    
-
-
-
+        //Update task position
         this.updateTask = function(taskData){
-
+            console.log(123)
             var jsonData = {
                 Y: taskData.Y,
                 X: taskData.X
@@ -306,8 +405,6 @@ var project = {
             m.request({method:'post', url: 'api/v1/account/' +m.route.param('aid')+ '/project/' +m.route.param('pid')+ '/task/' + taskData.id, data: jsonData })
         
         };
-
-
 
     },
     view: function(ctrl) {
@@ -330,16 +427,15 @@ var project = {
                         var tid = this.getAttribute("data-id");
 
                         if(dragged){
-                            m.route('/task/' + tid)
+                            m.route('/2/' + m.route.param('aid') + '/' + m.route.param('pid') + '/' + tid)
                             // console.log(ctrl.list[0])
+                        }else{
+                            var xPosition = 0;
+                            var yPosition = 0;
+                            var elm = element;
+                            // console.log(tid, element.offsetLeft, element.offsetTop)
+                            ctrl.updateTask({index: taskIndex, id: tid, X: element.offsetLeft + 'px', Y: element.offsetTop + 'px'});
                         }
-                        
-                        var xPosition = 0;
-                        var yPosition = 0;
-                        var elm = element;
-                        // console.log(tid, element.offsetLeft, element.offsetTop)
-                        ctrl.updateTask({index: taskIndex, id: tid, X: element.offsetLeft + 'px', Y: element.offsetTop + 'px'});
-
                     },
                     drag: function(){
                         dragged = 0;
@@ -384,7 +480,12 @@ var project = {
 var navigation = {
     controller: function() {
         var self = this;
-        this.ProjectList = m.prop('');
+        this.ProjectList = [];
+
+        socket.on('projectCreate', function(data){
+             self.ProjectList.push(data);
+             m.redraw(true);
+        });
 
         m.request({method:'get', url: 'api/v1/account/' +bootstrap.Accounts[0].id + '/projects'}).then(function(projectResp){
             if(projectResp.data.length)
@@ -408,9 +509,14 @@ var navigation = {
             m.request({method:'post', url: 'api/v1/account/' +m.route.param('aid')+ '/project/' +m.route.param('pid')+ '/task', data: jsonData});
 
         };
+
+        this.addProject = function () {
+            return m.request({method:'post', url: 'api/v1/account/1/project', data: {title: 'Project Title'}})
+        };
     
     },
     view: function(ctrl) {
+
         //Get project list
         function projectList(elm, init, context){
             if(!init)
@@ -461,13 +567,17 @@ console.log(bootstrap.Accounts[0]);
 m.routes( '/0/' + bootstrap.Accounts[0].id, {
     '/0/:aid' : {
         '#navigation' : navigation,
+        '#project' : '',
+        '#task' : ''
     },  
     '/1/:aid/:pid' : {
         '#navigation' : navigation,
-        '#project' : project
+        '#project' : project,
+        '#task' : ''
     },
     '/2/:aid/:pid/:tid' : {
-        '#app' : todo,
+        '#navigation' : navigation,
+        '#project' : project,
         '#task' : task
     }
 })
