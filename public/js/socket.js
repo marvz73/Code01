@@ -1,4 +1,4 @@
-var socket = io.connect('localhost:3000' + namespace);
+var socket = io.connect(baseUrl + namespace);
 
 socket.on('connect', function(){
 	socket.emit('chat', 'dscvdfv');

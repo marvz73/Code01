@@ -196,16 +196,30 @@ module.exports = function(passport, io) {
 
         }
 
-        models.User.find( { where: {id: req.user.id}, include: [models.Account] } ).then(function(user_model) {
-            if(user_model){
-                console.log(req.get('host'))
-                res.render('home', { title: 'Express', user : req.user, bootstrap: user_model, namespace: "/"+req.params.namespace, baseUrl: req.get('host')});
+        models.User.find( { where: {id: req.user.id}, include: [models.Account] } ).then(function(user) {
+            if(user){
+                models.Account.find(req.params.namespace).then(function(account) {
+                    user.hasAccount(account).then(function(result){
+                        if(result){
+                            console.log(req.get('host'))
+                            res.render('home', { 
+                                title: 'Express', 
+                                user : req.user, 
+                                bootstrap: user, 
+                                namespace: "/"+req.params.namespace, 
+                                baseUrl: req.get('host')
+                            });
+                        }else{
+                            res.sendStatus(403);
+                        }
+                    })
+                })
             }
 
         });
     });
 
-    router.get('/initialize/', isAuthenticated, function(req, res, next) {
+    router.get('/initialize', isAuthenticated, function(req, res, next) {
 
         models.User.find( { where: {id: req.user.id}, include: [models.Account] } ).then(function(user_model) {
             if(user_model){
