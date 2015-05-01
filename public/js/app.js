@@ -22,7 +22,7 @@ todo.Todo = function (data) {
     this.done = m.prop(false);
 
     this.projects = function(){
-        return m.request({method:'get', url: 'api/v1/account/1/projects'});
+        return m.request({method:'get', url: baseUrl + '/api/v1/account/1/projects'});
     }
 
 };
@@ -32,11 +32,11 @@ todo.Todo = function (data) {
 // };
 
 todo.getProject = function() {
-    return m.request({method:'get', url: 'api/v1/account/' + m.route.param('aid') + '/project' + m.route.param('pid')});
+    return m.request({method:'get', url: baseUrl + '/api/v1/account/' + m.route.param('aid') + '/project' + m.route.param('pid')});
 };
 
 todo.getTaskList = function() {
-    return m.request({method:'get', url: 'api/v1/account/' + m.route.param('aid') + '/project/' + m.route.param('pid') + '/tasks'});
+    return m.request({method:'get', url: baseUrl + '/api/v1/account/' + m.route.param('aid') + '/project/' + m.route.param('pid') + '/tasks'});
 };
 
 todo.controller = function () {
@@ -56,7 +56,7 @@ todo.controller = function () {
             'X': '23px',
             'Y': '25px'
         }
-        m.request({method:'post', url: 'api/v1/account/' +m.route.param('aid')+ '/project/' +m.route.param('pid')+ '/task', data: jsonData}).then(function(resp){
+        m.request({method:'post', url: baseUrl + '/api/v1/account/' +m.route.param('aid')+ '/project/' +m.route.param('pid')+ '/task', data: jsonData}).then(function(resp){
             self.TaskList().data.push(resp.data)
             // self.list.push(m.prop({id: list.length + 1, count: 1, axisX: '23px', axisY: '25px'}))
         })
@@ -69,7 +69,7 @@ todo.controller = function () {
             X: taskData.X
         }
 
-        m.request({method:'post', url: 'api/v1/account/' +m.route.param('aid')+ '/project/' +m.route.param('pid')+ '/task/' + taskData.id, data: jsonData }).then(function(resp){
+        m.request({method:'post', url: baseUrl + '/api/v1/account/' +m.route.param('aid')+ '/project/' +m.route.param('pid')+ '/task/' + taskData.id, data: jsonData }).then(function(resp){
             // self.list.push(resp.data)
         })
     };
@@ -243,14 +243,14 @@ var task = {
         //Fetch task details
         m.request({
             method:'get', 
-            url: 'api/v1/account/' +m.route.param('aid')+ '/project/' +m.route.param('pid')+ '/task/' + m.route.param('tid')
+            url: baseUrl + '/api/v1/account/' +m.route.param('aid')+ '/project/' +m.route.param('pid')+ '/task/' + m.route.param('tid')
         })
         .then(function(resp){
             self.TaskDetails = resp.data;
         }).then(function(){
             m.request({
                 method: 'get',
-                url: 'api/v1/account/' +m.route.param('aid')+ '/project/' +m.route.param('pid')+ '/task/' + m.route.param('tid') + '/comments'
+                url: baseUrl + '/api/v1/account/' +m.route.param('aid')+ '/project/' +m.route.param('pid')+ '/task/' + m.route.param('tid') + '/comments'
             }).then(function(commentsResp){
                 self.TaskComments = commentsResp.data;
             });
@@ -267,7 +267,7 @@ var task = {
              m.request({
                 method: 'post',
                 data: jsonData,
-                url: 'api/v1/account/' +m.route.param('aid')+ '/project/' +m.route.param('pid')+ '/task/' + m.route.param('tid') + '/comment'
+                url: baseUrl + '/api/v1/account/' +m.route.param('aid')+ '/project/' +m.route.param('pid')+ '/task/' + m.route.param('tid') + '/comment'
             });
         }
 
@@ -275,7 +275,7 @@ var task = {
           m.request({
                 method: 'post',
                 data: jsonData,
-                url: 'api/v1/account/' +m.route.param('aid')+ '/project/' +m.route.param('pid')+ '/task/' + m.route.param('tid')
+                url: baseUrl + '/api/v1/account/' +m.route.param('aid')+ '/project/' +m.route.param('pid')+ '/task/' + m.route.param('tid')
             });
         }
 
@@ -400,7 +400,7 @@ var task = {
 var project = {
     controller: function() {
         var self = this;
-        
+
         socket.emit('switchRoom', m.route.param('pid'))
 
         this.TaskList = [];
@@ -427,7 +427,10 @@ var project = {
         })
 
         //Fetch project task
-        m.request({method:'get', url: 'api/v1/account/' + m.route.param('aid') + '/project/' + m.route.param('pid') + '/tasks'}).then(function(taskResp){
+        m.request({
+            method:'get', 
+            url:  baseUrl + '/api/v1/account/' + m.route.param('aid') + '/project/' + m.route.param('pid') + '/tasks'
+        }).then(function(taskResp){
             if(taskResp.data.length){
                 self.TaskList = taskResp.data;
             }
@@ -441,7 +444,7 @@ var project = {
                 X: taskData.X
             }
 
-            m.request({method:'post', url: 'api/v1/account/' +m.route.param('aid')+ '/project/' +m.route.param('pid')+ '/task/' + taskData.id, data: jsonData })
+            m.request({method:'post', url: baseUrl + '/api/v1/account/' +m.route.param('aid')+ '/project/' +m.route.param('pid')+ '/task/' + taskData.id, data: jsonData })
         
         };
 
@@ -508,7 +511,7 @@ var project = {
                             ]),
 
                             //Project images
-                            m("img[src='./images/cd-app-image.jpg']")
+                            m("img[src='" + baseUrl + "/images/cd-app-image.jpg']")
                         ])
                     ])
                 ]);
@@ -526,7 +529,7 @@ var navigation = {
              m.redraw(true);
         });
 
-        m.request({method:'get', url: 'api/v1/account/' +bootstrap.Accounts[0].id + '/projects'}).then(function(projectResp){
+        m.request({method:'get', url: baseUrl + '/api/v1/account/' +bootstrap.Accounts[0].id + '/projects'}).then(function(projectResp){
             if(projectResp.data.length)
             {
                 if(m.route.param('pid') == 0){
@@ -545,12 +548,12 @@ var navigation = {
                 'Y': '25px'
             }
 
-            m.request({method:'post', url: 'api/v1/account/' +m.route.param('aid')+ '/project/' +m.route.param('pid')+ '/task', data: jsonData});
+            m.request({method:'post', url: baseUrl + '/api/v1/account/' +m.route.param('aid')+ '/project/' +m.route.param('pid')+ '/task', data: jsonData});
 
         };
 
         this.addProject = function () {
-            return m.request({method:'post', url: 'api/v1/account/1/project', data: {title: 'Project Title'}})
+            return m.request({method:'post', url: baseUrl + '/api/v1/account/1/project', data: {title: 'Project Title'}})
         };
     
     },
