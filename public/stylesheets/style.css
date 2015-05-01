@@ -1,4 +1,8 @@
-  html,
+html,
+body{
+  font-size: 14px;
+}
+html,
 body,
 div,
 span,
@@ -82,8 +86,8 @@ video {
   margin: 0;
   padding: 0;
   border: 0;
-  font-size: 100%;
-  font: inherit;
+  /*font-size: 100%;*/
+  /*font: inherit;*/
   vertical-align: baseline;
 }
 article,
@@ -1358,10 +1362,11 @@ header h1 {
   -moz-transition: top 0.3s 0s;
   transition: top 0.3s 0s;
 }
-.cd-panel-header h1 {
+.cd-panel-header .title {
   font-weight: bold;
   color: #89ba2c;
   padding-left: 5%;
+  margin-top: 15px;
 }
 .from-right .cd-panel-header, .from-left .cd-panel-header {
   top: -50px;
@@ -1385,7 +1390,7 @@ header h1 {
 }
 @media only screen and (min-width: 1170px) {
   .cd-panel-header {
-    width: 50%;
+    width: 25%;
   }
 }
 
@@ -1513,7 +1518,7 @@ a.cd-panel-close:after {
 }
 @media only screen and (min-width: 1170px) {
   .cd-panel-container {
-    width: 50%;
+    width: 25%;
   }
 }
 

@@ -1,3 +1,7 @@
+
+
+var socket = io.connect('localhost:3000/' + bootstrap.Accounts[0].id);
+
 var todo = {};
 // var socket = io();
 //for simplicity, we use this module to namespace the model classes
@@ -267,11 +271,29 @@ var task = {
             });
         }
 
+        this.updateTaskDesc = function(jsonData){
+          m.request({
+                method: 'post',
+                data: jsonData,
+                url: 'api/v1/account/' +m.route.param('aid')+ '/project/' +m.route.param('pid')+ '/task/' + m.route.param('tid')
+            });
+        }
+
     },
     view: function(ctrl) {
         
         function loaded(elm, init, context){
             if( !init ){
+
+                window.document.getElementById('taskDesc').addEventListener('keypress', Q.debounce(function(){
+                    var jsonData = {
+                        // desc: 
+                    }
+
+                    console.log(ctrl.TaskDetails.desc)
+
+                }, 1000));
+    
                 setTimeout(function(){
 
                     Q('.cd-panel').addClass('is-visible');
@@ -296,6 +318,21 @@ var task = {
             }
         }
 
+        function debounce(func, wait, immediate) {
+            var timeout;
+            return function() {
+                var context = this, args = arguments;
+                var later = function() {
+                    timeout = null;
+                    if (!immediate) func.apply(context, args);
+                };
+                var callNow = immediate && !timeout;
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+                if (callNow) func.apply(context, args);
+            };
+        };
+
         function addComment(elm, init, context){
             if(!init){
                 if(elm.keyCode == 13)
@@ -313,14 +350,14 @@ var task = {
 
         return  m("div.cd-panel.from-right#cd-panel", {config: loaded, onclick: hideRightModal}, [
                     m("header.cd-panel-header.no-touch",[
-                        m("h1", ctrl.TaskDetails.id),
+                        m("h4.title", ctrl.TaskDetails.id),
                         m("a.cd-panel-close", {onclick: hideRightModal}, "Close")
                     ]),
                     m("div.cd-panel-container", [
                         m("div.cd-panel-content", [
                             
                             m('form', [
-                                m('textarea[rows="10"][placeholder="Description here..."].form-control', ctrl.TaskDetails.desc)
+                                m('textarea[rows="10"][placeholder="Description here..."]#taskDesc.form-control', ctrl.TaskDetails.desc)
                             ]),
                             m('br'),
                             m('div.clearfix', [
@@ -334,7 +371,7 @@ var task = {
                                             ])
                                         ]),
                                         m('div.media-body', [
-                                            m('h4.media-heading', 'First Name'),
+                                            m('h5.media-heading', 'First Name'),
                                             m('small', val.comment)
                                         ])
                                     ])
@@ -344,7 +381,7 @@ var task = {
 
                             ]),
                             m('hr'),
-                            m('input[placeholder="Comment here...."].form-control', {onkeypress: addComment})
+                            m('input[placeholder="Comment here...."].form-control#taskComment', {onkeypress: addComment})
                             
 
 
@@ -364,6 +401,8 @@ var project = {
     controller: function() {
         var self = this;
         
+        socket.emit('switchRoom', m.route.param('pid'))
+
         this.TaskList = [];
 
         //Task create observ
@@ -558,6 +597,7 @@ var navigation = {
         ])
     }
 }
+
 
 //setup routes to start w/ the `#` symbol
 m.route.mode = "hash";

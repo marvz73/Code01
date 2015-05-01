@@ -96,6 +96,7 @@ setTimeout(function(){
     // Extend the Library object.
     Q.fn = Library.prototype = 
     {
+
         /**
          * Hide element(s) from DOM
          * @returns {*}
@@ -151,7 +152,7 @@ setTimeout(function(){
         },
 
         /**
-         * Add Class element(s) from DOM
+         * Remove Class element(s) from DOM
          * @returns {*}
          */
         removeClass: function (classToRemove, callback) {
@@ -182,6 +183,21 @@ setTimeout(function(){
 
         }, 
 
+        debounce: function(func, wait, immediate){
+            var timeout;
+            return function() {
+                var context = this, args = arguments;
+                var later = function() {
+                    timeout = null;
+                    if (!immediate) func.apply(context, args);
+                };
+                var callNow = immediate && !timeout;
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+                if (callNow) func.apply(context, args);
+            };
+        },
+
         //experimental
         timer: function(delay, callback){
         	var len = this.length;
@@ -189,14 +205,32 @@ setTimeout(function(){
             while (len--) {
 		    	window.setTimeout(function(){
 		    		callback(true);
-		    	}, delay)
+		    	}, delay);
 		    }
         }
     };
- 
+ 	
+ 	//create library plugin
+ 	var debounce = function(func, wait, immediate){
+        var timeout;
+        return function() {
+            var context = this, args = arguments;
+            var later = function() {
+                timeout = null;
+                if (!immediate) func.apply(context, args);
+            };
+            var callNow = immediate && !timeout;
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+            if (callNow) func.apply(context, args);
+        };
+ 	}
+
     // Assign our m object to global window object.
     if(!window.Q) {
         window.Q = Q;
+        window.Q.debounce = debounce;
     }
 })();
  
+
