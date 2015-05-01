@@ -49,7 +49,7 @@ module.exports = function(passport, io) {
 	        )
 	        .post(
 	            passport.authenticate('local-login', {
-	                successRedirect : '/home', // redirect to the secure profile section
+	                successRedirect : '/initialize', // redirect to the secure profile section
 	                failureRedirect : '/login', // redirect back to the signup page if there is an error
 	                failureFlash : true // allow flash messages
 	            })
@@ -178,20 +178,8 @@ module.exports = function(passport, io) {
         res.render('profile', { title: 'Express', user : req.user });
     });
 
-    router.get('/home', isAuthenticated, function(req, res, next) {
+    router.get('/home/:namespace', isAuthenticated, function(req, res, next) {
 
-        models.User.find( { where: {id: req.user.id}, include: [models.Account] } ).then(function(user_model) {
-            if(user_model){
-                res.render('home', { title: 'Express', user : req.user, bootstrap: user_model});
-            }
-            else
-                res.send('Unknown Token!');
-
-        });
-    });
-
-    router.get('/test/:namespace', isAuthenticated, function(req, res, next) {
-        
         if (!io.nsps["/"+req.params.namespace]) {
 
             io.of("/"+req.params.namespace)
@@ -208,7 +196,39 @@ module.exports = function(passport, io) {
 
         }
 
-        res.redirect('/profile');
+        models.User.find( { where: {id: req.user.id}, include: [models.Account] } ).then(function(user) {
+            if(user){
+                models.Account.find(req.params.namespace).then(function(account) {
+                    user.hasAccount(account).then(function(result){
+                        if(result){
+                            console.log(req.get('host'))
+                            res.render('home', { 
+                                title: 'Express', 
+                                user : req.user, 
+                                bootstrap: user, 
+                                namespace: "/"+req.params.namespace, 
+                                baseUrl: req.get('host')
+                            });
+                        }else{
+                            res.sendStatus(403);
+                        }
+                    })
+                })
+            }
+
+        });
+    });
+
+    router.get('/initialize', isAuthenticated, function(req, res, next) {
+
+        models.User.find( { where: {id: req.user.id}, include: [models.Account] } ).then(function(user_model) {
+            if(user_model){
+                console.dir(user_model.get('Accounts')[0].get('id'))
+                res.redirect('/home/' + user_model.get('Accounts')[0].get('id'));
+            }
+
+        });
+
     });
 
     router.get('/logout', function(req, res) {

@@ -1,8 +1,7 @@
-var socket = io.connect('localhost:3000/7');
+var socket = io.connect(baseUrl + namespace);
 
 socket.on('connect', function(){
 	socket.emit('chat', 'dscvdfv');
-	socket.emit('switchRoom', 1);
 })
 
 //account events
