@@ -1,7 +1,8 @@
-var socket = io.connect();
+var socket = io.connect('localhost:3000/7');
 
 socket.on('connect', function(){
-	// socket.emit('task', 'dscvdfv');
+	socket.emit('chat', 'dscvdfv');
+	socket.emit('switchRoom', 1);
 })
 
 //account events
@@ -35,9 +36,9 @@ socket.on('taskCreate', function(data){
 	console.log(data);
 })
 
-// socket.on('taskUpdate', function(data){
-// 	console.log(data);
-// })
+socket.on('taskUpdate', function(data){
+	console.log(data);
+})
 
 socket.on('taskDelete', function(data){
 	console.log(data);

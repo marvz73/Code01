@@ -31,7 +31,7 @@ function decrypt(text){
   return dec;
 }
 
-module.exports = function(passport) {
+module.exports = function(passport, io) {
 
 	/* GET home page. */
 	router.get('/', function(req, res) {
@@ -179,6 +179,7 @@ module.exports = function(passport) {
     });
 
     router.get('/home', isAuthenticated, function(req, res, next) {
+
         models.User.find( { where: {id: req.user.id}, include: [models.Account] } ).then(function(user_model) {
             if(user_model){
                 res.render('home', { title: 'Express', user : req.user, bootstrap: user_model});
@@ -187,6 +188,27 @@ module.exports = function(passport) {
                 res.send('Unknown Token!');
 
         });
+    });
+
+    router.get('/test/:namespace', isAuthenticated, function(req, res, next) {
+        
+        if (!io.nsps["/"+req.params.namespace]) {
+
+            io.of("/"+req.params.namespace)
+            .on('connection', function (socket) {
+                socket.on('switchRoom', function(room){
+                    socket.join(room);
+                })
+
+                socket.on('chat', function(data){
+                    console.log('custom namespace', data)
+                })
+
+            });
+
+        }
+
+        res.redirect('/profile');
     });
 
     router.get('/logout', function(req, res) {

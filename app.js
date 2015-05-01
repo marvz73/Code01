@@ -12,8 +12,6 @@ var i18n = require('i18n');
 var models = require('./models');
 
 var passport = require('./config/passport')(passport);
-var routes = require('./routes/index')(passport);
-var users = require('./routes/users');
 
 var app = express();
 
@@ -24,6 +22,8 @@ var app = express();
 //     pass: 'poi'
 //   }
 // );
+
+app.locals.passport = passport;
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -57,9 +57,6 @@ app.use(i18n.init);
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());
-
-app.use('/', routes);
-app.use('/users', users);
 
 // error handlers
 

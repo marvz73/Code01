@@ -25,7 +25,15 @@ app.set('port', port);
 var server = http.createServer(app);
 var ioInit = require('socket.io')(server);
 var io = require('../config/socket')(ioInit, models);
+
+/**
+ * ROUTES
+ */
+
 var api_v1 = require('../routes/api/v1/api.js')(models, ioInit);
+var routes = require('../routes/index')(app.locals.passport, ioInit);
+
+app.use('/', routes);
 app.use('/api/v1', api_v1);
 
 // catch 404 and forward to error handler

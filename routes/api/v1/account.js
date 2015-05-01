@@ -86,7 +86,7 @@ module.exports = function(models, io) {
 													msg : "Return message here...",
 													data : account
 												})	
-												io.emit('accountUpdate', account)
+												io.of('/' + req.params.accountId).emit('accountUpdate', account)
 											}else
 												res.status(404).json({
 													msg : "Return message here...",
@@ -130,7 +130,7 @@ module.exports = function(models, io) {
 												msg : 'Record is destroyed!',
 												data : account
 											})	
-											io.emit('accountDelete', account)
+											io.of('/' + req.params.accountId).emit('accountDelete', account)
 										})
 									}	
 									else

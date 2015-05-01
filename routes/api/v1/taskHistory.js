@@ -40,7 +40,7 @@ module.exports = function(models, io) {
 																	msg : "Return message here...",
 																	data : TaskHistory
 																});		
-																io.emit('taskHistoryCreate', TaskHistory)
+																io.of('/' + req.params.accountId).to(req.params.projectId).emit('taskHistoryCreate', TaskHistory)
 															})
 														}
 														else
@@ -186,7 +186,7 @@ module.exports = function(models, io) {
 																						msg : "Return message here...",
 																						data : TaskHistory
 																					});		
-																					io.emit('taskHistoryUpdate', TaskHistory)
+																					io.of('/' + req.params.accountId).to(req.params.projectId).emit('taskHistoryUpdate', TaskHistory)
 																				})	
 																			}
 																			else
@@ -270,7 +270,7 @@ module.exports = function(models, io) {
 																						msg : 'Record is destroyed!',
 																						data : TaskHistory
 																					})
-																					io.emit('taskHistoryDelete', TaskHistory)
+																					io.of('/' + req.params.accountId).to(req.params.projectId).emit('taskHistoryDelete', TaskHistory)
 																				})	
 																			}
 																			else

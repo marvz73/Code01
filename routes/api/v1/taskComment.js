@@ -40,7 +40,7 @@ module.exports = function(models, io) {
 																	msg : "Return message here...",
 																	data : TaskComment
 																});
-																io.emit('taskCommentCreate', TaskComment)
+																io.of('/' + req.params.accountId).to(req.params.projectId).emit('taskCommentCreate', TaskComment)
 															})
 														}
 														else
@@ -187,7 +187,7 @@ module.exports = function(models, io) {
 																						msg : "Return message here...",
 																						data : TaskComment
 																					});	
-																					io.emit('taskCommentUpdate', TaskComment)
+																					io.of('/' + req.params.accountId).to(req.params.projectId).emit('taskCommentUpdate', TaskComment)
 																				})
 																			}
 																			else
@@ -271,7 +271,7 @@ module.exports = function(models, io) {
 																						msg : 'Record is destroyed!',
 																						data : TaskComment
 																					})
-																					io.emit('taskCommentDelete', TaskComment)
+																					io.of('/' + req.params.accountId).to(req.params.projectId).emit('taskCommentDelete', TaskComment)
 																				})
 																			}
 																			else

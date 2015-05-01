@@ -37,7 +37,7 @@ module.exports = function(models, io) {
 														msg : "Return message here...",
 														data : task
 													});	
-													io.emit('taskCreate', task)
+													io.of('/' + req.params.accountId).to(req.params.projectId).emit('taskCreate', task)
 												})
 											}
 											else
@@ -143,7 +143,7 @@ module.exports = function(models, io) {
 																	msg : "Return message here...",
 																	data : task
 																});;
-																io.emit('taskUpdate', task)
+																io.of('/' + req.params.accountId).to(req.params.projectId).emit('taskUpdate', task)
 															})
 														else
 															res.status(404).json({
@@ -200,7 +200,7 @@ module.exports = function(models, io) {
 																	msg : 'Record is destroyed!',
 																	data : task
 																})
-																io.emit('taskDelete', task)
+																io.of('/' + req.params.accountId).to(req.params.projectId).emit('taskDelete', task)
 															})
 														else
 															res.status(404).json({

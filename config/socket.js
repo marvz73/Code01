@@ -4,6 +4,13 @@ module.exports = function(io, model) {
       // socket.on('task', function(data){
       //   socket.broadcast.emit('taskBroadcast', data);
       // })
+
+    	socket.on('switchRoom', function(room){
+    		socket.join(room);
+    		socket.room = room;
+    	})
+
+
     });
 	
 

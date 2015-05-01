@@ -33,7 +33,7 @@ module.exports = function(sequelize, DataTypes) {
     }, {
     classMethods: {
       associate: function(models) {
-        User.belongsToMany(models.Account, {through: 'AccountUser'});
+        User.belongsToMany(models.Account, {through: models.AccountUser});
         User.hasMany(models.AccountUser);
       }
     }
