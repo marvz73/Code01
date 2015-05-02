@@ -10,7 +10,6 @@ module.exports = function(sequelize, DataTypes) {
       associate: function(models) {
         Project.belongsTo(models.Account);
         Project.belongsTo(models.User);
-        Project.hasMany(models.ProjectHistory);
         Project.hasMany(models.Task);
       }
     }

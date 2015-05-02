@@ -15,6 +15,16 @@ router.param(function(name, fn) {
   }
 });
 
+var nodemailer = require('nodemailer');
+
+var transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: 'dumingagebpls@gmail.com',
+        pass: 'elguebpls'
+    }
+});
+
 
 module.exports = function(models, io) {
 	router.param('accountId', /^\d+$/);
@@ -46,26 +56,26 @@ module.exports = function(models, io) {
 								user.hasAccount(account).then(function(result){
 									if(result){
 										res.json({
-											msg : "Return message here...",
+											msg : res.__("account.success.fetch"),
 											data : account
 										})	
 									}else{
 										res.status(404).json({
-											msg : "Return message here...",
+											msg : res.__("account.fail.fetch"),
 											data : null
 										});
 									}
 								})
 							}else{
 						  		res.status(404).json({
-									msg : "Return message here...",
+									msg : res.__("account.fail.fetch"),
 									data : null
 								});
 						  	}
 						})						
 					}else{
 				  		res.status(404).json({
-							msg : "Return message here...",
+							msg : res.__("account.fail.fetch"),
 							data : null
 						});
 				  	}
@@ -83,34 +93,34 @@ module.exports = function(models, io) {
 										account.updateAttributes(req.body).then(function(account){
 											if(account){
 												res.json({
-													msg : "Return message here...",
+													msg : res.__("account.success.update"),
 													data : account
 												})	
 												io.of('/' + req.params.accountId).emit('accountUpdate', account)
 											}else
 												res.status(404).json({
-													msg : "Return message here...",
+													msg : res.__("account.fail.update"),
 													data : null
 												});
 										})
 									}
 									else{
 										res.status(404).json({
-											msg : "Return message here...",
+											msg : res.__("account.fail.update"),
 											data : null
 										});
 									}
 								})
 							}else{
 						  		res.status(404).json({
-									msg : "Return message here...",
+									msg : res.__("account.fail.update"),
 									data : null
 								});
 						  	}
 						})						
 					}else{
 				  		res.status(404).json({
-							msg : "Return message here...",
+							msg : res.__("account.fail.update"),
 							data : null
 						});
 				  	}
@@ -127,7 +137,7 @@ module.exports = function(models, io) {
 									if(result){
 										account.destroy().then(function(account){
 											res.json({
-												msg : 'Record is destroyed!',
+												msg : res.__("account.success.delete"),
 												data : account
 											})	
 											io.of('/' + req.params.accountId).emit('accountDelete', account)
@@ -135,20 +145,20 @@ module.exports = function(models, io) {
 									}	
 									else
 										res.status(404).json({
-											msg : 'Record is not destroyed!',
+											msg : res.__("account.fail.delete"),
 											data : null
 										});
 								})
 							}else{
 						  		res.status(404).json({
-									msg : 'Record is not destroyed!',
+									msg : res.__("account.fail.delete"),
 									data : null
 								});
 						  	}
 						})						
 					}else{
 				  		res.status(404).json({
-							msg : 'Record is not destroyed!',
+							msg : res.__("account.fail.delete"),
 							data : null
 						});
 				  	}
@@ -226,6 +236,67 @@ module.exports = function(models, io) {
 					}else{
 				  		res.status(404).json({
 							msg : "Return message here...",
+							data : null
+						});
+				  	}
+				})
+	  		}
+		)
+
+	router.route('/:accountId/inviteUser')
+		.post(
+			function(req, res, next) {
+				models.Account.find(req.params.accountId).then(function(account) {
+					if(account){
+						models.User.find(req.user.id).then(function(user) {
+							if(user){
+								user.hasAccount(account).then(function(result){
+										console.log(req.body)
+									if(result)
+										models.User.findOrCreate({ where: {email: req.body.email}, defaults: req.body})
+										.spread(function(user, created) {
+											account.addUser(user).then(function(account){
+												if(created || user.get('token') != null){
+							                        var text = req.get('host') + '/verify/' + user.get('token');
+
+							                        transporter.sendMail({
+							                            from: 'dumingagebpls@gmail.com',
+							                            to: req.body.email,
+							                            subject: 'Account Invitation and User Verification',
+							                            text: text
+							                        });
+					                    		} else {
+													transporter.sendMail({
+							                            from: 'dumingagebpls@gmail.com',
+							                            to: req.body.email,
+							                            subject: 'Account Invitation',
+							                            text: "You are invited to join to an organization."
+							                        });					                    			
+					                    		}
+
+
+						                        res.json({
+													msg : "user invite success",
+													data : null
+												});
+					                    	})
+						                })
+									else
+										res.status(404).json({
+											msg : "user invite fail",
+											data : null
+										});
+								})
+							}else{
+						  		res.status(404).json({
+									msg : "user invite fail",
+									data : null
+								});
+						  	}
+						})						
+					}else{
+				  		res.status(404).json({
+							msg : "user invite fail",
 							data : null
 						});
 				  	}

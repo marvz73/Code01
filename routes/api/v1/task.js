@@ -34,7 +34,7 @@ module.exports = function(models, io) {
 											if(result){
 												models.Task.create(req.body).then(function(task) {
 													res.json({
-														msg : "Return message here...",
+														msg : res.__("task.success.create"),
 														data : task
 													});	
 													io.of('/' + req.params.accountId).to(req.params.projectId).emit('taskCreate', task)
@@ -42,27 +42,27 @@ module.exports = function(models, io) {
 											}
 											else
 												res.status(404).json({
-													msg : "Return message here...",
+													msg : res.__("task.fail.create"),
 													data : null
 												});
 										})
 									}else{
 								  		res.status(404).json({
-											msg : "Return message here...",
+											msg : res.__("task.fail.create"),
 											data : null
 										});
 								  	}
 								})						
 							}else{
 						  		res.status(404).json({
-									msg : "Return message here...",
+									msg : res.__("task.fail.create"),
 									data : null
 								});
 						  	}
 						})					
 					}else{
 				  		res.status(404).json({
-							msg : "Return message here...",
+							msg : res.__("task.fail.create"),
 							data : null
 						});
 				  	}
@@ -85,18 +85,18 @@ module.exports = function(models, io) {
 													user.hasAccount(account).then(function(result){
 														if(result)
 															res.json({
-																msg : "Return message here...",
+																msg : res.__("task.success.create"),
 																data : task
 															});	
 														else
 															res.status(404).json({
-																msg : "Return message here...",
+																msg : res.__("task.fail.create"),
 																data : null
 															});
 													})
 												}else{
 											  		res.status(404).json({
-														msg : "Return message here...",
+														msg : res.__("task.fail.create"),
 														data : null
 													});
 											  	}
@@ -104,21 +104,21 @@ module.exports = function(models, io) {
 										})					
 									}else{
 								  		res.status(404).json({
-											msg : "Return message here...",
+											msg : res.__("task.fail.create"),
 											data : null
 										});
 								  	}
 								})					
 							}else{
 						  		res.status(404).json({
-									msg : "Return message here...",
+									msg : res.__("task.fail.create"),
 									data : null
 								});
 						  	}
 						})
 					}else{
 				  		res.status(404).json({
-							msg : "Return message here...",
+							msg : res.__("task.fail.create"),
 							data : null
 						});
 				  	}
@@ -140,20 +140,20 @@ module.exports = function(models, io) {
 														if(result)
 															task.updateAttributes(req.body).then(function(task){
 																res.json({
-																	msg : "Return message here...",
+																	msg : res.__("task.success.update"),
 																	data : task
 																});;
 																io.of('/' + req.params.accountId).to(req.params.projectId).emit('taskUpdate', task)
 															})
 														else
 															res.status(404).json({
-																msg : "Return message here...",
+																msg : res.__("task.fail.update"),
 																data : null
 															});
 													})
 												}else{
 											  		res.status(404).json({
-														msg : "Return message here...",
+														msg : res.__("task.fail.update"),
 														data : null
 													});
 											  	}
@@ -161,21 +161,21 @@ module.exports = function(models, io) {
 										})					
 									}else{
 								  		res.status(404).json({
-											msg : "Return message here...",
+											msg : res.__("task.fail.update"),
 											data : null
 										});
 								  	}
 								})					
 							}else{
 						  		res.status(404).json({
-									msg : "Return message here...",
+									msg : res.__("task.fail.update"),
 									data : null
 								});
 						  	}
 						})
 					}else{
 				  		res.status(404).json({
-							msg : "Return message here...",
+							msg : res.__("task.fail.update"),
 							data : null
 						});
 				  	}
@@ -197,20 +197,20 @@ module.exports = function(models, io) {
 														if(result)
 															task.destroy().then(function(task){
 																res.json({
-																	msg : 'Record is destroyed!',
+																	msg : res.__("task.success.delete"),
 																	data : task
 																})
 																io.of('/' + req.params.accountId).to(req.params.projectId).emit('taskDelete', task)
 															})
 														else
 															res.status(404).json({
-																msg : 'Record is not destroyed!',
+																msg : res.__("task.fail.delete"),
 																data : null
 															});
 													})
 												}else{
 											  		res.status(404).json({
-														msg : 'Record is not destroyed!',
+														msg : res.__("task.fail.delete"),
 														data : null
 													});
 											  	}
@@ -218,21 +218,21 @@ module.exports = function(models, io) {
 										})					
 									}else{
 								  		res.status(404).json({
-											msg : 'Record is not destroyed!',
+											msg : res.__("task.fail.delete"),
 											data : null
 										});
 								  	}
 								})					
 							}else{
 						  		res.status(404).json({
-									msg : 'Record is not destroyed!',
+									msg : res.__("task.fail.delete"),
 									data : null
 								});
 						  	}
 						})
 					}else{
 				  		res.status(404).json({
-							msg : 'Record is not destroyed!',
+							msg : res.__("task.fail.delete"),
 							data : null
 						});
 				  	}

@@ -23,7 +23,7 @@ module.exports = function(models, io) {
 		.post( 
 	  		function(req, res, next) {
 	  			req.body.AccountId = req.params.accountId;
-	  			req.body.CreatedById = req.user.id;
+	  			req.body.UserId = req.user.id;
 	  			models.Account.find(req.params.accountId).then(function(account) {
 					if(account){
 						models.User.find(req.user.id).then(function(user) {
@@ -32,7 +32,7 @@ module.exports = function(models, io) {
 									if(result){
 										models.Project.create(req.body).then(function(project) {
 											res.json({
-												msg : "Return message here...",
+												msg : res.__("project.success.create"),
 												data : project
 											});
 											io.of('/' + req.params.accountId).emit('projectCreate', project)
@@ -40,20 +40,20 @@ module.exports = function(models, io) {
 									}
 									else
 										res.status(404).json({
-											msg : "Return message here...",
+											msg : res.__("project.fail.create"),
 											data : null
 										});
 								})
 							}else{
 						  		res.status(404).json({
-									msg : "Return message here...",
+									msg : res.__("project.fail.create"),
 									data : null
 								});
 						  	}
 						})						
 					}else{
 				  		res.status(404).json({
-							msg : "Return message here...",
+							msg : res.__("project.fail.create"),
 							data : null
 						});
 				  	}
@@ -73,32 +73,32 @@ module.exports = function(models, io) {
 										user.hasAccount(account).then(function(result){
 											if(result)
 												res.json({
-													msg : "Return message here...",
+													msg : res.__("project.success.fetch"),
 													data : project
 												});
 											else
 												res.status(404).json({
-													msg : "Return message here...",
+													msg : res.__("project.fail.fetch"),
 													data : null
 												});
 										})
 									}else{
 								  		res.status(404).json({
-											msg : "Return message here...",
+											msg : res.__("project.fail.fetch"),
 											data : null
 										});
 								  	}
 								})						
 							}else{
 						  		res.status(404).json({
-									msg : "Return message here...",
+									msg : res.__("project.fail.fetch"),
 									data : null
 								});
 						  	}
 						})					
 					}else{
 				  		res.status(404).json({
-							msg : "Return message here...",
+							msg : res.__("project.fail.fetch"),
 							data : null
 						});
 				  	}
@@ -117,7 +117,7 @@ module.exports = function(models, io) {
 											if(result){
 												project.updateAttributes(req.body).then(function(project){
 													res.json({
-														msg : "Return message here...",
+														msg : res.__("project.success.update"),
 														data : project
 													});	
 													io.of('/' + req.params.accountId).emit('projectUpdate', project)
@@ -125,27 +125,27 @@ module.exports = function(models, io) {
 											}
 											else
 												res.status(404).json({
-													msg : "Return message here...",
+													msg : res.__("project.fail.update"),
 													data : null
 												});
 										})
 									}else{
 								  		res.status(404).json({
-											msg : "Return message here...",
+											msg : res.__("project.fail.update"),
 											data : null
 										});
 								  	}
 								})						
 							}else{
 						  		res.status(404).json({
-									msg : "Return message here...",
+									msg : res.__("project.fail.update"),
 									data : null
 								});
 						  	}
 						})					
 					}else{
 				  		res.status(404).json({
-							msg : "Return message here...",
+							msg : res.__("project.fail.update"),
 							data : null
 						});
 				  	}
@@ -164,7 +164,7 @@ module.exports = function(models, io) {
 											if(result){
 												project.destroy().then(function(project){
 													res.json({
-														msg : 'Record is destroyed!',
+														msg : res.__("project.success.delete"),
 														data : project
 													})	
 													io.of('/' + req.params.accountId).emit('projectDelete', project)
@@ -172,27 +172,27 @@ module.exports = function(models, io) {
 											}
 											else
 												res.status(404).json({
-													msg : 'Record is not destroyed!',
+													msg : res.__("project.fail.delete"),
 													data : null
 												});
 										})
 									}else{
 								  		res.status(404).json({
-											msg : 'Record is not destroyed!',
+											msg : res.__("project.fail.delete"),
 											data : null
 										});
 								  	}
 								})						
 							}else{
 						  		res.status(404).json({
-									msg : 'Record is not destroyed!',
+									msg : res.__("project.fail.delete"),
 									data : null
 								});
 						  	}
 						})					
 					}else{
 				  		res.status(404).json({
-							msg : 'Record is not destroyed!',
+							msg : res.__("project.fail.delete"),
 							data : null
 						});
 				  	}

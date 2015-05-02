@@ -1,1 +1,102 @@
-{}
+{
+	"user": {
+		"success": {
+			"invite": "User successfully invited!",
+			"fetch": "User successfully fetched!",
+			"create": "User successfully created!",
+			"update": "User successfully updated!",
+			"delete": "User successfully deleted!"
+		},
+		"fail": {
+			"invite": "User unsuccessfully invited!",
+			"fetch": "User unsuccessfully fetched!",
+			"create": "User unsuccessfully created!",
+			"update": "User unsuccessfully updated!",
+			"delete": "User unsuccessfully deleted!"
+		}
+	},
+	"account": {
+		"success": {
+			"fetch": "Account successfully fetched!",
+			"create": "Account successfully created!",
+			"update": "Account successfully updated!",
+			"delete": "Account successfully deleted!"
+		},
+		"fail": {
+			"fetch": "Account unsuccessfully fetched!",
+			"create": "Account unsuccessfully created!",
+			"update": "Account unsuccessfully updated!",
+			"delete": "Account unsuccessfully deleted!"
+		}
+	},
+	"accountUser": {
+		"success": {
+			"fetch": "Account User successfully fetched!",
+			"create": "Account User successfully created!",
+			"update": "Account User successfully updated!",
+			"delete": "Account User successfully deleted!"
+		},
+		"fail": {
+			"fetch": "Account User unsuccessfully fetched!",
+			"create": "Account User unsuccessfully created!",
+			"update": "Account User unsuccessfully updated!",
+			"delete": "Account User unsuccessfully deleted!"
+		}
+	},
+	"project": {
+		"success": {
+			"fetch": "Project successfully fetched!",
+			"create": "Project successfully created!",
+			"update": "Project successfully updated!",
+			"delete": "Project successfully deleted!"
+		},
+		"fail": {
+			"fetch": "Project unsuccessfully fetched!",
+			"create": "Project unsuccessfully created!",
+			"update": "Project unsuccessfully updated!",
+			"delete": "Project unsuccessfully deleted!"
+		}
+	},
+	"task": {
+		"success": {
+			"fetch": "Task successfully fetched!",
+			"create": "Task successfully created!",
+			"update": "Task successfully updated!",
+			"delete": "Task successfully deleted!"
+		},
+		"fail": {
+			"fetch": "Task unsuccessfully fetched!",
+			"create": "Task unsuccessfully created!",
+			"update": "Task unsuccessfully updated!",
+			"delete": "Task unsuccessfully deleted!"
+		}
+	},
+	"taskComment": {
+		"success": {
+			"fetch": "Task Comment successfully fetched!",
+			"create": "Task Comment successfully created!",
+			"update": "Task Comment successfully updated!",
+			"delete": "Task Comment successfully deleted!"
+		},
+		"fail": {
+			"fetch": "Task Comment unsuccessfully fetched!",
+			"create": "Task Comment unsuccessfully created!",
+			"update": "Task Comment unsuccessfully updated!",
+			"delete": "Task Comment unsuccessfully deleted!"
+		}
+	},
+	"taskHistory": {
+		"success": {
+			"fetch": "Task History successfully fetched!",
+			"create": "Task History successfully created!",
+			"update": "Task History successfully updated!",
+			"delete": "Task History successfully deleted!"
+		},
+		"fail": {
+			"fetch": "Task History unsuccessfully fetched!",
+			"create": "Task History unsuccessfully created!",
+			"update": "Task History unsuccessfully updated!",
+			"delete": "Task History unsuccessfully deleted!"
+		}
+	}
+}

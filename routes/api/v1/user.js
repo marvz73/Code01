@@ -24,24 +24,15 @@ module.exports = function(models) {
 			function(req, res, next) {
 				models.User.find(req.params.userId).then(function(user) {
 					if(user){
-						res.json(user)
+						res.json({
+							msg : "user fetch success",
+							data : null
+						});
 					}else{
-				  		res.json(null);
-				  	}
-				})
-	  		}
-	  	)
-
-	router.route('/:userId/accounts')
-		.get( 
-			function(req, res, next) {
-				models.User.find(req.params.userId).then(function(user) {
-					if(user){
-						user.getAccounts().then(function(accounts){
-							res.json(accounts)
-						})
-					}else{
-				  		res.json(null);
+				  		res.status(404).json({
+							msg : "user fetch fail",
+							data : null
+						});
 				  	}
 				})
 	  		}

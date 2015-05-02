@@ -37,7 +37,7 @@ module.exports = function(models, io) {
 														if(result){
 															models.TaskComment.create(req.body).then(function(TaskComment) {
 																res.json({
-																	msg : "Return message here...",
+																	msg : res.__("taskComment.success.create"),
 																	data : TaskComment
 																});
 																io.of('/' + req.params.accountId).to(req.params.projectId).emit('taskCommentCreate', TaskComment)
@@ -45,13 +45,13 @@ module.exports = function(models, io) {
 														}
 														else
 															res.status(404).json({
-																msg : "Return message here...",
+																msg : res.__("taskComment.fail.create"),
 																data : null
 															});
 													})
 												}else{
 											  		res.status(404).json({
-														msg : "Return message here...",
+														msg : res.__("taskComment.fail.create"),
 														data : null
 													});
 											  	}
@@ -59,21 +59,21 @@ module.exports = function(models, io) {
 										})					
 									}else{
 								  		res.status(404).json({
-											msg : "Return message here...",
+											msg : res.__("taskComment.fail.create"),
 											data : null
 										});
 								  	}
 								})					
 							}else{
 						  		res.status(404).json({
-									msg : "Return message here...",
+									msg : res.__("taskComment.fail.create"),
 									data : null
 								});
 						  	}
 						})
 					}else{
 				  		res.status(404).json({
-							msg : "Return message here...",
+							msg : res.__("taskComment.fail.create"),
 							data : null
 						});
 				  	}
@@ -102,19 +102,19 @@ module.exports = function(models, io) {
 																		user.hasAccount(account).then(function(result){
 																			if(result){
 																				res.json({
-																					msg : "Return message here...",
+																					msg : res.__("taskComment.success.fetch"),
 																					data : TaskComment
 																				});	
 																			}
 																			else
 																				res.status(404).json({
-																					msg : "Return message here...",
+																					msg : res.__("taskComment.fail.fetch"),
 																					data : null
 																				});
 																		})
 																	}else{
 																  		res.status(404).json({
-																			msg : "Return message here...",
+																			msg : res.__("taskComment.fail.fetch"),
 																			data : null
 																		});
 																  	}
@@ -122,42 +122,42 @@ module.exports = function(models, io) {
 															}
 															else{
 																res.status(404).json({
-																	msg : "Return message here...",
+																	msg : res.__("taskComment.fail.fetch"),
 																	data : null
 																});
 															}
 														})					
 													}else{
 												  		res.status(404).json({
-															msg : "Return message here...",
+															msg : res.__("taskComment.fail.fetch"),
 															data : null
 														});
 												  	}
 												})			
 											}else{
 												res.status(404).json({
-													msg : "Return message here...",
+													msg : res.__("taskComment.fail.fetch"),
 													data : null
 												});
 											}
 										})	
 									}else{
 								  		res.status(404).json({
-											msg : "Return message here...",
+											msg : res.__("taskComment.fail.fetch"),
 											data : null
 										});
 								  	}
 								})
 							}else{
 						  		res.status(404).json({
-									msg : "Return message here...",
+									msg : res.__("taskComment.fail.fetch"),
 									data : null
 								});
 						  	}
 						})
 					}else{
 						res.status(404).json({
-							msg : "Return message here...",
+							msg : res.__("taskComment.fail.fetch"),
 							data : null
 						});
 					}
@@ -184,7 +184,7 @@ module.exports = function(models, io) {
 																			if(result){
 																				TaskComment.updateAttributes(req.body).then(function(TaskComment){
 																					res.json({
-																						msg : "Return message here...",
+																						msg : res.__("taskComment.success.update"),
 																						data : TaskComment
 																					});	
 																					io.of('/' + req.params.accountId).to(req.params.projectId).emit('taskCommentUpdate', TaskComment)
@@ -192,13 +192,13 @@ module.exports = function(models, io) {
 																			}
 																			else
 																				res.status(404).json({
-																					msg : "Return message here...",
+																					msg : res.__("taskComment.fail.update"),
 																					data : null
 																				});
 																		})
 																	}else{
 																  		res.status(404).json({
-																			msg : "Return message here...",
+																			msg : res.__("taskComment.fail.update"),
 																			data : null
 																		});
 																  	}
@@ -206,42 +206,42 @@ module.exports = function(models, io) {
 															}
 															else{
 																res.status(404).json({
-																msg : "Return message here...",
+																msg : res.__("taskComment.fail.update"),
 																data : null
 															});
 															}
 														})					
 													}else{
 												  		res.status(404).json({
-															msg : "Return message here...",
+															msg : res.__("taskComment.fail.update"),
 															data : null
 														});
 												  	}
 												})			
 											}else{
 												res.status(404).json({
-													msg : "Return message here...",
+													msg : res.__("taskComment.fail.update"),
 													data : null
 												});
 											}
 										})	
 									}else{
 								  		res.status(404).json({
-											msg : "Return message here...",
+											msg : res.__("taskComment.fail.update"),
 											data : null
 										});
 								  	}
 								})
 							}else{
 						  		res.status(404).json({
-									msg : "Return message here...",
+									msg : res.__("taskComment.fail.update"),
 									data : null
 								});
 						  	}
 						})
 					}else{
 						res.status(404).json({
-							msg : "Return message here...",
+							msg : res.__("taskComment.fail.update"),
 							data : null
 						});
 					}
@@ -268,7 +268,7 @@ module.exports = function(models, io) {
 																			if(result){
 																				TaskComment.destroy().then(function(TaskComment){
 																					res.json({
-																						msg : 'Record is destroyed!',
+																						msg : res.__("taskComment.success.delete"),
 																						data : TaskComment
 																					})
 																					io.of('/' + req.params.accountId).to(req.params.projectId).emit('taskCommentDelete', TaskComment)
@@ -276,13 +276,13 @@ module.exports = function(models, io) {
 																			}
 																			else
 																				res.status(404).json({
-																					msg : 'Record is not destroyed!',
+																					msg : res.__("taskComment.fail.delete"),
 																					data : null
 																				});
 																		})
 																	}else{
 																  		res.status(404).json({
-																			msg : 'Record is not destroyed!',
+																			msg : res.__("taskComment.fail.delete"),
 																			data : null
 																		});
 																  	}
@@ -290,42 +290,42 @@ module.exports = function(models, io) {
 															}
 															else{
 																res.status(404).json({
-																	msg : 'Record is not destroyed!',
+																	msg : res.__("taskComment.fail.delete"),
 																	data : null
 																});
 															}
 														})					
 													}else{
 												  		res.status(404).json({
-															msg : 'Record is not destroyed!',
+															msg : res.__("taskComment.fail.delete"),
 															data : null
 														});
 												  	}
 												})			
 											}else{
 												res.status(404).json({
-													msg : 'Record is not destroyed!',
+													msg : res.__("taskComment.fail.delete"),
 													data : null
 												});
 											}
 										})	
 									}else{
 								  		res.status(404).json({
-											msg : 'Record is not destroyed!',
+											msg : res.__("taskComment.fail.delete"),
 											data : null
 										});
 								  	}
 								})
 							}else{
 						  		res.status(404).json({
-									msg : 'Record is not destroyed!',
+									msg : res.__("taskComment.fail.delete"),
 									data : null
 								});
 						  	}
 						})
 					}else{
 						res.status(404).json({
-							msg : 'Record is not destroyed!',
+							msg : res.__("taskComment.fail.delete"),
 							data : null
 						});
 					}

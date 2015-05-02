@@ -46,8 +46,9 @@ app.use(expressSession({
 }));
 
 i18n.configure({
-  locales: ['en'],
+  locales:['en'],
   defaultLocale: 'en',
+  objectNotation: true,
   cookie: 'locale',
   directory: __dirname + '/locales'
 });

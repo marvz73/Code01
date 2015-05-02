@@ -64,7 +64,6 @@ module.exports = function(passport, io) {
         )
         .post( 
             function(req, res){
-            	req.body.password = encrypt(req.body.password)
 
 				models.User.findOrCreate({ where: {email: req.body.email}, defaults: req.body})
 				.spread(function(user, created) {
@@ -80,38 +79,54 @@ module.exports = function(passport, io) {
 
                         res.send('Thank You!');
 
-					} else {
-						req.flash('signupMessage', 'That email is already taken.')
-	                    res.redirect('/signup');
-					}
-				})
+                    } else {
+                        req.flash('signupMessage', 'That email is already taken.')
+                        res.redirect('/signup');
+                    }
+                })
             }
         )
-	
-	// render the user verification
-    router.get('/verify/:token', function(req, res){
-        models.User.find({ where: {token: req.params.token} }).then(function(user_model) {
-            if(user_model){
-            	user_model.set({verified: true, token: ''}).save().then(function(user_model){
-            		models.Account.create({name: 'Personal', description: 'My Personal Description'}).then(function(account_model) {
-			            if(account_model){
-			            	account_model.addUser(user_model);
+    
+    // render the user verification
+    router.route('/verify/:token')
+        .get(
+            function(req, res){
+                models.User.find({ where: {token: req.params.token} }).then(function(user_model) {
+                    if(user_model){
+                        res.render('verify', { title: 'Express' });
+                    }
+                    else
+                        res.send('Unknown Token!');
 
-		            		console.log(user_model.toJSON())
-			                res.redirect('/login');
-			            }
-			            else
-			            	res.send('Unknown Token!');
-
-			        }); 	                
-                })
-
+                }); 
             }
-            else
-            	res.send('Unknown Token!');
+        )
+        .post(
+            function(req, res){
+                models.User.find({ where: {token: req.params.token} }).then(function(user_model) {
+                    if(user_model){
 
-        }); 
-    });
+                        req.body.verified = true;
+                        req.body.token = '';
+                        req.body.password = encrypt(req.body.password);
+
+                        user_model.set(req.body).save().then(function(user_model){
+                            models.Account.create({name: 'Personal', description: 'My Personal Description'}).then(function(account_model) {
+                                if(account_model){
+                                    account_model.addUser(user_model);
+
+                                    console.log(user_model.toJSON())
+                                    res.redirect('/login');
+                                }
+                            });                     
+                        })
+
+                    }
+                    else
+                        res.send('Unknown Token!');
+                }); 
+            }
+        )
 
     router.route('/forgot-password')
         .get( 
@@ -201,7 +216,6 @@ module.exports = function(passport, io) {
                 models.Account.find(req.params.namespace).then(function(account) {
                     user.hasAccount(account).then(function(result){
                         if(result){
-                            console.log(req.get('host'))
                             res.render('home', { 
                                 title: 'Express', 
                                 user : req.user, 

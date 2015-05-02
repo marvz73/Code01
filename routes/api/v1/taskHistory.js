@@ -37,7 +37,7 @@ module.exports = function(models, io) {
 														if(result){
 															models.TaskHistory.create(req.body).then(function(TaskHistory) {
 																res.json({
-																	msg : "Return message here...",
+																	msg : res.__("taskHistory.success.create"),
 																	data : TaskHistory
 																});		
 																io.of('/' + req.params.accountId).to(req.params.projectId).emit('taskHistoryCreate', TaskHistory)
@@ -45,13 +45,13 @@ module.exports = function(models, io) {
 														}
 														else
 															res.status(404).json({
-																msg : "Return message here...",
+																msg : res.__("taskHistory.fail.create"),
 																data : null
 															});
 													})
 												}else{
 											  		res.status(404).json({
-														msg : "Return message here...",
+														msg : res.__("taskHistory.fail.create"),
 														data : null
 													});
 											  	}
@@ -59,21 +59,21 @@ module.exports = function(models, io) {
 										})					
 									}else{
 								  		res.status(404).json({
-											msg : "Return message here...",
+											msg : res.__("taskHistory.fail.create"),
 											data : null
 										});
 								  	}
 								})					
 							}else{
 						  		res.status(404).json({
-									msg : "Return message here...",
+									msg : res.__("taskHistory.fail.create"),
 									data : null
 								});
 						  	}
 						})
 					}else{
 				  		res.status(404).json({
-							msg : "Return message here...",
+							msg : res.__("taskHistory.fail.create"),
 							data : null
 						});
 				  	}
@@ -101,19 +101,19 @@ module.exports = function(models, io) {
 																		user.hasAccount(account).then(function(result){
 																			if(result){
 																				res.json({
-																					msg : "Return message here...",
+																					msg : res.__("taskHistory.success.fetch"),
 																					data : TaskHistory
 																				});		
 																			}
 																			else
 																				res.status(404).json({
-																					msg : "Return message here...",
+																					msg : res.__("taskHistory.fail.fetch"),
 																					data : null
 																				});
 																		})
 																	}else{
 																  		res.status(404).json({
-																			msg : "Return message here...",
+																			msg : res.__("taskHistory.fail.fetch"),
 																			data : null
 																		});
 																  	}
@@ -121,42 +121,42 @@ module.exports = function(models, io) {
 															}
 															else{
 																res.status(404).json({
-																	msg : "Return message here...",
+																	msg : res.__("taskHistory.fail.fetch"),
 																	data : null
 																});
 															}
 														})					
 													}else{
 												  		res.status(404).json({
-															msg : "Return message here...",
+															msg : res.__("taskHistory.fail.fetch"),
 															data : null
 														});
 												  	}
 												})			
 											}else{
 												res.status(404).json({
-													msg : "Return message here...",
+													msg : res.__("taskHistory.fail.fetch"),
 													data : null
 												});
 											}
 										})	
 									}else{
 								  		res.status(404).json({
-											msg : "Return message here...",
+											msg : res.__("taskHistory.fail.fetch"),
 											data : null
 										});
 								  	}
 								})
 							}else{
 						  		res.status(404).json({
-									msg : "Return message here...",
+									msg : res.__("taskHistory.fail.fetch"),
 									data : null
 								});
 						  	}
 						})
 					}else{
 						res.status(404).json({
-							msg : "Return message here...",
+							msg : res.__("taskHistory.fail.fetch"),
 							data : null
 						});
 					}
@@ -183,7 +183,7 @@ module.exports = function(models, io) {
 																			if(result){
 																				TaskHistory.updateAttributes(req.body).then(function(TaskHistory){
 																					res.json({
-																						msg : "Return message here...",
+																						msg : res.__("taskHistory.success.update"),
 																						data : TaskHistory
 																					});		
 																					io.of('/' + req.params.accountId).to(req.params.projectId).emit('taskHistoryUpdate', TaskHistory)
@@ -191,13 +191,13 @@ module.exports = function(models, io) {
 																			}
 																			else
 																				res.status(404).json({
-																					msg : "Return message here...",
+																					msg : res.__("taskHistory.fail.update"),
 																					data : null
 																				});
 																		})
 																	}else{
 																  		res.status(404).json({
-																			msg : "Return message here...",
+																			msg : res.__("taskHistory.fail.update"),
 																			data : null
 																		});
 																  	}
@@ -205,42 +205,42 @@ module.exports = function(models, io) {
 															}
 															else{
 																res.status(404).json({
-																	msg : "Return message here...",
+																	msg : res.__("taskHistory.fail.update"),
 																	data : null
 																});
 															}
 														})					
 													}else{
 												  		res.status(404).json({
-															msg : "Return message here...",
+															msg : res.__("taskHistory.fail.update"),
 															data : null
 														});
 												  	}
 												})			
 											}else{
 												res.status(404).json({
-													msg : "Return message here...",
+													msg : res.__("taskHistory.fail.update"),
 													data : null
 												});
 											}
 										})	
 									}else{
 								  		res.status(404).json({
-											msg : "Return message here...",
+											msg : res.__("taskHistory.fail.update"),
 											data : null
 										});
 								  	}
 								})
 							}else{
 						  		res.status(404).json({
-									msg : "Return message here...",
+									msg : res.__("taskHistory.fail.update"),
 									data : null
 								});
 						  	}
 						})
 					}else{
 						res.status(404).json({
-							msg : "Return message here...",
+							msg : res.__("taskHistory.fail.update"),
 							data : null
 						});
 					}
@@ -267,7 +267,7 @@ module.exports = function(models, io) {
 																			if(result){
 																				TaskHistory.destroy().then(function(TaskHistory){
 																					res.json({
-																						msg : 'Record is destroyed!',
+																						msg : res.__("taskHistory.success.delete"),
 																						data : TaskHistory
 																					})
 																					io.of('/' + req.params.accountId).to(req.params.projectId).emit('taskHistoryDelete', TaskHistory)
@@ -275,13 +275,13 @@ module.exports = function(models, io) {
 																			}
 																			else
 																				res.status(404).json({
-																					msg : 'Record is not destroyed!',
+																					msg : res.__("taskHistory.fail.delete"),
 																					data : null
 																				});
 																		})
 																	}else{
 																  		res.status(404).json({
-																			msg : 'Record is not destroyed!',
+																			msg : res.__("taskHistory.fail.delete"),
 																			data : null
 																		});
 																  	}
@@ -289,42 +289,42 @@ module.exports = function(models, io) {
 															}
 															else{
 																res.status(404).json({
-																	msg : 'Record is not destroyed!',
+																	msg : res.__("taskHistory.fail.delete"),
 																	data : null
 																});
 															}
 														})					
 													}else{
 												  		res.status(404).json({
-															msg : 'Record is not destroyed!',
+															msg : res.__("taskHistory.fail.delete"),
 															data : null
 														});
 												  	}
 												})			
 											}else{
 												res.status(404).json({
-													msg : 'Record is not destroyed!',
+													msg : res.__("taskHistory.fail.delete"),
 													data : null
 												});
 											}
 										})	
 									}else{
 								  		res.status(404).json({
-											msg : 'Record is not destroyed!',
+											msg : res.__("taskHistory.fail.delete"),
 											data : null
 										});
 								  	}
 								})
 							}else{
 						  		res.status(404).json({
-									msg : 'Record is not destroyed!',
+									msg : res.__("taskHistory.fail.delete"),
 									data : null
 								});
 						  	}
 						})
 					}else{
 						res.status(404).json({
-							msg : 'Record is not destroyed!',
+							msg : res.__("taskHistory.fail.delete"),
 							data : null
 						});
 					}
