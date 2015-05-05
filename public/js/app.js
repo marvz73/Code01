@@ -285,15 +285,15 @@ var task = {
         function loaded(elm, init, context){
             if( !init ){
 
-                window.document.getElementById('taskDesc').addEventListener('keypress', Q.debounce(function(){
+                window.document.getElementById('taskDesc').addEventListener('keypress', Q.debounce(function(params){
                     var jsonData = {
-                        // desc: 
+                        desc: this.value
                     }
 
-                    console.log(ctrl.TaskDetails.desc)
+                    ctrl.updateTaskDesc(jsonData);
 
-                }, 1000));
-    
+                }, 1000));                
+                
                 setTimeout(function(){
 
                     Q('.cd-panel').addClass('is-visible');
@@ -350,7 +350,7 @@ var task = {
 
         return  m("div.cd-panel.from-right#cd-panel", {config: loaded, onclick: hideRightModal}, [
                     m("header.cd-panel-header.no-touch",[
-                        m("h4.title", ctrl.TaskDetails.id),
+                        m("input[type='text'][value='"+ctrl.TaskDetails.id+"'].title#taskTitle"),
                         m("a.cd-panel-close", {onclick: hideRightModal}, "Close")
                     ]),
                     m("div.cd-panel-container", [

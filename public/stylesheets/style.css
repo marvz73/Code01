@@ -1365,8 +1365,11 @@ header h1 {
 .cd-panel-header .title {
   font-weight: bold;
   color: #89ba2c;
-  padding-left: 5%;
-  margin-top: 15px;
+  margin-left: 5%;
+  line-height: 0;
+  border: 0 none;
+  font-size: 20px;
+  padding: 7px;
 }
 .from-right .cd-panel-header, .from-left .cd-panel-header {
   top: -50px;
@@ -1390,7 +1393,7 @@ header h1 {
 }
 @media only screen and (min-width: 1170px) {
   .cd-panel-header {
-    width: 25%;
+    width: 35%;
   }
 }
 
@@ -1518,7 +1521,7 @@ a.cd-panel-close:after {
 }
 @media only screen and (min-width: 1170px) {
   .cd-panel-container {
-    width: 25%;
+    width: 35%;
   }
 }
 
