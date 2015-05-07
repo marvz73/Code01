@@ -518,6 +518,52 @@ var project = {
     }
 }
 
+var settings = {
+    controller: function() {
+
+
+    },
+    view: function(ctrl){
+        function loaded(elm, init, context){
+            if( !init ){               
+                
+                setTimeout(function(){
+
+                    Q('.cd-panel').addClass('is-visible');
+
+                }, 200)
+            }
+        }
+        console.log(m.route())
+        function hideRightModal(elm, init, context){
+            if( !init ){
+                var strClass = elm.target.className;
+                if(strClass.indexOf('cd-panel') == 0 || strClass.indexOf('cd-panel-close') == 0){
+                    
+                    Q('.cd-panel').removeClass('is-visible', function(resp){
+                        console.log(1)
+
+                        Q('.cd-panel').timer(500, function(){
+                            // m.route('/0')
+
+                        })
+                    });
+                }
+
+            }
+        }
+
+        return  m("div.cd-panel.from-right#cd-panel", {config: loaded, onclick: hideRightModal}, [
+                    m("header.cd-panel-header.no-touch",[
+                        m("h4.title","Settings"),
+                        m("a.cd-panel-close", {onclick: hideRightModal}, "Close")
+                    ]),
+                    m("div.cd-panel-container", [
+                        m("div.cd-panel-content")
+                    ])
+                ])
+    }
+}
 
 var navigation = {
     controller: function() {
@@ -565,7 +611,7 @@ var navigation = {
             {
                 return ctrl.ProjectList.map(function (val, index) {
                     return m("li", [
-                        m("a[href='/1/" + m.route.param("aid") + '/' +val.id+ "']", {config: m.route }, val.title)
+                        m("a[href='/1/" + val.AccountId + '/' +val.id+ "']", {config: m.route }, val.title)
                     ])
                 })     
             }
@@ -589,7 +635,7 @@ var navigation = {
                         m("a[href='#']", {onclick: ctrl.addProject}, "Add Project")
                     ]),
                     m("li", [
-                        m("a[href='#']", "Settings")
+                        m("a[href='/1000/"+m.route.param('aid')+"']",{config: m.route}, "Settings")
                     ]),
                     m("li", [
                         m("a[href='/0/1']", {config: m.route}, "Home")
@@ -602,6 +648,7 @@ var navigation = {
 }
 
 
+
 //setup routes to start w/ the `#` symbol
 m.route.mode = "hash";
 
@@ -611,18 +658,27 @@ m.routes( '/0/' + bootstrap.Accounts[0].id, {
     '/0/:aid' : {
         '#navigation' : navigation,
         '#project' : '',
-        '#task' : ''
+        '#task' : '',
+        '#settings' : ''
     },  
     '/1/:aid/:pid' : {
         '#navigation' : navigation,
         '#project' : project,
-        '#task' : ''
+        '#task' : '',
+        '#settings' : '',
     },
     '/2/:aid/:pid/:tid' : {
         '#navigation' : navigation,
         '#project' : project,
-        '#task' : task
-    }
+        '#task' : task,
+        '#settings' : '',
+    },
+    '/1000/:aid' : {
+        '#navigation' : navigation,
+        '#settings' : settings,
+        // '#project' : project,
+        // '#task' : task
+    },
 })
 
 
