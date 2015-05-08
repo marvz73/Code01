@@ -26,7 +26,7 @@ module.exports = function(models) {
 					if(user){
 						res.json({
 							msg : "user fetch success",
-							data : null
+							data : user
 						});
 					}else{
 				  		res.status(404).json({
