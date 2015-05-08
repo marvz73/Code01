@@ -1553,6 +1553,35 @@ a.cd-panel-close:after {
 .cd-panel-content p:first-of-type {
   margin-top: 0;
 }
+
+.settings legend{
+  font-size: 1rem;
+  font-weight: bold;
+  color: #999;
+  /*margin-bottom: 0.5rem;*/
+}
+
+.settings-group{
+  margin: 0.5rem 0 1.5rem 0;
+}
+
+.settings-group input{
+  border-radius: 0;
+  margin-top: -1px;
+}
+
+.settings-group input:first-child{
+  border-top-right-radius: 5px;
+  border-top-left-radius: 5px; 
+}
+
+.settings-group input:last-child{
+  border-bottom-right-radius: 5px;
+  border-bottom-left-radius: 5px; 
+}
+
+
+
 @media only screen and (min-width: 768px) {
   .cd-panel-content p {
     font-size: 16px;

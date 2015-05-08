@@ -522,6 +522,12 @@ var settings = {
     controller: function() {
 
 
+        this.getUserDetails = function(){
+            m.request({method:'get', url: baseUrl + '/api/v1/user/' + bootstrap.Accounts[0].AccountUser.UserId })
+        }
+
+        this.getUserDetails();
+        
     },
     view: function(ctrl){
         function loaded(elm, init, context){
@@ -534,22 +540,17 @@ var settings = {
                 }, 200)
             }
         }
-        console.log(m.route())
+
         function hideRightModal(elm, init, context){
             if( !init ){
                 var strClass = elm.target.className;
                 if(strClass.indexOf('cd-panel') == 0 || strClass.indexOf('cd-panel-close') == 0){
-                    
                     Q('.cd-panel').removeClass('is-visible', function(resp){
-                        console.log(1)
-
                         Q('.cd-panel').timer(500, function(){
-                            // m.route('/0')
-
+                            window.history.back()
                         })
                     });
                 }
-
             }
         }
 
@@ -559,7 +560,24 @@ var settings = {
                         m("a.cd-panel-close", {onclick: hideRightModal}, "Close")
                     ]),
                     m("div.cd-panel-container", [
-                        m("div.cd-panel-content")
+                        m("div.cd-panel-content",[
+                            m('fieldset.settings',[
+                                m('legend', "Personal Details"),
+                                m('div.settings-group', [
+                                    m('input.form-control[type="text"][placeholder="Email"]'),
+                                    m('input.form-control[type="text"][placeholder="First Name"]'),
+                                    m('input.form-control[type="text"][placeholder="Last Name"]')
+                                ]),
+
+                                m('legend', "Password Details"),
+                                m('div.settings-group', [
+                                    m('input.form-control[type="text"][placeholder="Old Password"]'),
+                                    m('input.form-control[type="text"][placeholder="New Password"]'),
+                                    m('input.form-control[type="text"][placeholder="Confirm Password"]')
+                                ])
+
+                            ])
+                        ])
                     ])
                 ])
     }
