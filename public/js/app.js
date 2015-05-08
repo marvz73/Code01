@@ -447,7 +447,6 @@ var project = {
             m.request({method:'post', url: baseUrl + '/api/v1/account/' +m.route.param('aid')+ '/project/' +m.route.param('pid')+ '/task/' + taskData.id, data: jsonData })
         
         };
-
     },
     view: function(ctrl) {
         //Bind an event to the element
@@ -517,6 +516,21 @@ var project = {
                 ]);
     }
 }
+
+
+var projectDetails = {
+    controller: function() {
+
+        this.getUserDetails = function(){
+            m.request({method:'get', url: baseUrl + '/api/v1/user/' + bootstrap.Accounts[0].AccountUser.UserId })
+        }
+        
+    },
+    view: function(){
+
+    }
+}
+
 
 var settings = {
     controller: function() {
@@ -628,8 +642,10 @@ var navigation = {
             if(!init)
             {
                 return ctrl.ProjectList.map(function (val, index) {
-                    return m("li", [
-                        m("a[href='/1/" + val.AccountId + '/' +val.id+ "']", {config: m.route }, val.title)
+                    return m("li.clearfix", [
+                        m("a[href='/1/" + val.AccountId + '/' +val.id+ "'].pull-left", {config: m.route }, val.title),
+                        m("a.pull-right", "View")
+
                     ])
                 })     
             }
