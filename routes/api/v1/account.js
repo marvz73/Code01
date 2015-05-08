@@ -1,5 +1,7 @@
 var express = require('express');
 var router = express.Router({mergeParams: true});
+var Promise = require("bluebird");
+var join = Promise.join;
 
 router.param(function(name, fn) {
   if (fn instanceof RegExp) {
@@ -49,37 +51,68 @@ module.exports = function(models, io) {
 	router.route('/:accountId')
 		.get( 
 	  		function(req, res, next) {
-	  			models.Account.find(req.params.accountId).then(function(account) {
-					if(account){
-						models.User.find(req.user.id).then(function(user) {
-							if(user){
-								user.hasAccount(account).then(function(result){
-									if(result){
-										res.json({
-											msg : res.__("account.success.fetch"),
-											data : account
-										})	
-									}else{
-										res.status(404).json({
-											msg : res.__("account.fail.fetch"),
-											data : null
-										});
-									}
-								})
-							}else{
-						  		res.status(404).json({
-									msg : res.__("account.fail.fetch"),
-									data : null
-								});
-						  	}
-						})						
-					}else{
-				  		res.status(404).json({
-							msg : res.__("account.fail.fetch"),
-							data : null
-						});
-				  	}
+	  			var userPromise  = models.User.find(req.user.id);
+	  			var accountPromise = models.Account.find(req.params.accountId);
+
+	  			join(userPromise, accountPromise, function(user, account) {
+	  				if(user || account){
+		  				return [account, user.hasAccount(account)];
+		  			} else {
+		  				return[ null, null]
+		  			}
 				})
+				.spread(function(account, result){
+					if(account && result){
+						res.json({
+							msg : res.__("account.success.fetch"),
+							data : account,
+							error : null
+						})	
+					} else {
+						res.status(404).json({
+							msg : res.__("account.fail.fetch"),
+							data : null,
+							error : null
+						});
+					}
+				})
+				.catch(function(e){
+					res.status(500).json({
+						msg : res.__("account.fail.fetch"),
+						data : null,
+						error : e
+					});	
+				});
+
+
+	  	// 		models.Account.find(req.params.accountId).then(function(account) {
+				// 	if(account){
+				// 		models.User.find(req.user.id).then(function(user) {
+				// 			if(user){
+				// 				user.hasAccount(account).then(function(result){
+				// 					if(result){
+				// 						res.json({
+				// 							msg : res.__("account.success.fetch"),
+				// 							data : account
+				// 						})	
+				// 					}else{
+				// 						c
+				// 					}
+				// 				})
+				// 			}else{
+				// 		  		res.status(404).json({
+				// 					msg : res.__("account.fail.fetch"),
+				// 					data : null
+				// 				});
+				// 		  	}
+				// 		})						
+				// 	}else{
+				//   		res.status(404).json({
+				// 			msg : res.__("account.fail.fetch"),
+				// 			data : null
+				// 		});
+				//   	}
+				// })
 	  		}
 	  	)
 	  	.post(
