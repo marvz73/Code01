@@ -1581,6 +1581,26 @@ a.cd-panel-close:after {
 }
 
 
+.project-task-list{
+  margin-top: 1rem;
+}
+
+.project-task-list a{
+  display: block;
+  padding: 0.5rem 1rem;
+  border: 1px solid #ccc;
+  margin-top: -1px;
+  background-color: #fff;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.project-task-list a.no-result{
+  background-color: #dbe2e9;
+  color: #ccc;
+  font-weight: bold;
+  cursor: default;
+}
 
 @media only screen and (min-width: 768px) {
   .cd-panel-content p {

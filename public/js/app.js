@@ -308,10 +308,11 @@ var task = {
                 if(strClass.indexOf('cd-panel') == 0 || strClass.indexOf('cd-panel-close') == 0){
                     // document.getElementById("cd-panel").className = "cd-panel from-right";
                     Q('.cd-panel').removeClass('is-visible', function(resp){
-                        console.log(1)
 
                         Q('.cd-panel').timer(500, function(){
-                            m.route('/1/'+ m.route.param('aid') + '/' + m.route.param('pid'))
+                            // m.route('/1/'+ m.route.param('aid') + '/' + m.route.param('pid'))
+                            window.history.back()
+                            console.log(11111111111)
                         })
                     });
                 }
@@ -396,6 +397,7 @@ var task = {
     }
 }
 
+var sharedProjectTask = [];
 
 var project = {
     controller: function() {
@@ -433,6 +435,9 @@ var project = {
         }).then(function(taskResp){
             if(taskResp.data.length){
                 self.TaskList = taskResp.data;
+                sharedProjectTask = taskResp.data;
+            }else{
+                sharedProjectTask = []
             }
         });
 
@@ -468,7 +473,7 @@ var project = {
                         var tid = this.getAttribute("data-id");
 
                         if(dragged){
-                            m.route('/2/' + m.route.param('aid') + '/' + m.route.param('pid') + '/' + tid)
+                            m.route('/3/' + m.route.param('aid') + '/' + m.route.param('pid') + '/' + tid)
                             // console.log(ctrl.list[0])
                         }else{
                             var xPosition = 0;
@@ -520,13 +525,134 @@ var project = {
 
 var projectDetails = {
     controller: function() {
+        var self = this;
+        this.projectDetails = {};
 
-        this.getUserDetails = function(){
-            m.request({method:'get', url: baseUrl + '/api/v1/user/' + bootstrap.Accounts[0].AccountUser.UserId })
+        this.getProjectDetails = function(){
+            m.request({
+                method:'get', 
+                url:  baseUrl + '/api/v1/account/' + m.route.param('aid') + '/project/' + m.route.param('pid') + ''
+            }).then(function(resp){
+                self.projectDetails = resp.data;
+            })
         }
         
+        console.log(sharedProjectTask);
+
+        //Fetch project task
+        // m.request({
+        //     method:'get', 
+        //     url:  baseUrl + '/api/v1/account/' + m.route.param('aid') + '/project/' + m.route.param('pid') + '/tasks'
+        // }).then(function(taskResp){
+        //     if(taskResp.data.length){
+        //         self.TaskList = taskResp.data;
+        //     }
+        // });
+
+        this.getProjectDetails();
+        
     },
-    view: function(){
+    view: function(ctrl){
+
+        function loaded(elm, init, context){
+            if( !init ){               
+                setTimeout(function(){
+                    Q('.cd-panel').addClass('is-visible');
+                }, 200)
+            }
+        }
+
+        function hideRightModal(elm, init, context){
+            if( !init ){
+                var strClass = elm.target.className;
+                if(strClass.indexOf('cd-panel') == 0 || strClass.indexOf('cd-panel-close') == 0){
+                    Q('.cd-panel').removeClass('is-visible', function(resp){
+                        Q('.cd-panel').timer(500, function(){
+                            // window.history.back()
+                            m.route('/1/'+ m.route.param('aid') + '/' + m.route.param('pid'))
+                        })
+                    });
+                }
+            }
+        }
+
+        function projectTask(){
+            if(sharedProjectTask.length)
+            {
+                return sharedProjectTask.map(function(val, index){
+                    return m('li',[
+
+                        m('a[href="/3/' + m.route.param('aid') + '/' + m.route.param('pid') + '/' + val.id+'"]', {config: m.route}, 'Issue #'+val.id,[
+                            m('span.pull-right', val.createdAt)
+                        ])
+                    ])
+                })
+            }else{
+                return m('li',[
+                    m('a.no-result', 'No Result')
+                ])   
+            }
+
+
+        }
+
+// function timeDifference(current, previous) {
+    
+//     var msPerMinute = 60 * 1000;
+//     var msPerHour = msPerMinute * 60;
+//     var msPerDay = msPerHour * 24;
+//     var msPerMonth = msPerDay * 30;
+//     var msPerYear = msPerDay * 365;
+    
+//     var elapsed = current - previous;
+    
+//     if (elapsed < msPerMinute) {
+//          return Math.round(elapsed/1000) + ' seconds ago';   
+//     }
+    
+//     else if (elapsed < msPerHour) {
+//          return Math.round(elapsed/msPerMinute) + ' minutes ago';   
+//     }
+    
+//     else if (elapsed < msPerDay ) {
+//          return Math.round(elapsed/msPerHour ) + ' hours ago';   
+//     }
+
+//     else if (elapsed < msPerMonth) {
+//          return 'approximately ' + Math.round(elapsed/msPerDay) + ' days ago';   
+//     }
+    
+//     else if (elapsed < msPerYear) {
+//          return 'approximately ' + Math.round(elapsed/msPerMonth) + ' months ago';   
+//     }
+    
+//     else {
+//          return 'approximately ' + Math.round(elapsed/msPerYear ) + ' years ago';   
+//     }
+// }
+
+        return  m("div.cd-panel.from-right#cd-panel", {config: loaded, onclick: hideRightModal}, [
+                    m("header.cd-panel-header.no-touch",[
+                        m("h4.title", ctrl.projectDetails.title),
+                        m("a.cd-panel-close", {onclick: hideRightModal}, "Close")
+                    ]),
+                    m("div.cd-panel-container", [
+                        m("div.cd-panel-content",[
+                            m('div.form-group', [
+                                m('textarea[rows="6"].form-control', ctrl.projectDetails.description),
+                            ]),
+                            m('fieldset.settings',[
+                                m('legend', "Project Task"),
+                                m('ul.unstyled.project-task-list', [
+
+                                    projectTask()
+
+
+                                ])
+                            ])
+                        ])
+                    ])
+                ])
 
     }
 }
@@ -544,13 +670,11 @@ var settings = {
         
     },
     view: function(ctrl){
+
         function loaded(elm, init, context){
             if( !init ){               
-                
                 setTimeout(function(){
-
                     Q('.cd-panel').addClass('is-visible');
-
                 }, 200)
             }
         }
@@ -637,6 +761,15 @@ var navigation = {
     },
     view: function(ctrl) {
 
+        function projectDetails(elm, init, context){
+            if(!init)
+            {
+
+                return m.render(document.getElementById("task"), projectDetails);
+
+            }
+        }
+
         //Get project list
         function projectList(elm, init, context){
             if(!init)
@@ -644,8 +777,7 @@ var navigation = {
                 return ctrl.ProjectList.map(function (val, index) {
                     return m("li.clearfix", [
                         m("a[href='/1/" + val.AccountId + '/' +val.id+ "'].pull-left", {config: m.route }, val.title),
-                        m("a.pull-right", "View")
-
+                        m("a[href='/2/"+ val.AccountId+"/"+val.id+"'].pull-right", {config: m.route}, "View")
                     ])
                 })     
             }
@@ -699,11 +831,20 @@ m.routes( '/0/' + bootstrap.Accounts[0].id, {
         '#navigation' : navigation,
         '#project' : project,
         '#task' : '',
+        '#projectdetails' : '',
         '#settings' : '',
     },
-    '/2/:aid/:pid/:tid' : {
+    '/2/:aid/:pid' : {
         '#navigation' : navigation,
         '#project' : project,
+        '#projectdetails' : projectDetails,
+        '#task' : '',
+        '#settings' : '',
+    },
+    '/3/:aid/:pid/:tid' : {
+        '#navigation' : navigation,
+        '#project' : project,
+        '#projectdetails' : '',
         '#task' : task,
         '#settings' : '',
     },

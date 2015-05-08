@@ -4,6 +4,7 @@ module.exports = function(sequelize, DataTypes) {
   var Task = sequelize.define("Task", {
     action: DataTypes.STRING,
     desc: DataTypes.STRING,
+    status: DataTypes.STRING,
     X: DataTypes.STRING,
     Y: DataTypes.STRING,
   }, {
