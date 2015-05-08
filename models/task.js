@@ -5,6 +5,7 @@ module.exports = function(sequelize, DataTypes) {
     title: DataTypes.STRING,
     status: DataTypes.STRING,
     desc: DataTypes.STRING,
+    status: DataTypes.STRING,
     X: DataTypes.STRING,
     Y: DataTypes.STRING,
   }, {

@@ -811,11 +811,11 @@ header h1 {
   }
   #cd-nav.is-fixed ul li {
     display: block;
+    border-bottom: 1px solid #eff2f6;
   }
   #cd-nav.is-fixed ul li a {
     padding: 1.6em;
     margin-left: 0;
-    border-bottom: 1px solid #eff2f6;
   }
   #cd-nav ul.has-transitions {
 /* this class is used to bring back transitions when the navigation moves at the bottom right */
@@ -1553,6 +1553,55 @@ a.cd-panel-close:after {
 .cd-panel-content p:first-of-type {
   margin-top: 0;
 }
+
+.settings legend{
+  font-size: 1rem;
+  font-weight: bold;
+  color: #999;
+  /*margin-bottom: 0.5rem;*/
+}
+
+.settings-group{
+  margin: 0.5rem 0 1.5rem 0;
+}
+
+.settings-group input{
+  border-radius: 0;
+  margin-top: -1px;
+}
+
+.settings-group input:first-child{
+  border-top-right-radius: 5px;
+  border-top-left-radius: 5px; 
+}
+
+.settings-group input:last-child{
+  border-bottom-right-radius: 5px;
+  border-bottom-left-radius: 5px; 
+}
+
+
+.project-task-list{
+  margin-top: 1rem;
+}
+
+.project-task-list a{
+  display: block;
+  padding: 0.5rem 1rem;
+  border: 1px solid #ccc;
+  margin-top: -1px;
+  background-color: #fff;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.project-task-list a.no-result{
+  background-color: #dbe2e9;
+  color: #ccc;
+  font-weight: bold;
+  cursor: default;
+}
+
 @media only screen and (min-width: 768px) {
   .cd-panel-content p {
     font-size: 16px;
