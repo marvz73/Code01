@@ -25,12 +25,12 @@ module.exports = function(models) {
 				models.User.find(req.params.userId).then(function(user) {
 					if(user){
 						res.json({
-							msg : "user fetch success",
+							msg : res.__("user.success.fetch"),
 							data : user
-						});
+						})
 					}else{
 				  		res.status(404).json({
-							msg : "user fetch fail",
+							msg : res.__("user.fail.fetch"),
 							data : null
 						});
 				  	}

@@ -13,6 +13,10 @@
 			"create": "User unsuccessfully created!",
 			"update": "User unsuccessfully updated!",
 			"delete": "User unsuccessfully deleted!"
+		},
+		"error": {
+			"priviledge": "Insufficient priviledge!",
+			"server": "SERVER ERROR! Please contact system administrator."
 		}
 	},
 	"account": {
@@ -27,6 +31,10 @@
 			"create": "Account unsuccessfully created!",
 			"update": "Account unsuccessfully updated!",
 			"delete": "Account unsuccessfully deleted!"
+		},
+		"error": {
+			"priviledge": "Insufficient priviledge!",
+			"server": "SERVER ERROR! Please contact system administrator."
 		}
 	},
 	"accountUser": {
@@ -41,6 +49,10 @@
 			"create": "Account User unsuccessfully created!",
 			"update": "Account User unsuccessfully updated!",
 			"delete": "Account User unsuccessfully deleted!"
+		},
+		"error": {
+			"priviledge": "Insufficient priviledge!",
+			"server": "SERVER ERROR! Please contact system administrator."
 		}
 	},
 	"project": {
@@ -55,6 +67,10 @@
 			"create": "Project unsuccessfully created!",
 			"update": "Project unsuccessfully updated!",
 			"delete": "Project unsuccessfully deleted!"
+		},
+		"error": {
+			"priviledge": "Insufficient priviledge!",
+			"server": "SERVER ERROR! Please contact system administrator."
 		}
 	},
 	"task": {
@@ -69,6 +85,10 @@
 			"create": "Task unsuccessfully created!",
 			"update": "Task unsuccessfully updated!",
 			"delete": "Task unsuccessfully deleted!"
+		},
+		"error": {
+			"priviledge": "Insufficient priviledge!",
+			"server": "SERVER ERROR! Please contact system administrator."
 		}
 	},
 	"taskComment": {
@@ -83,6 +103,10 @@
 			"create": "Task Comment unsuccessfully created!",
 			"update": "Task Comment unsuccessfully updated!",
 			"delete": "Task Comment unsuccessfully deleted!"
+		},
+		"error": {
+			"priviledge": "Insufficient priviledge!",
+			"server": "SERVER ERROR! Please contact system administrator."
 		}
 	},
 	"taskHistory": {
@@ -97,6 +121,10 @@
 			"create": "Task History unsuccessfully created!",
 			"update": "Task History unsuccessfully updated!",
 			"delete": "Task History unsuccessfully deleted!"
+		},
+		"error": {
+			"priviledge": "Insufficient priviledge!",
+			"server": "SERVER ERROR! Please contact system administrator."
 		}
 	}
 }
