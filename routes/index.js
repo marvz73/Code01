@@ -250,6 +250,19 @@ module.exports = function(passport, io) {
         res.redirect('/');
     });
 
+    router.route('/upload')
+        .get( 
+            function(req, res){
+                res.render('upload', { title: 'Express' });
+            }
+        )
+        .post( 
+            function(req, res) {
+                console.log(req.files);
+                res.render('upload', { title: 'Express' });
+            }
+        )
+
 	return router;
 
 }

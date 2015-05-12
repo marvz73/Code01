@@ -67,7 +67,7 @@ module.exports = function(models, io) {
 				.then(function(_response){
 					res.status(_response.status).json(_response.data);
 				})
-				.catch(function(e){
+				.error(function(e){
 					res.status(500).json({
 						msg : res.__("project.error.server"),
 						data : null,
@@ -113,7 +113,7 @@ module.exports = function(models, io) {
 				.then(function(_response){
 					res.status(_response.status).json(_response.data);
 				})
-				.catch(function(e){
+				.error(function(e){
 					res.status(500).json({
 						msg : res.__("project.error.server"),
 						data : null,
@@ -165,7 +165,7 @@ module.exports = function(models, io) {
 				.then(function(_response){
 					res.status(_response.status).json(_response.data);
 				})
-				.catch(function(e){
+				.error(function(e){
 					res.status(500).json({
 						msg : res.__("project.error.server"),
 						data : null,
@@ -217,7 +217,7 @@ module.exports = function(models, io) {
 				.then(function(_response){
 					res.status(_response.status).json(_response.data);
 				})
-				.catch(function(e){
+				.error(function(e){
 					res.status(500).json({
 						msg : res.__("project.error.server"),
 						data : null,
@@ -270,9 +270,125 @@ module.exports = function(models, io) {
 				.then(function(_response){
 					res.status(_response.status).json(_response.data);
 				})
-				.catch(function(e){
+				.error(function(e){
 					res.status(500).json({
 						msg : res.__("task.error.server"),
+						data : null,
+						error : e
+					});	
+				});
+	  		}
+		)
+
+	router.route('/:projectId/attachments')
+		.get(
+			function(req, res, next) {
+				var userPromise  = models.User.find(req.user.id);
+	  			var accountPromise = models.Account.find(req.params.accountId);
+	  			var projectPromise = models.Project.find({ where: {'id': req.params.projectId, AccountId: req.params.accountId}, include: [ models.User ] });
+
+	  			join(userPromise, accountPromise, projectPromise, function(user, account, project) {
+	  				if(user && account && project){
+		  				return [project, user.hasAccount(account)];
+		  			} else {
+		  				return [ null, null]
+		  			}
+				})
+				.spread(function(project, result){
+					if(project && result){
+						return project.getProjectAttachments({ include: [ models.User ]})
+					} else {
+						return null;
+					}
+				})
+				.then(function(attachments){
+					var _response = {}
+					if(attachments){
+						_response.data =  	{
+												msg : res.__("attachment.success.fetch"),
+												data : attachments,
+												error : null
+											}
+						_response.status = 200;
+					} else {
+						_response.data =  	{
+												msg : res.__("attachment.fail.fetch"),
+												data : null,
+												error : null
+											}	
+						_response.status = 400;
+					}
+					return _response;
+				})
+				.then(function(_response){
+					res.status(_response.status).json(_response.data);
+				})
+				.error(function(e){
+					res.status(500).json({
+						msg : res.__("attachment.error.server"),
+						data : null,
+						error : e
+					});	
+				});
+	  		}
+		)
+		.post(
+			function(req, res, next) {
+				var userPromise  = models.User.find(req.user.id);
+	  			var accountPromise = models.Account.find(req.params.accountId);
+	  			var projectPromise = models.Project.find({ where: {'id': req.params.projectId, AccountId: req.params.accountId}, include: [ models.User ] });
+
+	  			join(userPromise, accountPromise, projectPromise, function(user, account, project) {
+	  				if(user && account && project){
+		  				return [project, user.hasAccount(account)];
+		  			} else {
+		  				return [ null, null]
+		  			}
+				})
+				.spread(function(project, result){
+					if(project && result){
+						var attachments = [];
+
+						req.files.file.forEach(function(element, index, array){
+							attachments.push(models.ProjectAttachment.create({
+								originalName: element.originalname,
+								name: element.name,
+								path: element.path,
+								extension: element.extension,
+								ProjectId: req.params.projectId,
+								UserId: req.user.id
+							}))
+						})
+						return Promise.all(attachments)
+					} else {
+						return null;
+					}
+				})
+				.then(function(attachments){
+					var _response = {}
+					if(attachments){
+						_response.data =  	{
+												msg : res.__("attachment.success.create"),
+												data : attachments,
+												error : null
+											}
+						_response.status = 200;
+					} else {
+						_response.data =  	{
+												msg : res.__("attachment.fail.create"),
+												data : null,
+												error : null
+											}	
+						_response.status = 400;
+					}
+					return _response;
+				})
+				.then(function(_response){
+					res.status(_response.status).json(_response.data);
+				})
+				.error(function(e){
+					res.status(500).json({
+						msg : res.__("attachment.error.server"),
 						data : null,
 						error : e
 					});	

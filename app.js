@@ -8,6 +8,7 @@ var flash = require('express-flash');
 var expressSession = require('express-session');
 var RedisStore = require('connect-redis')(expressSession);
 var i18n = require('i18n');
+var multer  = require('multer');
 
 var models = require('./models');
 
@@ -50,7 +51,7 @@ i18n.configure({
   defaultLocale: 'en',
   objectNotation: true,
   cookie: 'locale',
-  directory: __dirname + '/locales'
+  directory: path.join(__dirname, 'locales')
 });
 
 app.use(i18n.init);
@@ -58,6 +59,10 @@ app.use(i18n.init);
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());
+app.use(multer({ 
+  dest: path.join(__dirname, 'uploads'),
+  putSingleFilesInArray: true
+}))
 
 // error handlers
 

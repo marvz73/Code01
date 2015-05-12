@@ -1,0 +1,13 @@
+extends layout
+
+block content
+	div(class="container")
+		
+		form(method="post" enctype="multipart/form-data" class="form")
+			div.form-group
+				label File:
+				input(type="file" name="file" multiple)
+
+			div.form-group
+				button(type="submit" class="btn btn-warning btn-lg")  Upload
+

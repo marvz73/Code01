@@ -126,5 +126,23 @@
 			"priviledge": "Insufficient priviledge!",
 			"server": "SERVER ERROR! Please contact system administrator."
 		}
+	},
+	"attachment": {
+		"success": {
+			"fetch": "Attachment successfully fetched!",
+			"create": "Attachment successfully created!",
+			"update": "Attachment successfully updated!",
+			"delete": "Attachment successfully deleted!"
+		},
+		"fail": {
+			"fetch": "Attachment unsuccessfully fetched!",
+			"create": "Attachment unsuccessfully created!",
+			"update": "Attachment unsuccessfully updated!",
+			"delete": "Attachment unsuccessfully deleted!"
+		},
+		"error": {
+			"priviledge": "Insufficient priviledge!",
+			"server": "SERVER ERROR! Please contact system administrator."
+		}
 	}
 }

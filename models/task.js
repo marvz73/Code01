@@ -14,6 +14,7 @@ module.exports = function(sequelize, DataTypes) {
         Task.belongsTo(models.User);
         Task.hasMany(models.TaskComment);
         Task.hasMany(models.TaskHistory);
+        Task.hasMany(models.TaskAttachment);
       }
     }
   });

@@ -56,7 +56,7 @@ module.exports = function(models, io) {
 				.then(function(_response){
 					res.status(_response.status).json(_response.data);
 				})
-				.catch(function(e){
+				.error(function(e){
 					res.status(500).json({
 						msg : res.__("accountUser.error.server"),
 						data : null,
@@ -107,7 +107,7 @@ module.exports = function(models, io) {
 				.then(function(_response){
 					res.status(_response.status).json(_response.data);
 				})
-				.catch(function(e){
+				.error(function(e){
 					res.status(500).json({
 						msg : res.__("accountUser.error.server"),
 						data : null,
@@ -158,7 +158,7 @@ module.exports = function(models, io) {
 				.then(function(_response){
 					res.status(_response.status).json(_response.data);
 				})
-				.catch(function(e){
+				.error(function(e){
 					res.status(500).json({
 						msg : res.__("accountUser.error.server"),
 						data : null,

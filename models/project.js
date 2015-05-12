@@ -11,6 +11,7 @@ module.exports = function(sequelize, DataTypes) {
         Project.belongsTo(models.Account);
         Project.belongsTo(models.User);
         Project.hasMany(models.Task);
+        Project.hasMany(models.ProjectAttachment);
       }
     }
   });
