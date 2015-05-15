@@ -466,6 +466,9 @@ module.exports = function(models, io) {
 	var taskComment = require('./taskComment.js')(models, io);
 	router.use('/:taskId/comment', taskComment);
 
+	var taskAttachment = require('./taskAttachment.js')(models, io);
+	router.use('/:taskId/attachment', taskAttachment);
+
 	return router;
 }
 

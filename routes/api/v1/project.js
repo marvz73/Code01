@@ -399,6 +399,9 @@ module.exports = function(models, io) {
 	var task = require('./task.js')(models, io);
 	router.use('/:projectId/task', task);
 
+	var projectAttachment = require('./projectAttachment.js')(models, io);
+	router.use('/:projectId/attachment', projectAttachment);
+
 
 	return router;
 }
