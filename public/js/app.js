@@ -6,7 +6,7 @@ var socket = io.connect('localhost:3000/' + bootstrap.Accounts[0].id);
 
 var AJAXERROR = function(){
     alert("Something went wrong and we don't why!");
-    window.location.reload();
+    // window.location.reload();
 }
 
 
@@ -729,8 +729,21 @@ var settings = {
                         m("a.cd-panel-close", {onclick: hideRightModal}, "Close")
                     ]),
                     m("div.cd-panel-container", [
+                        m('ul.nav.nav-tabs', [
+                            m('li', [
+                                m('a[href="#"]', 'Menu 1')
+                            ]),
+                            m('li', [
+                                m('a[href="#"]', 'Menu 2')
+                            ])
+                        ]),
                         m("div.cd-panel-content",[
+
+
+
+
                             m('fieldset.settings',[
+
                                 m('legend', "Personal Details"),
                                 m('div.settings-group', [
                                     m('input.form-control[type="text"][placeholder="Email"]'),
@@ -739,6 +752,7 @@ var settings = {
                                 ]),
 
                                 m('legend', "Password Details"),
+
                                 m('div.settings-group', [
                                     m('input.form-control[type="text"][placeholder="Old Password"]'),
                                     m('input.form-control[type="text"][placeholder="New Password"]'),
@@ -746,9 +760,61 @@ var settings = {
                                 ])
 
                             ])
+
+
+
+
                         ])
                     ])
                 ])
+    }
+}
+
+var accounts = {
+    controller: function(){
+        var self = this;
+
+
+
+    },
+    view: function(){
+
+        function loaded(elm, init, context){
+            if( !init ){               
+                setTimeout(function(){
+                    Q('.cd-panel').addClass('is-visible');
+                }, 200)
+            }
+        }
+
+        function hideRightModal(elm, init, context){
+            if( !init ){
+                var strClass = elm.target.className;
+                if(strClass.indexOf('cd-panel') == 0 || strClass.indexOf('cd-panel-close') == 0){
+                    Q('.cd-panel').removeClass('is-visible', function(resp){
+                        Q('.cd-panel').timer(500, function(){
+                            window.history.back()
+                            // m.route('/0')
+                        })
+                    });
+                }
+            }
+        }
+
+        return  m("div.cd-panel.from-right#cd-panel", {config: loaded, onclick: hideRightModal}, [
+                    m("header.cd-panel-header.no-touch",[
+                        m("h4.title", 'Account'),
+                        m("a.cd-panel-close", {onclick: hideRightModal}, "Close")
+                    ]),
+                    m("div.cd-panel-container", [
+                        m("div.cd-panel-content",[
+
+
+
+                        ])
+                    ])
+                ])
+
     }
 }
 
@@ -756,13 +822,15 @@ var navigation = {
     controller: function() {
         var self = this;
         this.ProjectList = [];
+        this.AccountList = [];
 
         socket.on('projectCreate', function(data){
              self.ProjectList.push(data);
              m.redraw(true);
         });
 
-        m.request({method:'get', url: baseUrl + '/api/v1/account/' +bootstrap.Accounts[0].id + '/projects'}).then(function(projectResp){
+        m.request({method:'get', url: baseUrl + '/api/v1/account/' +bootstrap.Accounts[0].id + '/projects'})
+        .then(function(projectResp){
             if(projectResp.data.length)
             {
                 if(m.route.param('pid') == 0){
@@ -774,6 +842,15 @@ var navigation = {
         }, function(){
             AJAXERROR();
         });
+
+        m.request({method:'get', url: baseUrl + '/api/v1/accounts'})
+        .then(function(resp){
+            self.AccountList = resp.data;
+        }, function(){
+            AJAXERROR();
+        })
+
+
 
         this.addTask = function (elm, init, context ) {
 
@@ -790,7 +867,18 @@ var navigation = {
         };
 
         this.addProject = function () {
-            return m.request({method:'post', url: baseUrl + '/api/v1/account/1/project', data: {title: 'Project Title'}}).then(function(){}, AJAXERROR())
+            return m.request({method:'post', url: baseUrl + '/api/v1/account/1/project', data: {title: 'Project Title'}}).then(function(){}, function(){
+                AJAXERROR();
+            })
+        };
+
+        this.addAccount = function(){
+            return m.request({method:'post', url: baseUrl + '/api/v1/account', data: {name: 'Account Name'}})
+            .then(function(resp){
+                m.route('/4/' + resp.data.id)
+            }, function(){
+                AJAXERROR();
+            })  
         };
     
     },
@@ -818,6 +906,18 @@ var navigation = {
             }
         }
 
+        //Get account list
+        function accountList(elm, init, context){
+            if(!init)
+            {
+                return ctrl.AccountList.map(function (val, index) {
+                    return m("li.clearfix", [
+                        m("a[href='/4/" + val.id + "'].pull-left", {config: m.route }, val.name),
+                    ])
+                })     
+            }
+        }
+
         //Navigation Menu
         return m("#cd-nav", [
             m("a[href='javascript:void(0)'].cd-nav-trigger", {}, "Menu",[
@@ -833,8 +933,15 @@ var navigation = {
                         m("a", { onclick:  ctrl.addTask }, "Add Pin")
                     ]),
                     m("li", [
-                        m("a[href='#']", {onclick: ctrl.addProject}, "Add Project")
+                        m("a", {onclick: ctrl.addProject}, "Add Project")
                     ]),
+
+                    ((ctrl.AccountList.length) ? accountList() : '' ),
+
+                    m("li", [
+                        m("a", {onclick: ctrl.addAccount}, "Add Account")
+                    ]),
+
                     m("li", [
                         m("a[href='/1000/"+m.route.param('aid')+"']",{config: m.route}, "Settings")
                     ]),
@@ -858,12 +965,14 @@ console.log(bootstrap.Accounts[0]);
 m.routes( '/0/' + bootstrap.Accounts[0].id, {
     '/0/:aid' : {
         '#navigation' : navigation,
+        '#account' : '',
         '#project' : '',
         '#task' : '',
         '#settings' : ''
     },  
     '/1/:aid/:pid' : {
         '#navigation' : navigation,
+        '#account' : '',
         '#project' : project,
         '#task' : '',
         '#projectdetails' : '',
@@ -871,6 +980,7 @@ m.routes( '/0/' + bootstrap.Accounts[0].id, {
     },
     '/2/:aid/:pid' : {
         '#navigation' : navigation,
+        '#account' : '',
         '#project' : project,
         '#projectdetails' : projectDetails,
         '#task' : '',
@@ -878,13 +988,23 @@ m.routes( '/0/' + bootstrap.Accounts[0].id, {
     },
     '/3/:aid/:pid/:tid' : {
         '#navigation' : navigation,
+        '#account' : '',
         '#project' : project,
         '#projectdetails' : '',
         '#task' : task,
         '#settings' : '',
     },
+    '/4/:cid' : {
+        '#navigation' : navigation,
+        '#account' : accounts,
+        '#project' : '',
+        '#projectdetails' : '',
+        '#task' : '',
+        '#settings' : '',
+    },
     '/1000/:aid' : {
         '#navigation' : navigation,
+        '#account' : '',
         '#settings' : settings,
         // '#project' : project,
         // '#task' : task
