@@ -31,22 +31,50 @@ var transporter = nodemailer.createTransport({
 module.exports = function(models, io) {
 	router.param('accountId', /^\d+$/);
 
-	/*router.route('/')
+	router.route('/')
 		.post(
 	  		function(req, res, next) {
-	  			new dbmodel.Account(req.body).save().then(function(account_model) {
-	        		if(account_model){
-	        			res.json(account_model.toJSON({shallow: true}));
+	  			var userPromise  = models.User.find(req.user.id);
+	  			var accountPromise = models.Account.create(req.body);
 
-				  		console.dir(account_model.toJSON());
-	        		}
-				  	else{
-				  		res.json(null);
-				  		console.log("no data");
-				  	}
+	  			join(userPromise, accountPromise, function(user, account) {
+	  				if(user && account){
+		  				return [ account, user.addAccount(account)]
+		  			} else {
+		  				return [ null, null]
+		  			}
+				})
+				.spread(function(account, user){
+					var _response = {}
+					if(account && user){
+						_response.data =  	{
+												msg : res.__("account.success.create"),
+												data : account,
+												error : null
+											}
+						_response.status = 200;
+					} else {
+						_response.data =  	{
+												msg : res.__("account.fail.create"),
+												data : null,
+												error : null
+											}	
+						_response.status = 400;
+					}
+					return _response;
+				})
+				.then(function(_response){
+					res.status(_response.status).json(_response.data);
+				})
+				.error(function(e){
+					res.status(500).json({
+						msg : res.__("account.error.server"),
+						data : null,
+						error : e
+					});	
 				});
 	  		}
-	  	)*/
+	  	)
 
 	router.route('/:accountId')
 		.get( 
