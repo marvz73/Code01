@@ -262,7 +262,7 @@ module.exports = function(models, io) {
 				})
 				.spread(function(account, result){
 					if(account && result){
-						return account.getAccountUsers()
+						return account.getAccountUsers({ include: [ models.User ]})
 					} else {
 						return null
 					}
