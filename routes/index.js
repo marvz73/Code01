@@ -193,6 +193,10 @@ module.exports = function(passport, io) {
         res.render('profile', { title: 'Express', user : req.user });
     });
 
+    router.get('/home', isAuthenticated, function(req, res, next) {
+        res.redirect('/initialize');
+    });
+
     router.get('/home/:namespace', isAuthenticated, function(req, res, next) {
 
         if (!io.nsps["/"+req.params.namespace]) {
