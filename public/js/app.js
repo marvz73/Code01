@@ -773,11 +773,68 @@ var settings = {
 var accounts = {
     controller: function(){
         var self = this;
+        var accountsProjectList = [];
+        var accountsUserList = [];
 
+        m.request({method:'get', url: baseUrl + '/api/v1/account/' + m.route.param('aid') + '/projects' })
+        .then(function(resp){
+            self.accountsProjectList = resp.data;
+        },function(){
+            AJAXERROR();
+        })
+        .then(function(){
 
+            m.request({method:'get', url: baseUrl + '/api/v1/users' })
+            .then(function(resp){
+                self.accountsUserList = resp.data;
+            },function(){
+                AJAXERROR();
+            }) 
 
+        })
     },
-    view: function(){
+    view: function(ctrl){
+
+
+        function projectList(elm, init, context){
+            if( !init ){
+                if(ctrl.accountsProjectList.length)
+                {
+                    return ctrl.accountsProjectList.map(function(val, index){
+                        return m('li',[
+                            m('a[href="/3/' + m.route.param('aid') + '/' + m.route.param('pid') + '/' + val.id+'"]', {config: m.route}, val.title)
+                        ])
+                    })
+                }
+                else
+                {
+                    return m('li',[
+                        m('a.no-result', 'No Result')
+                    ]) 
+                }
+            }     
+        }
+
+        function userList(elm, init, context){
+            if( !init ){
+                if(ctrl.accountsUserList.length)
+                {
+                    return ctrl.accountsUserList.map(function(val, index){
+                        return m('li',[
+                            // m('a[href="/3/' + m.route.param('aid') + '/' + m.route.param('pid') + '/' + val.id+'"]', {config: m.route}, 'Issue #'+val.id,[
+                            //     m('span.pull-right', val.createdAt)
+                            // ])
+                        ])
+                    })
+                }
+                else
+                {
+                    return m('li',[
+                        m('a.no-result', 'No Result')
+                    ]) 
+                }
+            }
+        }
 
         function loaded(elm, init, context){
             if( !init ){               
@@ -809,6 +866,9 @@ var accounts = {
                     m("div.cd-panel-container", [
                         m("div.cd-panel-content",[
 
+                            m('ul.unstyled.project-task-list', [
+                                projectList()
+                            ])
 
 
                         ])
@@ -994,7 +1054,7 @@ m.routes( '/0/' + bootstrap.Accounts[0].id, {
         '#task' : task,
         '#settings' : '',
     },
-    '/4/:cid' : {
+    '/4/:aid' : {
         '#navigation' : navigation,
         '#account' : accounts,
         '#project' : '',
