@@ -1,18 +1,29 @@
+/*
+Fetch bootraped data, find the ID and return the index.
+*/
+function getIndex(params){
+    var result;
+    for( var i = 0, len = bootstrap.Accounts.length; i < len; i++ ) {
+        if( bootstrap.Accounts[i]['id'] === params ) {
+            // result = bootstrap.Accounts[i];
+            return result = i;
+            break;
+        }
+    }
+    return result;
+}
 
-
-var socket = io.connect('localhost:3000/' + bootstrap.Accounts[0].id);
-
-
-
+//Global ajax error message
 var AJAXERROR = function(){
     alert("Something went wrong and we don't why!");
     // window.location.reload();
 }
 
+var accountId = bootstrap.Accounts[getIndex(parseInt(namespace.replace('/', '')))].id;
 
+var socket = io.connect('localhost:3000/' + accountId);
 
-
-
+console.log(accountId);
 
 
 // var todo = {};
@@ -776,7 +787,7 @@ var accounts = {
         var accountsProjectList = [];
         var accountsUserList = [];
 
-        m.request({method:'get', url: baseUrl + '/api/v1/account/' + m.route.param('aid') + '/projects' })
+        m.request({method:'get', url: baseUrl + '/api/v1/account/' + accountId + '/projects' })
         .then(function(resp){
             self.accountsProjectList = resp.data;
         },function(){
@@ -889,7 +900,7 @@ var navigation = {
              m.redraw(true);
         });
 
-        m.request({method:'get', url: baseUrl + '/api/v1/account/' +bootstrap.Accounts[0].id + '/projects'})
+        m.request({method:'get', url: baseUrl + '/api/v1/account/' + accountId + '/projects'})
         .then(function(projectResp){
             if(projectResp.data.length)
             {
@@ -972,7 +983,7 @@ var navigation = {
             {
                 return ctrl.AccountList.map(function (val, index) {
                     return m("li.clearfix", [
-                        m("a[href='/4/" + val.id + "'].pull-left", {config: m.route }, val.name),
+                        m("a[href='" + val.id + "'].pull-left", val.name),
                     ])
                 })     
             }
@@ -1020,7 +1031,6 @@ var navigation = {
 //setup routes to start w/ the `#` symbol
 m.route.mode = "hash";
 
-console.log(bootstrap.Accounts[0]);
 
 m.routes( '/0/' + bootstrap.Accounts[0].id, {
     '/0/:aid' : {

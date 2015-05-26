@@ -217,7 +217,14 @@ module.exports = function(passport, io) {
 
         models.User.find( { where: {id: req.user.id}, include: [models.Account] } ).then(function(user) {
             if(user){
-                models.Account.find(req.params.namespace).then(function(account) {
+
+
+                models.Account.find(parseInt(req.params.namespace)).then(function(account) {
+                    
+                console.log("++++++++++++++++++++++++++++++++++++++++++++++++");
+                console.log(user);
+                console.log("++++++++++++++++++++++++++++++++++++++++++++++++");
+                
                     user.hasAccount(account).then(function(result){
                         if(result){
                             res.render('home', { 
