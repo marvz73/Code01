@@ -427,92 +427,15 @@ var task = {
     }
 }
 
-
-
-//drag and drop micro-library
-function dragdrop(element, options) {
-    options = options || {}
-    
-    element.addEventListener("dragover", activate)
-    element.addEventListener("dragleave", deactivate)
-    element.addEventListener("dragend", deactivate)
-    element.addEventListener("drop", deactivate)
-    element.addEventListener("drop", update)
-    window.addEventListener("blur", deactivate)
-
-    function activate(e) {
-        e.preventDefault()
-    }
-    function deactivate() {}
-    function update(e) {
-        e.preventDefault()
-        if (typeof options.onchange == "function") {
-            options.onchange((e.dataTransfer || e.target).files)
-        }
-    }
-}
-
-//model entity
-var Uploader = {}
-
-Uploader.upload = function(files) {
-    var formData = new FormData
-    for (var i = 0; i < files.length; i++) {
-        formData.append("file" + i, files[i])
-    }
-    
-    return m.request({
-        method: "POST",
-        url: "/echo/json",
-        data: formData,
-        //simply pass the FormData object intact to the underlying XMLHttpRequest, instead of JSON.stringify'ing it
-        serialize: function(value) {return value}
-    })
-}
-
-//an uploader module
-var uploader = {}
-
-uploader.controller = function(options) {
-    options = options || {}
-    return {
-        onchange: options.onchange
-    }
-}
-
-uploader.view = function(ctrl) {
-    return m(".uploader", {
-        config: function(element, isInitialized) {
-            if (!isInitialized) {
-                dragdrop(element, {onchange: ctrl.onchange})
-            }
-        }
-    })
-}
-
-
-// return {
-//     uploader: submodule(uploader, {
-//         onchange: function(files) {
-//             Uploader.upload(files).then(function() {
-//                 alert("uploaded!")
-//             })
-//         }
-//     })
-// }
-
-
-
-
-
 //project module
 var project = {
     controller: function() {
         var self = this;
-        console.log(uploader)
+
         socket.emit('switchRoom', m.route.param('pid'))
 
         this.TaskList = [];
+        this.ProjectImage = "";
 
         //Task create observ
         socket.on('taskCreate', function(data){
@@ -533,12 +456,12 @@ var project = {
                     m.redraw(true)
                 }                
             }
-        })
+        });
 
         //Fetch project task
         m.request({
             method:'get', 
-            url:  baseUrl + '/api/v1/account/' + m.route.param('aid') + '/project/' + m.route.param('pid') + '/tasks'
+            url:  baseUrl + '/api/v1/account/' + accountId + '/project/' + m.route.param('pid') + '/tasks'
         }).then(function(taskResp){
             if(taskResp.data.length){
                 self.TaskList = taskResp.data;
@@ -550,22 +473,45 @@ var project = {
             AJAXERROR();
         });
 
+        //Fetch project image
+        m.request({
+            method:'get', 
+            url:  baseUrl + '/api/v1/account/' + accountId + '/project/' + m.route.param('pid') + '/attachments'
+        }).then(function(projectImage){
+
+            self.ProjectImage = projectImage.data[(projectImage.data.length -1)];
+
+        })
+
+
         //Update task position
         this.updateTask = function(taskData){
-            console.log(123)
+
             var jsonData = {
                 Y: taskData.Y,
                 X: taskData.X
             }
 
             m.request({method:'post', url: baseUrl + '/api/v1/account/' +m.route.param('aid')+ '/project/' +m.route.param('pid')+ '/task/' + taskData.id, data: jsonData })
-            .then(function(){
+            .then(function(resp){
                 
             },function(){
                 AJAXERROR();
             })
         
         };
+
+        this.UploadFile = function(formData){
+            return m.request({
+                method: "POST",
+                url: '/api/v1/account/' + accountId + '/project/' + m.route.param('pid') + '/attachments',
+                data: formData,
+                //simply pass the FormData object intact to the underlying XMLHttpRequest, instead of JSON.stringify'ing it
+                serialize: function(value) {return value}
+            }).then(function(resp){
+                console.log(resp)
+            });
+        }
 
     },
     view: function(ctrl) {
@@ -621,64 +567,62 @@ var project = {
             }
         }
 
+        function dragDropUpload(elm, init, context){
 
+            if(!init)
+            {
+                var elms = document.getElementsByTagName("body")[0];
+             
+                elms.ondragover = function () { this.className = 'hover'; return false; };
+                elms.ondragend = function () { this.className = ''; return false; };
+                elms.ondrop = function (event) {
+                    event.preventDefault && event.preventDefault();
+                    this.className = '';
+                
+                    var files = event.dataTransfer.files;
 
-// return {
-//     uploader: submodule(uploader, {
-//         onchange: function(files) {
-//             Uploader.upload(files).then(function() {
-//                 alert("uploaded!")
-//             })
-//         }
-//     })
-// }
+                    var formData = new FormData;        
+                    for (var i = 0; i < files.length; i++) {
+                        formData.append("file", files[i])
+                    }
+
+                    ctrl.UploadFile(formData);
+
+                    return false;
+                } 
+            }
+
+        }
+
+        function projectImage(elm, init, context){
+
+            if(!init)
+            {
+                if(typeof ctrl.ProjectImage != 'undefined')
+                {
+                    return m("img[src='http://localhost:3000/api/v1/account/"+accountId+"/project/"+m.route.param('pid')+"/attachment/"+ctrl.ProjectImage.id+"']");
+                }
+                else
+                {
+                    return m('h1',{style: "color: red"}, 'No image attach!');
+                }
+            }
+        }
+
 
         return m("div", [
                     //pins annotation
                     m("div.cd-product.cd-container", [
-                        m("div#wrapper", {
-    config: function(elm, init){
-        elm.ondragover = function () { this.className = 'hover'; return false; };
-        elm.ondragend = function () { this.className = ''; return false; };
-        elm.ondrop = function (event) {
-            event.preventDefault && event.preventDefault();
-            this.className = '';
-        
-            var files = event.dataTransfer.files;
+                        m("div#wrapper", { config: dragDropUpload },[
 
-            var formData = new FormData;        
-            for (var i = 0; i < files.length; i++) {
-                formData.append("file", files[i])
-            }
-
-            return m.request({
-                method: "POST",
-                url: '/api/v1/account/' + accountId + '/project/' + m.route.param('pid') + '/attachments',
-                data: formData,
-                //simply pass the FormData object intact to the underlying XMLHttpRequest, instead of JSON.stringify'ing it
-                serialize: function(value) {return value}
-            });
-
-
-            return false;
-        }
-    }
-                        },[
                             m("ul", [
                                 ((ctrl.TaskList.length) ? taskList() : '' )
                             ]),
              
                             //Project images
-                            m("img[src='" + baseUrl + "/images/cd-app-image.jpg']"
+                            projectImage()
 
-        // ,{
-        //     config: function(element, isInitialized) {
-        //         if (!isInitialized) {
-        //             dragdrop(element, {onchange: ctrl.onchange})
-        //         }
-        //     }
-        // }
-                            )
+                         
                         ])
                     ])
                 ]);
