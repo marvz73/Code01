@@ -959,6 +959,74 @@ var accounts = {
     }
 }
 
+var accountViews = {
+    controller: function() {
+        var self = this;
+    },
+    view: function(ctrl){
+
+        function loaded(elm, init, context){
+            if( !init ){               
+                setTimeout(function(){
+                    Q('.cd-panel').addClass('is-visible');
+                }, 200)
+            }
+        }
+
+        function hideRightModal(elm, init, context){
+            if( !init ){
+                var strClass = elm.target.className;
+                if(strClass.indexOf('cd-panel') == 0 || strClass.indexOf('cd-panel-close') == 0){
+                    Q('.cd-panel').removeClass('is-visible', function(resp){
+                        Q('.cd-panel').timer(500, function(){
+                            window.history.back()
+                        })
+                    });
+                }
+            }
+        }
+
+        return  m("div.cd-panel.from-right#cd-panel", {config: loaded, onclick: hideRightModal}, [
+                    m("header.cd-panel-header.no-touch",[
+                        m("h4.title","Settings"),
+                        m("a.cd-panel-close", {onclick: hideRightModal}, "Close")
+                    ]),
+                    m("div.cd-panel-container", [
+                        m('ul.nav.nav-tabs', [
+                            m('li', [
+                                m('a[href="#"]', 'Menu 1')
+                            ]),
+                            m('li', [
+                                m('a[href="#"]', 'Menu 2')
+                            ])
+                        ]),
+                        m("div.cd-panel-content",[
+
+
+
+
+                            m('fieldset.settings',[
+
+                                m('legend', "Account Details"),
+                                m('div.settings-group', [
+                                    m('input.form-control[type="text"][placeholder="Email"]'),
+                                    m('input.form-control[type="text"][placeholder="First Name"]'),
+                                    m('input.form-control[type="text"][placeholder="Last Name"]')
+                                ]),
+
+
+                            ])
+
+
+
+
+                        ])
+                    ])
+                ])
+    }
+}
+
+
 var navigation = {
     controller: function() {
         var self = this;
@@ -1021,6 +1089,10 @@ var navigation = {
                 AJAXERROR();
             })  
         };
+
+        this.addSubProject = function(){
+            alert("no function!")
+        }
     
     },
     view: function(ctrl) {
@@ -1041,7 +1113,9 @@ var navigation = {
                 return ctrl.ProjectList.map(function (val, index) {
                     return m("li.clearfix", [
                         m("a[href='/1/" + val.AccountId + '/' +val.id+ "'].pull-left", {config: m.route }, val.title),
-                        m("a[href='/2/"+ val.AccountId+"/"+val.id+"'].pull-right", {config: m.route}, "View")
+                        m("a[href='/2/"+ val.AccountId+"/"+val.id+"'].pull-right", {config: m.route}, "View"),
+                        m("a[href='/2/"+ val.AccountId+"/"+val.id+"'].pull-right", {onclick: ctrl.addSubProject}, " + "),
+                        
                     ])
                 })     
             }
@@ -1054,6 +1128,7 @@ var navigation = {
                 return ctrl.AccountList.map(function (val, index) {
                     return m("li.clearfix", [
                         m("a[href='" + val.id + "'].pull-left", val.name),
+                        m("a[href='/4/" + val.id + "/details'].pull-right",{config: m.route}, "details"),
                     ])
                 })     
             }
@@ -1138,6 +1213,15 @@ m.routes( '/0/' + bootstrap.Accounts[0].id, {
         '#navigation' : navigation,
         '#account' : accounts,
         '#project' : '',
+        '#projectdetails' : '',
+        '#task' : '',
+        '#settings' : '',
+    },
+    '/4/:aid/details' : {
+        '#navigation' : navigation,
+        '#account' : '',
+        '#account' : accountViews,
+        // '#project' : project,
         '#projectdetails' : '',
         '#task' : '',
         '#settings' : '',
