@@ -648,7 +648,7 @@ var project = {
 
             var formData = new FormData;        
             for (var i = 0; i < files.length; i++) {
-                formData.append("file" + i, files[i])
+                formData.append("file", files[i])
             }
 
             return m.request({

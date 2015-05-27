@@ -348,7 +348,8 @@ module.exports = function(models, io) {
 				.spread(function(project, result){
 					if(project && result){
 						var attachments = [];
-
+						console.log(req.files);
+						
 						req.files.file.forEach(function(element, index, array){
 							attachments.push(models.ProjectAttachment.create({
 								originalName: element.originalname,
