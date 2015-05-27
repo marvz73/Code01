@@ -19,9 +19,10 @@ var AJAXERROR = function(){
     // window.location.reload();
 }
 
+var sharedProjectTask = [];
 var accountId = bootstrap.Accounts[getIndex(parseInt(namespace.replace('/', '')))].id;
-
 var socket = io.connect('localhost:3000/' + accountId);
+
 
 console.log(accountId);
 
@@ -254,8 +255,7 @@ console.log(accountId);
 
 
 
-
-
+// task module
 var task = {
     controller: function() {
 
@@ -427,12 +427,89 @@ var task = {
     }
 }
 
-var sharedProjectTask = [];
 
+
+//drag and drop micro-library
+function dragdrop(element, options) {
+    options = options || {}
+    
+    element.addEventListener("dragover", activate)
+    element.addEventListener("dragleave", deactivate)
+    element.addEventListener("dragend", deactivate)
+    element.addEventListener("drop", deactivate)
+    element.addEventListener("drop", update)
+    window.addEventListener("blur", deactivate)
+
+    function activate(e) {
+        e.preventDefault()
+    }
+    function deactivate() {}
+    function update(e) {
+        e.preventDefault()
+        if (typeof options.onchange == "function") {
+            options.onchange((e.dataTransfer || e.target).files)
+        }
+    }
+}
+
+//model entity
+var Uploader = {}
+
+Uploader.upload = function(files) {
+    var formData = new FormData
+    for (var i = 0; i < files.length; i++) {
+        formData.append("file" + i, files[i])
+    }
+    
+    return m.request({
+        method: "POST",
+        url: "/echo/json",
+        data: formData,
+        //simply pass the FormData object intact to the underlying XMLHttpRequest, instead of JSON.stringify'ing it
+        serialize: function(value) {return value}
+    })
+}
+
+//an uploader module
+var uploader = {}
+
+uploader.controller = function(options) {
+    options = options || {}
+    return {
+        onchange: options.onchange
+    }
+}
+
+uploader.view = function(ctrl) {
+    return m(".uploader", {
+        config: function(element, isInitialized) {
+            if (!isInitialized) {
+                dragdrop(element, {onchange: ctrl.onchange})
+            }
+        }
+    })
+}
+
+
+// return {
+//     uploader: submodule(uploader, {
+//         onchange: function(files) {
+//             Uploader.upload(files).then(function() {
+//                 alert("uploaded!")
+//             })
+//         }
+//     })
+// }
+
+
+
+
+
+//project module
 var project = {
     controller: function() {
         var self = this;
-
+        console.log(uploader)
         socket.emit('switchRoom', m.route.param('pid'))
 
         this.TaskList = [];
@@ -489,6 +566,7 @@ var project = {
             })
         
         };
+
     },
     view: function(ctrl) {
         //Bind an event to the element
@@ -543,16 +621,64 @@ var project = {
             }
         }
 
+
+
+// return {
+//     uploader: submodule(uploader, {
+//         onchange: function(files) {
+//             Uploader.upload(files).then(function() {
+//                 alert("uploaded!")
+//             })
+//         }
+//     })
+// }
+
         return m("div", [
                     //pins annotation
                     m("div.cd-product.cd-container", [
-                        m("div#wrapper.cd-product-wrapper", [
+                        m("div#wrapper", {
+    config: function(elm, init){
+        elm.ondragover = function () { this.className = 'hover'; return false; };
+        elm.ondragend = function () { this.className = ''; return false; };
+        elm.ondrop = function (event) {
+            event.preventDefault && event.preventDefault();
+            this.className = '';
+        
+            var files = event.dataTransfer.files;
+
+            var formData = new FormData;        
+            for (var i = 0; i < files.length; i++) {
+                formData.append("file" + i, files[i])
+            }
+
+            return m.request({
+                method: "POST",
+                url: '/api/v1/account/' + accountId + '/project/' + m.route.param('pid') + '/attachments',
+                data: formData,
+                //simply pass the FormData object intact to the underlying XMLHttpRequest, instead of JSON.stringify'ing it
+                serialize: function(value) {return value}
+            });
+
+
+            return false;
+        }
+    }
+                        },[
                             m("ul", [
                                 ((ctrl.TaskList.length) ? taskList() : '' )
                             ]),
-
+             
                             //Project images
-                            m("img[src='" + baseUrl + "/images/cd-app-image.jpg']")
+                            m("img[src='" + baseUrl + "/images/cd-app-image.jpg']"
+
+        // ,{
+        //     config: function(element, isInitialized) {
+        //         if (!isInitialized) {
+        //             dragdrop(element, {onchange: ctrl.onchange})
+        //         }
+        //     }
+        // }
+                            )
                         ])
                     ])
                 ]);
@@ -938,7 +1064,7 @@ var navigation = {
         };
 
         this.addProject = function () {
-            return m.request({method:'post', url: baseUrl + '/api/v1/account/1/project', data: {title: 'Project Title'}}).then(function(){}, function(){
+            return m.request({method:'post', url: baseUrl + '/api/v1/account/' + accountId + '/project', data: {title: 'Project Title'}}).then(function(){}, function(){
                 AJAXERROR();
             })
         };

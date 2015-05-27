@@ -1615,7 +1615,9 @@ a.cd-panel-close:after {
 
 
 
-
+.hover{
+  border: 3px dotted red;
+}
 
 
 

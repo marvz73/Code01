@@ -1,10 +1,11 @@
 jQuery(document).ready(function($){
 
-
+$('#navigation').hide();
 
 
 setTimeout(function(){
 
+        $('#navigation').show();
 
 		// browser window scroll (in pixels) after which the "menu" link is shown
 		var offset = -5;
