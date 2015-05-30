@@ -350,7 +350,7 @@ module.exports = function(models, io) {
 				.spread(function(account, user) {
 					account.addUser(user[0]);
 					if(user[1] && user[0].get('token') != null){
-                        var text = req.get('host') + '/verify/' + user[0].get('token');
+                        var text = req.get('host') + '/verify/' + user[0].get('token', {raw: true});
 
                         transporter.sendMail({
                             from: 'dumingagebpls@gmail.com',
