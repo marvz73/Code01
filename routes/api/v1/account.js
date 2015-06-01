@@ -59,7 +59,7 @@ module.exports = function(models, io) {
 												data : null,
 												error : null
 											}	
-						_response.status = 400;
+						_response.status = 404;
 					}
 					return _response;
 				})
@@ -104,7 +104,7 @@ module.exports = function(models, io) {
 												data : null,
 												error : null
 											}	
-						_response.status = 400;
+						_response.status = 404;
 					}
 					return _response;
 				})
@@ -155,7 +155,7 @@ module.exports = function(models, io) {
 												data : null,
 												error : null
 											}	
-						_response.status = 400;
+						_response.status = 404;
 					}
 					return _response;
 				})
@@ -206,7 +206,7 @@ module.exports = function(models, io) {
 												data : null,
 												error : null
 											}	
-						_response.status = 400;
+						_response.status = 404;
 					}
 					return _response;
 				})
@@ -238,7 +238,7 @@ module.exports = function(models, io) {
 				})
 				.spread(function(account, result){
 					if(account && result){
-						return account.getProjects({ include: [ models.User ]})
+						return account.getProjects({ include: [ models.User ], where: {ProjectId: null}})
 					} else {
 						return null
 					}
@@ -258,7 +258,7 @@ module.exports = function(models, io) {
 												data : null,
 												error : null
 											}	
-						_response.status = 400;
+						_response.status = 404;
 					}
 					return _response;
 				})
@@ -310,7 +310,7 @@ module.exports = function(models, io) {
 												data : null,
 												error : null
 											}	
-						_response.status = 400;
+						_response.status = 404;
 					}
 					return _response;
 				})
@@ -386,7 +386,7 @@ module.exports = function(models, io) {
 												data : null,
 												error : null
 											}	
-						_response.status = 400;
+						_response.status = 404;
 					}
 					return _response;
 				})

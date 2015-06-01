@@ -62,7 +62,7 @@ module.exports = function(models, io) {
 												data : null,
 												error : null
 											}	
-						_response.status = 400;
+						_response.status = 404;
 					}
 					return _response;
 				})
@@ -110,7 +110,7 @@ module.exports = function(models, io) {
 												data : null,
 												error : null
 											}	
-						_response.status = 400;
+						_response.status = 404;
 					}
 					return _response;
 				})
@@ -164,7 +164,7 @@ module.exports = function(models, io) {
 												data : null,
 												error : null
 											}	
-						_response.status = 400;
+						_response.status = 404;
 					}
 					return _response;
 				})
@@ -218,7 +218,7 @@ module.exports = function(models, io) {
 												data : null,
 												error : null
 											}	
-						_response.status = 400;
+						_response.status = 404;
 					}
 					return _response;
 				})
