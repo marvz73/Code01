@@ -31,15 +31,28 @@ var io = require('../config/socket')(ioInit, models);
  */
 
 var api_v1 = require('../routes/api/v1/api.js')(models, ioInit);
+var api_v2 = require('../routes/api/v2/api.js')(models, ioInit);
 var routes = require('../routes/index')(app.locals.passport, ioInit);
+
+app.all('*', function(req, res, next) {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
+  next();
+ });
 
 app.use('/', routes);
 app.use('/api/v1', api_v1);
+app.use('/api/v2', api_v2);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   var err = new Error('Not Found');
   err.status = 404;
+  if(Object.getOwnPropertyNames(req.files).length > 0)
+    req.files.file.forEach(function(element, index, array){
+      fs.unlink(__dirname + '../uploads/' + element.name);
+    })
   next(err);
 });
 

@@ -10,7 +10,7 @@ module.exports = function(sequelize, DataTypes) {
       associate: function(models) {
         Project.belongsTo(models.Account);
         Project.belongsTo(models.User);
-        Project.hasMany(models.Project);
+        Project.hasMany(models.Project, {as: 'SubProjects'});
         Project.hasMany(models.Task);
         Project.hasOne(models.ProjectAttachment);
       }

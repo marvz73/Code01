@@ -82,7 +82,7 @@ module.exports = function(models, io) {
 	  		function(req, res, next) {
 	  			var userPromise  = models.User.find(parseInt(req.user.id));
 	  			var accountPromise = models.Account.find(parseInt(req.params.accountId));
-	  			var projectPromise = models.Project.find({ where: {'id': req.params.projectId, AccountId: req.params.accountId}, include: [ models.User, { model: models.Project, as: 'SubProjects' }, models.ProjectAttachment ] });
+	  			var projectPromise = models.Project.find({ where: {'id': req.params.projectId, AccountId: req.params.accountId}, include: [ models.User, models.Project, models.ProjectAttachment ] });
 
 	  			join(userPromise, accountPromise, projectPromise, function(user, account, project) {
 	  				if(user && account && project){
@@ -396,13 +396,6 @@ module.exports = function(models, io) {
 				});
 	  		}
 		)
-
-	var task = require('./task.js')(models, io);
-	router.use('/:projectId/task', task);
-
-	var projectAttachment = require('./projectAttachment.js')(models, io);
-	router.use('/:projectId/attachment', projectAttachment);
-
 
 	return router;
 }
