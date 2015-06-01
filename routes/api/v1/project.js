@@ -296,7 +296,7 @@ module.exports = function(models, io) {
 				})
 				.spread(function(project, result){
 					if(project && result){
-						return project.getProjectAttachments({ include: [ models.User ]})
+						return project.getProjectAttachment({ include: [ models.User ]})
 					} else {
 						return null;
 					}
