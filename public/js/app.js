@@ -479,7 +479,9 @@ var project = {
             url:  baseUrl + '/api/v1/account/' + accountId + '/project/' + m.route.param('pid') + '/attachments'
         }).then(function(projectImage){
 
-            self.ProjectImage = projectImage.data[(projectImage.data.length -1)];
+                console.log(projectImage.data.id)
+
+            self.ProjectImage = projectImage.data.id;
 
         })
 
@@ -600,7 +602,7 @@ var project = {
             {
                 if(typeof ctrl.ProjectImage != 'undefined')
                 {
-                    return m("img[src='http://localhost:3000/api/v1/account/"+accountId+"/project/"+m.route.param('pid')+"/attachment/"+ctrl.ProjectImage.id+"']");
+                    return m("img[src='http://localhost:3000/api/v1/account/"+accountId+"/project/"+m.route.param('pid')+"/attachment/"+ctrl.ProjectImage+"']");
                 }
                 else
                 {
