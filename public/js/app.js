@@ -685,60 +685,62 @@ var projectDetails = {
             }
         }
 
-        function projectTask(){
-            if(sharedProjectTask.length)
+        function projectTask(elm, init, context){
+            if(!init)
             {
-                return sharedProjectTask.map(function(val, index){
-                    return m('li',[
-
-                        m('a[href="/3/' + m.route.param('aid') + '/' + m.route.param('pid') + '/' + val.id+'"]', {config: m.route}, 'Issue #'+val.id,[
-                            m('span.pull-right', val.createdAt)
+                if(sharedProjectTask.length)
+                {
+                    return sharedProjectTask.map(function(val, index){
+                        return m('li',[
+                            m('a[href="/3/' + m.route.param('aid') + '/' + m.route.param('pid') + '/' + val.id+'"]', {config: m.route}, 'Issue #'+val.id,[
+                                m('span.pull-right', val.createdAt)
+                            ])
                         ])
-                    ])
-                })
-            }else{
-                return m('li',[
-                    m('a.no-result', 'No Result')
-                ])   
+                    })
+                }else{
+                    return m('li',[
+                        m('a.no-result', 'No Result')
+                    ])   
+                }
             }
-
-
         }
 
-// function timeDifference(current, previous) {
-    
-//     var msPerMinute = 60 * 1000;
-//     var msPerHour = msPerMinute * 60;
-//     var msPerDay = msPerHour * 24;
-//     var msPerMonth = msPerDay * 30;
-//     var msPerYear = msPerDay * 365;
-    
-//     var elapsed = current - previous;
-    
-//     if (elapsed < msPerMinute) {
-//          return Math.round(elapsed/1000) + ' seconds ago';   
-//     }
-    
-//     else if (elapsed < msPerHour) {
-//          return Math.round(elapsed/msPerMinute) + ' minutes ago';   
-//     }
-    
-//     else if (elapsed < msPerDay ) {
-//          return Math.round(elapsed/msPerHour ) + ' hours ago';   
-//     }
+        function projectSubTask(elm, init, context){
+            if(!init)
+            {
 
-//     else if (elapsed < msPerMonth) {
-//          return 'approximately ' + Math.round(elapsed/msPerDay) + ' days ago';   
-//     }
-    
-//     else if (elapsed < msPerYear) {
-//          return 'approximately ' + Math.round(elapsed/msPerMonth) + ' months ago';   
-//     }
-    
-//     else {
-//          return 'approximately ' + Math.round(elapsed/msPerYear ) + ' years ago';   
-//     }
-// }
+                if(ctrl.projectDetails.SubProjects.length)
+                {
+                    return ctrl.projectDetails.SubProjects.map(function(val, index){
+                        return m('li',[
+                            m('a[href="/3/' + m.route.param('aid') + '/' + m.route.param('pid') + '/' + val.id+'"]', {config: m.route}, 'Sub Project #'+val.id,[
+                                m('span.pull-right', val.createdAt)
+                            ])
+                        ])
+                    })
+                }else{
+                    return m('li',[
+                        m('a.no-result', 'No Result')
+                    ])   
+                }
+
+            }
+        }
+
+         function projectSubTaskContainer(elm, init, context){
+            if(!init && !ctrl.projectDetails.ProjectId)
+            {
+
+                return m('m', [
+                    m('legend', "Sub Project's"),
+                    m('ul.unstyled.project-task-list', [
+                        projectSubTask()
+                    ])
+                ])
+
+            }
+        }
+
 
         return  m("div.cd-panel.from-right#cd-panel", {config: loaded, onclick: hideRightModal}, [
                     m("header.cd-panel-header.no-touch",[
@@ -751,13 +753,17 @@ var projectDetails = {
                                 m('textarea[rows="6"].form-control', ctrl.projectDetails.description),
                             ]),
                             m('fieldset.settings',[
-                                m('legend', "Project Task"),
+
+                                m('legend', "Project Task's"),
                                 m('ul.unstyled.project-task-list', [
 
                                     projectTask()
 
+                                ]),
 
-                                ])
+                                m('p',''),
+                                projectSubTaskContainer()
+
                             ])
                         ])
                     ])
@@ -1092,8 +1098,10 @@ var navigation = {
             })  
         };
 
-        this.addSubProject = function(){
-            alert("no function!")
+        this.addSubProject = function(pid){
+            return m.request({method:'post', url: baseUrl + '/api/v1/account/' + accountId + '/project', data: {ProjectId: pid, title: 'Project Title'}}).then(function(){}, function(){
+                AJAXERROR();
+            })
         }
     
     },
@@ -1116,7 +1124,12 @@ var navigation = {
                     return m("li.clearfix", [
                         m("a[href='/1/" + val.AccountId + '/' +val.id+ "'].pull-left", {config: m.route }, val.title),
                         m("a[href='/2/"+ val.AccountId+"/"+val.id+"'].pull-right", {config: m.route}, "View"),
-                        m("a[href='/2/"+ val.AccountId+"/"+val.id+"'].pull-right", {onclick: ctrl.addSubProject}, " + "),
+
+                        m("a", {onclick: function(elm, init, context){
+                            if(!init){
+                                ctrl.addSubProject(val.id);
+                            }
+                        } }, " + "),
                         
                     ])
                 })     

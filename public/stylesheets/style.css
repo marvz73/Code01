@@ -142,7 +142,7 @@ body {
   font-size: 100%;
   font-family: "Roboto", sans-serif;
   color: #33435a;
-  background-color: #3c4f6a;
+  background-color: #3c4f6a;`
 }
 a {
   color: #d95353;
@@ -815,7 +815,7 @@ header h1 {
     border-bottom: 1px solid #eff2f6;
   }
   #cd-nav.is-fixed ul li a {
-    padding: 1.6em;
+    padding: 1em;
     margin-left: 0;
   }
   #cd-nav ul.has-transitions {
