@@ -970,6 +970,25 @@ var accounts = {
 var accountViews = {
     controller: function() {
         var self = this;
+
+        this.accountUsers = function(){
+            m.request({method:'get', url: baseUrl + '/api/v1/account/'+m.route.param('aid')+'/accountUsers' })
+            .then(function(resp){
+                
+            },function(){
+                AJAXERROR();
+            }) 
+        }
+
+        this.addUserAccount = function(){
+            m.request({method:'get', url: baseUrl + '/api/v1/users' })
+            .then(function(resp){
+                
+            },function(){
+                AJAXERROR();
+            }) 
+        }
+
     },
     view: function(ctrl){
 
@@ -983,50 +1002,52 @@ var accountViews = {
 
         function hideRightModal(elm, init, context){
             if( !init ){
-                var strClass = elm.target.className;
-                if(strClass.indexOf('cd-panel') == 0 || strClass.indexOf('cd-panel-close') == 0){
-                    Q('.cd-panel').removeClass('is-visible', function(resp){
-                        Q('.cd-panel').timer(500, function(){
-                            window.history.back()
-                        })
-                    });
-                }
+                // var strClass = elm.target.className;
+                // if(strClass.indexOf('cd-panel') == 0 || strClass.indexOf('cd-panel-close') == 0){
+                //     Q('.cd-panel').removeClass('is-visible', function(resp){
+                //         Q('.cd-panel').timer(500, function(){
+                //             window.history.back()
+                //         })
+                //     });
+                // }
+            }
+        }
+
+        function addUserAccount(elm, init, context){
+            if( !init ){
+                console.log(123111111)
             }
         }
 
         return  m("div.cd-panel.from-right#cd-panel", {config: loaded, onclick: hideRightModal}, [
                     m("header.cd-panel-header.no-touch",[
-                        m("h4.title","Settings"),
+                        m("h4.title","Account Details"),
                         m("a.cd-panel-close", {onclick: hideRightModal}, "Close")
                     ]),
                     m("div.cd-panel-container", [
-                        m('ul.nav.nav-tabs', [
-                            m('li', [
-                                m('a[href="#"]', 'Menu 1')
-                            ]),
-                            m('li', [
-                                m('a[href="#"]', 'Menu 2')
-                            ])
-                        ]),
+                        // m('ul.nav.nav-tabs', [
+                        //     m('li', [
+                        //         m('a[href="#"]', 'Menu 1')
+                        //     ]),
+                        //     m('li', [
+                        //         m('a[href="#"]', 'Menu 2')
+                        //     ])
+                        // ]),
                         m("div.cd-panel-content",[
-
-
-
 
                             m('fieldset.settings',[
 
-                                m('legend', "Account Details"),
+                                m('legend', "Invite User's"),
                                 m('div.settings-group', [
-                                    m('input.form-control[type="text"][placeholder="Email"]'),
-                                    m('input.form-control[type="text"][placeholder="First Name"]'),
-                                    m('input.form-control[type="text"][placeholder="Last Name"]')
+                                    m('div.form-group', [
+                                        m('input.form-control[type="email"][placeholder="Enter Email Address"]', {config: addUserAccount}),
+                                    ]),
+                                    m('div.form-group', [
+                                        m('button.btn.btn-primary', {onclick: addUserAccount}, 'Send Invite')
+                                    ]),
                                 ]),
 
-
                             ])
-
-
-
 
                         ])
                     ])
