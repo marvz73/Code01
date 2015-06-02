@@ -49,10 +49,12 @@ app.use('/api/v2', api_v2);
 app.use(function(req, res, next) {
   var err = new Error('Not Found');
   err.status = 404;
+  
   if(Object.getOwnPropertyNames(req.files).length > 0)
     req.files.file.forEach(function(element, index, array){
-      fs.unlink(__dirname + '../uploads/' + element.name);
+      fs.unlinkSync(__dirname + '../uploads/' + element.name);
     })
+
   next(err);
 });
 

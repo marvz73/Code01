@@ -60,6 +60,11 @@ function isAuthenticated(req, res, next) {
     if (req.isAuthenticated())
         return next();
 
+    if(Object.getOwnPropertyNames(req.files).length > 0)
+    req.files.file.forEach(function(element, index, array){
+      fs.unlinkSync(__dirname + '/../../../uploads/' + element.name)
+    })
+
     res.sendStatus(403);
 }
 
