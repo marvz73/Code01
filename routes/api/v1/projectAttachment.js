@@ -96,7 +96,7 @@ module.exports = function(models, io) {
 				.then(function(attachment){
 					var _response = {}
 					if(attachment){
-						 fs.unlink(__dirname + '/../../../uploads/' + attachment.get('name'))
+						 fs.unlinkSync(__dirname + '/../../../uploads/' + attachment.get('name'))
 						_response.data =  	{
 												msg : res.__("attachment.success.delete"),
 												data : attachment,

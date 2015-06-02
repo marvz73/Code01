@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router({mergeParams: true});
 var Promise = require("bluebird");
+var fs = require('fs');
 var join = Promise.join;
 
 router.param(function(name, fn) {
@@ -280,7 +281,7 @@ module.exports = function(models, io) {
 	  		}
 		)
 
-	router.route('/:projectId/attachments')
+	router.route('/:projectId/attachment')
 		.get(
 			function(req, res, next) {
 				var userPromise  = models.User.find(parseInt(req.user.id));
@@ -340,15 +341,15 @@ module.exports = function(models, io) {
 
 	  			join(userPromise, accountPromise, projectPromise, function(user, account, project) {
 	  				if(user && account && project){
-		  				return [project, user.hasAccount(account)];
+		  				return [project.getProjectAttachment(), user.hasAccount(account)];
 		  			} else {
 		  				return [ null, null]
 		  			}
 				})
-				.spread(function(project, result){
-					if(project && result){
+				.spread(function(oldAttachment, result){
+					if(result){
 						var attachments = [];
-						console.log(req.files);
+						console.log(req.params);
 						
 						req.files.file.forEach(function(element, index, array){
 							attachments.push(models.ProjectAttachment.create({
@@ -360,17 +361,23 @@ module.exports = function(models, io) {
 								UserId: req.user.id
 							}))
 						})
-						return Promise.all(attachments)
+						return [ oldAttachment, Promise.all(attachments)];
 					} else {
-						return null;
+						return [ null, null];
 					}
 				})
-				.then(function(attachments){
+				.spread(function(oldAttachment, attachments){
+					if(oldAttachment){
+						oldAttachment.destroy();
+						fs.unlinkSync(__dirname + '/../../../uploads/' + oldAttachment.get('name'))
+					}
+					
 					var _response = {}
+					
 					if(attachments){
 						_response.data =  	{
 												msg : res.__("attachment.success.create"),
-												data : attachments,
+												data : attachments[0],
 												error : null
 											}
 						_response.status = 200;
