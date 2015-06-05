@@ -19,21 +19,63 @@ router.param(function(name, fn) {
 module.exports = function(models) {
 	router.param('userId', /^\d+$/);
 
+	router.route('/')
+		.get(
+			function(req, res){
+				models.User.findAll().then(function(users) {
+					res.json({
+						users : users
+					});
+				})
+			}
+		)
+	  	.post( 
+			function(req, res, next) {
+				models.User.create(req.body.user).then(function(user) {
+					res.json({
+						user : user
+					});
+				})
+	  		}
+	  	)
+
 	router.route('/:userId')
 		.get( 
 			function(req, res, next) {
-				models.User.find(parseInt(req.user.id)).then(function(user) {
+				models.User.find(parseInt(req.params.userId)).then(function(user) {
+					res.json({
+						user : user
+					});
+				})
+	  		}
+	  	)
+	  	.put( 
+			function(req, res, next) {
+				models.User.find(parseInt(req.params.userId)).then(function(user) {
 					if(user){
-						res.json({
-							msg : res.__("user.success.fetch"),
-							data : user
-						})
+						return user.updateAttributes(req.body.user)
 					}else{
-				  		res.status(404).json({
-							msg : res.__("user.fail.fetch"),
-							data : null
-						});
+				  		return null;
 				  	}
+				}).then(function(user){
+					res.json({
+						user : user
+					});
+				})
+	  		}
+	  	)
+	  	.delete( 
+			function(req, res, next) {
+				models.User.find(parseInt(req.params.userId)).then(function(user) {
+					if(user){
+						return user.destroy()
+					}else{
+				  		return null;
+				  	}
+				}).then(function(user){
+					res.json({
+						user : user
+					});
 				})
 	  		}
 	  	)

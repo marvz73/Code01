@@ -34,55 +34,21 @@ module.exports = function(models, io) {
 	router.route('/')
 		.get(
 			function(req, res, next){
-				models.Account.findAll().then(function(accounts) {
+				models.Account.findAll({include: [{ all: true }]}).then(function(accounts) {
 					res.json({
 						accounts: accounts
 					});
 				})
 			}
 		)
-		.post(
-	  	// 	function(req, res, next) {
-	  	// 		var userPromise  = models.User.find(parseInt(req.user.id));
-	  	// 		var accountPromise = models.Account.create(req.body);
-
-	  	// 		join(userPromise, accountPromise, function(user, account) {
-	  	// 			if(user && account){
-		  // 				return [ account, user.addAccount(account)]
-		  // 			} else {
-		  // 				return [ null, null]
-		  // 			}
-				// })
-				// .spread(function(account, user){
-				// 	var _response = {}
-				// 	if(account && user){
-				// 		_response.data =  	{
-				// 								msg : res.__("account.success.create"),
-				// 								data : account,
-				// 								error : null
-				// 							}
-				// 		_response.status = 200;
-				// 	} else {
-				// 		_response.data =  	{
-				// 								msg : res.__("account.fail.create"),
-				// 								data : null,
-				// 								error : null
-				// 							}	
-				// 		_response.status = 400;
-				// 	}
-				// 	return _response;
-				// })
-				// .then(function(_response){
-				// 	res.status(_response.status).json(_response.data);
-				// })
-				// .error(function(e){
-				// 	res.status(500).json({
-				// 		msg : res.__("account.error.server"),
-				// 		data : null,
-				// 		error : e
-				// 	});	
-				// });
-	  	// 	}
+	  	.post(
+	  		function(req, res, next) {
+	  			models.Account.create(req.body.account).then(function(account) {
+					res.json({
+						account : account
+					});
+				})
+	  		}
 	  	)
 
 	router.route('/:accountId')
@@ -93,18 +59,6 @@ module.exports = function(models, io) {
   						account: account
   					})
 	  			})
-	  		}
-	  	)
-	  	.post(
-	  		function(req, res, next) {
-	  			// models.Account.find(parseInt(req.params.accountId)).then(function(account){
-	  			// 	return account.updateAttributes(req.body);
-	  			// }).then(function(account){
-	  			// 	res.json({
-	  			// 		account: account
-	  			// 	})
-	  			// });
-	  			console.log(req.body);
 	  		}
 	  	)
 	  	.put(
@@ -130,7 +84,7 @@ module.exports = function(models, io) {
 	  		}
 	  	)
 
-	router.route('/:accountId/projects')
+	/*router.route('/:accountId/projects')
 		.get(
 			function(req, res, next) {
 				var userPromise  = models.User.find(parseInt(req.user.id));
@@ -308,7 +262,7 @@ module.exports = function(models, io) {
 					});	
 				});
 	  		}
-		)
+		)*/
 
 
 	return router;
