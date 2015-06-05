@@ -971,6 +971,8 @@ var accountViews = {
     controller: function() {
         var self = this;
 
+        this.inviteUser = "Test";
+
         this.accountUsers = function(){
             m.request({method:'get', url: baseUrl + '/api/v1/account/'+m.route.param('aid')+'/accountUsers' })
             .then(function(resp){
@@ -981,12 +983,16 @@ var accountViews = {
         }
 
         this.addUserAccount = function(){
-            m.request({method:'get', url: baseUrl + '/api/v1/users' })
+            m.request({
+                method:'post', 
+                url: baseUrl + '/api/v1/account/' + m.route.param('aid') + '/inviteUser',
+                data: formData,
+            })
             .then(function(resp){
                 
             },function(){
                 AJAXERROR();
-            }) 
+            });
         }
 
     },
@@ -1002,20 +1008,23 @@ var accountViews = {
 
         function hideRightModal(elm, init, context){
             if( !init ){
-                // var strClass = elm.target.className;
-                // if(strClass.indexOf('cd-panel') == 0 || strClass.indexOf('cd-panel-close') == 0){
-                //     Q('.cd-panel').removeClass('is-visible', function(resp){
-                //         Q('.cd-panel').timer(500, function(){
-                //             window.history.back()
-                //         })
-                //     });
-                // }
+                var strClass = elm.target.className;
+                if(strClass.indexOf('cd-panel') == 0 || strClass.indexOf('cd-panel-close') == 0){
+                    Q('.cd-panel').removeClass('is-visible', function(resp){
+                        Q('.cd-panel').timer(500, function(){
+                            window.history.back()
+                        })
+                    });
+                }
             }
         }
 
         function addUserAccount(elm, init, context){
             if( !init ){
-                console.log(123111111)
+                
+                // formData
+                console.log(ctrl.inviteUser)
+
             }
         }
 
@@ -1040,7 +1049,7 @@ var accountViews = {
                                 m('legend', "Invite User's"),
                                 m('div.settings-group', [
                                     m('div.form-group', [
-                                        m('input.form-control[type="email"][placeholder="Enter Email Address"]', {config: addUserAccount}),
+                                        m('input.form-control[type="email"][placeholder="Enter Email Address"]', {onchange: m.withAttr("value", ctrl.inviteUser), value: ctrl.inviteUser}),
                                     ]),
                                     m('div.form-group', [
                                         m('button.btn.btn-primary', {onclick: addUserAccount}, 'Send Invite')
