@@ -9,7 +9,7 @@ module.exports = function(models, io) {
 		router.route('/')
 		.get(
 			function(req, res, next){
-				models.Task.findAll({include: [{ all: true }]}).then(function(tasks) {
+				models.Task.findAll({where: req.query, include: [{ all: true }]}).then(function(tasks) {
 					res.json({
 						tasks: tasks
 					});
@@ -29,7 +29,7 @@ module.exports = function(models, io) {
 	router.route('/:taskId')
 		.get( 
 	  		function(req, res, next) {
-	  			models.Task.find(parseInt(req.params.taskId)).then(function(task){
+	  			models.Task.findById(parseInt(req.params.taskId)).then(function(task){
 	  				res.json({
 						task : task
 					});
@@ -38,7 +38,7 @@ module.exports = function(models, io) {
 	  	)
 	  	.put( 
 	  		function(req, res, next) {
-	  			models.Task.find(parseInt(req.params.taskId)).then(function(task){
+	  			models.Task.findById(parseInt(req.params.taskId)).then(function(task){
 	  				return task.updateAttributes(req.body.task);
 	  			}).then(function(task){
 	  				res.json({
@@ -49,7 +49,7 @@ module.exports = function(models, io) {
 	  	)
 	  	.delete( 
 	  		function(req, res, next) {
-	  			models.Task.find(parseInt(req.params.taskId)).then(function(task){
+	  			models.Task.findById(parseInt(req.params.taskId)).then(function(task){
 	  				return task.destroy();
 	  			}).then(function(task){
 	  				res.json({

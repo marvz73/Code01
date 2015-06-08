@@ -9,11 +9,11 @@ module.exports = function(models, io) {
 	router.route('/:taskAttachmentId')
 		.get(
 			function(req, res, next){
-				var userPromise  = models.User.find(parseInt(req.user.id));
-	  			var accountPromise = models.Account.find(parseInt(req.params.accountId));
-	  			var projectPromise = models.Project.find({ where: {'id': req.params.projectId, AccountId: req.params.accountId}, include: [ models.User ] });
-	  			var taskPromise = models.Task.find({ where: {'id': req.params.taskId, ProjectId: req.params.projectId}, include: [ models.User ] })
-	  			var taskAttachmentPromise = models.TaskAttachment.find({ where: {'id': req.params.taskAttachmentId, TaskId: req.params.taskId}})
+				var userPromise  = models.User.findById(parseInt(req.user.id));
+	  			var accountPromise = models.Account.findById(parseInt(req.params.accountId));
+	  			var projectPromise = models.Project.findOne({ where: {'id': req.params.projectId, AccountId: req.params.accountId}, include: [ models.User ] });
+	  			var taskPromise = models.Task.findOne({ where: {'id': req.params.taskId, ProjectId: req.params.projectId}, include: [ models.User ] })
+	  			var taskAttachmentPromise = models.TaskAttachment.findOne({ where: {'id': req.params.taskAttachmentId, TaskId: req.params.taskId}})
 
 	  			join(userPromise, accountPromise, projectPromise, taskPromise, taskAttachmentPromise, function(user, account, project, task, attachment) {
 	  				if(user && account && project && task && attachment){
@@ -59,11 +59,11 @@ module.exports = function(models, io) {
 		)
 		.delete(
 			function(req, res, next){
-				var userPromise  = models.User.find(parseInt(req.user.id));
-	  			var accountPromise = models.Account.find(parseInt(req.params.accountId));
-	  			var projectPromise = models.Project.find({ where: {'id': req.params.projectId, AccountId: req.params.accountId}, include: [ models.User ] });
-	  			var taskPromise = models.Task.find({ where: {'id': req.params.taskId, ProjectId: req.params.projectId}, include: [ models.User ] })
-	  			var taskAttachmentPromise = models.TaskAttachment.find({ where: {'id': req.params.taskAttachmentId, TaskId: req.params.taskId}})
+				var userPromise  = models.User.findById(parseInt(req.user.id));
+	  			var accountPromise = models.Account.findById(parseInt(req.params.accountId));
+	  			var projectPromise = models.Project.findOne({ where: {'id': req.params.projectId, AccountId: req.params.accountId}, include: [ models.User ] });
+	  			var taskPromise = models.Task.findOne({ where: {'id': req.params.taskId, ProjectId: req.params.projectId}, include: [ models.User ] })
+	  			var taskAttachmentPromise = models.TaskAttachment.findOne({ where: {'id': req.params.taskAttachmentId, TaskId: req.params.taskId}})
 
 	  			join(userPromise, accountPromise, projectPromise, taskPromise, taskAttachmentPromise, function(user, account, project, task, attachment) {
 	  				if(user && account && project && task && attachment){

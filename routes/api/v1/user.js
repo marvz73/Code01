@@ -22,7 +22,7 @@ module.exports = function(models) {
 	router.route('/:userId')
 		.get( 
 			function(req, res, next) {
-				models.User.find(parseInt(req.user.id)).then(function(user) {
+				models.User.findById(parseInt(req.user.id)).then(function(user) {
 					if(user){
 						res.json({
 							msg : res.__("user.success.fetch"),

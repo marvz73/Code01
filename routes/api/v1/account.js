@@ -34,7 +34,7 @@ module.exports = function(models, io) {
 	router.route('/')
 		.post(
 	  		function(req, res, next) {
-	  			var userPromise  = models.User.find(parseInt(req.user.id));
+	  			var userPromise  = models.User.findById(parseInt(req.user.id));
 	  			var accountPromise = models.Account.create(req.body);
 
 	  			join(userPromise, accountPromise, function(user, account) {
@@ -79,8 +79,8 @@ module.exports = function(models, io) {
 	router.route('/:accountId')
 		.get( 
 	  		function(req, res, next) {
-	  			var userPromise  = models.User.find(parseInt(req.user.id));
-	  			var accountPromise = models.Account.find(parseInt(req.params.accountId));
+	  			var userPromise  = models.User.findById(parseInt(req.user.id));
+	  			var accountPromise = models.Account.findById(parseInt(req.params.accountId));
 
 	  			join(userPromise, accountPromise, function(user, account) {
 	  				if(user && account){
@@ -122,8 +122,8 @@ module.exports = function(models, io) {
 	  	)
 	  	.post(
 	  		function(req, res, next) {
-	  			var userPromise  = models.User.find(parseInt(req.user.id));
-	  			var accountPromise = models.Account.find(parseInt(req.params.accountId));
+	  			var userPromise  = models.User.findById(parseInt(req.user.id));
+	  			var accountPromise = models.Account.findById(parseInt(req.params.accountId));
 
 	  			join(userPromise, accountPromise, function(user, account) {
 	  				if(user && account){
@@ -173,8 +173,8 @@ module.exports = function(models, io) {
 	  	)
 	  	.delete(
 	  		function(req, res, next) {
-	  			var userPromise  = models.User.find(parseInt(req.user.id));
-	  			var accountPromise = models.Account.find(parseInt(req.params.accountId));
+	  			var userPromise  = models.User.findById(parseInt(req.user.id));
+	  			var accountPromise = models.Account.findById(parseInt(req.params.accountId));
 
 	  			join(userPromise, accountPromise, function(user, account) {
 	  				if(user && account){
@@ -226,8 +226,8 @@ module.exports = function(models, io) {
 	router.route('/:accountId/projects')
 		.get(
 			function(req, res, next) {
-				var userPromise  = models.User.find(parseInt(req.user.id));
-	  			var accountPromise = models.Account.find(parseInt(req.params.accountId));
+				var userPromise  = models.User.findById(parseInt(req.user.id));
+	  			var accountPromise = models.Account.findById(parseInt(req.params.accountId));
 
 	  			join(userPromise, accountPromise, function(user, account) {
 	  				if(user && account){
@@ -278,8 +278,8 @@ module.exports = function(models, io) {
 	router.route('/:accountId/accountUsers')
 		.get(
 			function(req, res, next) {
-				var userPromise  = models.User.find(parseInt(req.user.id));
-	  			var accountPromise = models.Account.find(parseInt(req.params.accountId));
+				var userPromise  = models.User.findById(parseInt(req.user.id));
+	  			var accountPromise = models.Account.findById(parseInt(req.params.accountId));
 
 	  			join(userPromise, accountPromise, function(user, account) {
 	  				if(user && account){
@@ -330,8 +330,8 @@ module.exports = function(models, io) {
 	router.route('/:accountId/inviteUser')
 		.post(
 			function(req, res, next) {
-				var userPromise  = models.User.find(parseInt(req.user.id));
-	  			var accountPromise = models.Account.find(parseInt(req.params.accountId));
+				var userPromise  = models.User.findById(parseInt(req.user.id));
+	  			var accountPromise = models.Account.findById(parseInt(req.params.accountId));
 
 	  			join(userPromise, accountPromise, function(user, account) {
 	  				if(user && account){

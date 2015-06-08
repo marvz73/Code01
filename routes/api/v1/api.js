@@ -33,7 +33,7 @@ module.exports = function(models, io) {
 	router.route('/accounts')
 		.get(
 			function(req, res, next) {
-				models.User.find(parseInt(req.user.id)).then(function(user) {
+				models.User.findById(parseInt(req.user.id)).then(function(user) {
 					if(user){
 						user.getAccounts().then(function(accounts){
 							res.json({

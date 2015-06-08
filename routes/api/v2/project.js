@@ -8,7 +8,7 @@ module.exports = function(models, io) {
 	router.route('/')
 		.get(
 			function(req, res, next){
-				models.Project.findAll({include: [{ all: true }]}).then(function(projects) {
+				models.Project.findAll({where: req.query, include: [{ all: true }]}).then(function(projects) {
 					res.json({
 						projects: projects
 					});
@@ -28,7 +28,7 @@ module.exports = function(models, io) {
 	router.route('/:projectId')
 		.get( 
 	  		function(req, res, next) {
-	  			models.Project.find(parseInt(req.params.projectId)).then(function(project){
+	  			models.Project.findById(parseInt(req.params.projectId)).then(function(project){
 	  				res.json({
 						project : project
 					});
@@ -37,7 +37,7 @@ module.exports = function(models, io) {
 	  	)
 	  	.put( 
 	  		function(req, res, next) {
-	  			models.Project.find(parseInt(req.params.projectId)).then(function(project){
+	  			models.Project.findById(parseInt(req.params.projectId)).then(function(project){
 	  				return project.updateAttributes(req.body.project);
 	  			}).then(function(project){
 	  				res.json({
@@ -48,7 +48,7 @@ module.exports = function(models, io) {
 	  	)
 	  	.delete( 
 	  		function(req, res, next) {
-	  			models.Project.find(parseInt(req.params.projectId)).then(function(project){
+	  			models.Project.findById(parseInt(req.params.projectId)).then(function(project){
 	  				return project.destroy();
 	  			}).then(function(project){
 	  				res.json({

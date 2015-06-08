@@ -27,10 +27,10 @@ module.exports = function(models, io) {
 				req.body.TaskId = req.params.taskId;
 	  			req.body.UserId = req.user.id;
 
-	  			var userPromise  = models.User.find(parseInt(req.user.id));
-	  			var accountPromise = models.Account.find(parseInt(req.params.accountId));
-	  			var projectPromise = models.Project.find({ where: {'id': req.params.projectId, AccountId: req.params.accountId}, include: [ models.User ] });
-	  			var taskPromise = models.Task.find({ where: {'id': req.params.taskId, ProjectId: req.params.projectId}, include: [ models.User ] })
+	  			var userPromise  = models.User.findById(parseInt(req.user.id));
+	  			var accountPromise = models.Account.findById(parseInt(req.params.accountId));
+	  			var projectPromise = models.Project.findOne({ where: {'id': req.params.projectId, AccountId: req.params.accountId}, include: [ models.User ] });
+	  			var taskPromise = models.Task.findOne({ where: {'id': req.params.taskId, ProjectId: req.params.projectId}, include: [ models.User ] })
 
 	  			join(userPromise, accountPromise, projectPromise, taskPromise, function(user, account, project, task) {
 	  				if(user && account && project && task){
@@ -82,11 +82,11 @@ module.exports = function(models, io) {
 	router.route('/:commentId')
 		.get(
 			function(req, res, next){
-				var userPromise  = models.User.find(parseInt(req.user.id));
-	  			var accountPromise = models.Account.find(parseInt(req.params.accountId));
-	  			var projectPromise = models.Project.find({ where: {'id': req.params.projectId, AccountId: req.params.accountId}, include: [ models.User ] });
-	  			var taskPromise = models.Task.find({ where: {'id': req.params.taskId, ProjectId: req.params.projectId}, include: [ models.User ] })
-	  			var taskCommentPromise = models.TaskComment.find({ where: {'id': req.params.commentId, TaskId: req.params.taskId}, include: [ models.User ] })
+				var userPromise  = models.User.findById(parseInt(req.user.id));
+	  			var accountPromise = models.Account.findById(parseInt(req.params.accountId));
+	  			var projectPromise = models.Project.findOne({ where: {'id': req.params.projectId, AccountId: req.params.accountId}, include: [ models.User ] });
+	  			var taskPromise = models.Task.findOne({ where: {'id': req.params.taskId, ProjectId: req.params.projectId}, include: [ models.User ] })
+	  			var taskCommentPromise = models.TaskComment.findOne({ where: {'id': req.params.commentId, TaskId: req.params.taskId}, include: [ models.User ] })
 
 	  			join(userPromise, accountPromise, projectPromise, taskPromise, taskCommentPromise, function(user, account, project, task, taskComment) {
 	  				if(user && account && project && task && taskComment){
@@ -128,11 +128,11 @@ module.exports = function(models, io) {
 		)
 		.post(
 			function(req, res, next){
-				var userPromise  = models.User.find(parseInt(req.user.id));
-	  			var accountPromise = models.Account.find(parseInt(req.params.accountId));
-	  			var projectPromise = models.Project.find({ where: {'id': req.params.projectId, AccountId: req.params.accountId}, include: [ models.User ] });
-	  			var taskPromise = models.Task.find({ where: {'id': req.params.taskId, ProjectId: req.params.projectId}, include: [ models.User ] })
-	  			var taskCommentPromise = models.TaskComment.find({ where: {'id': req.params.commentId, TaskId: req.params.taskId}, include: [ models.User ] })
+				var userPromise  = models.User.findById(parseInt(req.user.id));
+	  			var accountPromise = models.Account.findById(parseInt(req.params.accountId));
+	  			var projectPromise = models.Project.findOne({ where: {'id': req.params.projectId, AccountId: req.params.accountId}, include: [ models.User ] });
+	  			var taskPromise = models.Task.findOne({ where: {'id': req.params.taskId, ProjectId: req.params.projectId}, include: [ models.User ] })
+	  			var taskCommentPromise = models.TaskComment.findOne({ where: {'id': req.params.commentId, TaskId: req.params.taskId}, include: [ models.User ] })
 
 	  			join(userPromise, accountPromise, projectPromise, taskPromise, taskCommentPromise, function(user, account, project, task, taskComment) {
 	  				if(user && account && project && task && taskComment){
@@ -182,11 +182,11 @@ module.exports = function(models, io) {
 		)
 		.delete(
 			function(req, res, next){
-				var userPromise  = models.User.find(parseInt(req.user.id));
-	  			var accountPromise = models.Account.find(parseInt(req.params.accountId));
-	  			var projectPromise = models.Project.find({ where: {'id': req.params.projectId, AccountId: req.params.accountId}, include: [ models.User ] });
-	  			var taskPromise = models.Task.find({ where: {'id': req.params.taskId, ProjectId: req.params.projectId}, include: [ models.User ] })
-	  			var taskCommentPromise = models.TaskComment.find({ where: {'id': req.params.commentId, TaskId: req.params.taskId}, include: [ models.User ] })
+				var userPromise  = models.User.findById(parseInt(req.user.id));
+	  			var accountPromise = models.Account.findById(parseInt(req.params.accountId));
+	  			var projectPromise = models.Project.findOne({ where: {'id': req.params.projectId, AccountId: req.params.accountId}, include: [ models.User ] });
+	  			var taskPromise = models.Task.findOne({ where: {'id': req.params.taskId, ProjectId: req.params.projectId}, include: [ models.User ] })
+	  			var taskCommentPromise = models.TaskComment.findOne({ where: {'id': req.params.commentId, TaskId: req.params.taskId}, include: [ models.User ] })
 
 	  			join(userPromise, accountPromise, projectPromise, taskPromise, taskCommentPromise, function(user, account, project, task, taskComment) {
 	  				if(user && account && project && task && taskComment){

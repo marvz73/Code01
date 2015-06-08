@@ -25,14 +25,14 @@ module.exports = function(models, io) {
 	router.route('/:attachmentId')
 		.get(
 			function(req, res, next){
-				var userPromise  = models.User.find(parseInt(req.user.id));
-	  			var accountPromise = models.Account.find(parseInt(req.params.accountId));
-	  			var projectPromise = models.Project.find({ where: {'id': req.params.projectId, AccountId: req.params.accountId}, include: [ models.User ] });
-	  			var attachmentPromise = models.ProjectAttachment.find({ where: {'id': req.params.attachmentId, ProjectId: req.params.projectId}});
+				var userPromise  = models.User.findById(parseInt(req.user.id));
+	  			var accountPromise = models.Account.findById(parseInt(req.params.accountId));
+	  			var projectPromise = models.Project.findOne({ where: {'id': req.params.projectId, AccountId: req.params.accountId}, include: [ models.User ] });
+	  			// var attachmentPromise = models.ProjectAttachment.findOne({ where: {'id': req.params.attachmentId, ProjectId: req.params.projectId}});
 
-	  			join(userPromise, accountPromise, projectPromise, attachmentPromise, function(user, account, project, attachment) {
-	  				if(user && account && project && attachment){
-		  				return [attachment, user.hasAccount(account)];
+	  			join(userPromise, accountPromise, projectPromise, /*attachmentPromise,*/ function(user, account, project/*, attachment*/) {
+	  				if(user && account && project/* && attachment*/){
+		  				return [project.getAttachment(), user.hasAccount(account)];
 		  			} else {
 		  				return [ null, null]
 		  			}
@@ -74,10 +74,10 @@ module.exports = function(models, io) {
 		)
 		.delete(
 			function(req, res, next){
-				var userPromise  = models.User.find(parseInt(req.user.id));
-	  			var accountPromise = models.Account.find(parseInt(req.params.accountId));
-	  			var projectPromise = models.Project.find({ where: {'id': req.params.projectId, AccountId: req.params.accountId}, include: [ models.User ] });
-	  			var attachmentPromise = models.ProjectAttachment.find({ where: {'id': req.params.attachmentId, ProjectId: req.params.projectId}});
+				var userPromise  = models.User.findById(parseInt(req.user.id));
+	  			var accountPromise = models.Account.findById(parseInt(req.params.accountId));
+	  			var projectPromise = models.Project.findOne({ where: {'id': req.params.projectId, AccountId: req.params.accountId}, include: [ models.User ] });
+	  			var attachmentPromise = models.ProjectAttachment.findOne({ where: {'id': req.params.attachmentId, ProjectId: req.params.projectId}});
 
 	  			join(userPromise, accountPromise, projectPromise, attachmentPromise, function(user, account, project, attachment) {
 	  				if(user && account && project && attachment){

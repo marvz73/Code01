@@ -91,7 +91,7 @@ module.exports = function(passport, io) {
     router.route('/verify/:token')
         .get(
             function(req, res){
-                models.User.find({ where: {token: req.params.token} }).then(function(user_model) {
+                models.User.findOne({ where: {token: req.params.token} }).then(function(user_model) {
                     if(user_model){
                         res.render('verify', { title: 'Express' });
                     }
@@ -103,7 +103,7 @@ module.exports = function(passport, io) {
         )
         .post(
             function(req, res){
-                models.User.find({ where: {token: req.params.token} }).then(function(user_model) {
+                models.User.findOne({ where: {token: req.params.token} }).then(function(user_model) {
                     if(user_model){
 
                         req.body.verified = true;
@@ -136,7 +136,7 @@ module.exports = function(passport, io) {
         )
         .post( 
             function(req, res){
-                models.User.find({ where: {email: req.body.email} }).then(function(user_model) {
+                models.User.findOne({ where: {email: req.body.email} }).then(function(user_model) {
                     if(user_model){
                         var token = uuid.v4();
                         user_model.set({token: token}).save().then(function(user_model){ 
@@ -163,7 +163,7 @@ module.exports = function(passport, io) {
     router.route('/reset-password/:token')
         .get( 
             function(req, res){
-                models.User.find({ where: {token: req.params.token} }).then(function(user_model) {
+                models.User.findOne({ where: {token: req.params.token} }).then(function(user_model) {
                     if(user_model){
                         res.render('reset-password', { title: 'Express' });
                     }
@@ -174,7 +174,7 @@ module.exports = function(passport, io) {
         )
         .post( 
             function(req, res){
-                models.User.find({ where: {token: req.params.token} }).then(function(user_model) {
+                models.User.findOne({ where: {token: req.params.token} }).then(function(user_model) {
                     if(user_model){
                         var passwordHash = encrypt(req.body.password);
 
@@ -215,11 +215,11 @@ module.exports = function(passport, io) {
 
         }
 
-        models.User.find( { where: {id: req.user.id}, include: [models.Account] } ).then(function(user) {
+        models.User.findOne( { where: {id: req.user.id}, include: [models.Account] } ).then(function(user) {
             if(user){
 
 
-                models.Account.find(parseInt(req.params.namespace)).then(function(account) {
+                models.Account.findById(parseInt(req.params.namespace)).then(function(account) {
                     
                 console.log("++++++++++++++++++++++++++++++++++++++++++++++++");
                 console.log(user);
@@ -246,7 +246,7 @@ module.exports = function(passport, io) {
 
     router.get('/initialize', isAuthenticated, function(req, res, next) {
 
-        models.User.find( { where: {id: req.user.id}, include: [models.Account] } ).then(function(user_model) {
+        models.User.findOne( { where: {id: req.user.id}, include: [models.Account] } ).then(function(user_model) {
             if(user_model){
                 console.dir(user_model.get('Accounts')[0].get('id'))
                 res.redirect('/home/' + user_model.get('Accounts')[0].get('id'));

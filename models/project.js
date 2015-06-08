@@ -12,7 +12,10 @@ module.exports = function(sequelize, DataTypes) {
         Project.belongsTo(models.User);
         Project.hasMany(models.Project, {as: 'SubProjects'});
         Project.hasMany(models.Task);
-        Project.hasOne(models.ProjectAttachment);
+        Project.hasOne(models.Attachment, {
+          foreignKey: 'attachmentable_id',
+          constraints: false
+        });
       }
     }
   });

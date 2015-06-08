@@ -23,9 +23,9 @@ module.exports = function(models, io) {
 	router.route('/:userId')
 		.get( 
 			function(req, res, next) {
-				var userPromise  = models.User.find(parseInt(req.user.id));
-	  			var accountPromise = models.Account.find(parseInt(req.params.accountId));
-	  			var accountUserPromise = models.AccountUser.find({ where: {'UserId': req.params.userId, 'AccountId': req.params.accountId} });
+				var userPromise  = models.User.findById(parseInt(req.user.id));
+	  			var accountPromise = models.Account.findById(parseInt(req.params.accountId));
+	  			var accountUserPromise = models.AccountUser.findOne({ where: {'UserId': req.params.userId, 'AccountId': req.params.accountId} });
 
 	  			join(userPromise, accountPromise, accountUserPromise, function(user, account, accountUser) {
 	  				if(user && account && accountUser){
@@ -67,9 +67,9 @@ module.exports = function(models, io) {
 	  	)
 	  	.post( 
 			function(req, res, next) {
-				var userPromise  = models.User.find(parseInt(req.user.id));
-	  			var accountPromise = models.Account.find(parseInt(req.params.accountId));
-	  			var accountUserPromise = models.AccountUser.find({ where: {'UserId': req.params.userId, 'AccountId': req.params.accountId} });
+				var userPromise  = models.User.findById(parseInt(req.user.id));
+	  			var accountPromise = models.Account.findById(parseInt(req.params.accountId));
+	  			var accountUserPromise = models.AccountUser.findOne({ where: {'UserId': req.params.userId, 'AccountId': req.params.accountId} });
 
 	  			join(userPromise, accountPromise, accountUserPromise, function(user, account, accountUser) {
 	  				if(user && account && accountUser){
@@ -118,9 +118,9 @@ module.exports = function(models, io) {
 	  	)
 	  	.delete( 
 			function(req, res, next) {
-				var userPromise  = models.User.find(parseInt(req.user.id));
-	  			var accountPromise = models.Account.find(parseInt(req.params.accountId));
-	  			var accountUserPromise = models.AccountUser.find({ where: {'UserId': req.params.userId, 'AccountId': req.params.accountId} });
+				var userPromise  = models.User.findById(parseInt(req.user.id));
+	  			var accountPromise = models.Account.findById(parseInt(req.params.accountId));
+	  			var accountUserPromise = models.AccountUser.findOne({ where: {'UserId': req.params.userId, 'AccountId': req.params.accountId} });
 
 	  			join(userPromise, accountPromise, accountUserPromise, function(user, account, accountUser) {
 	  				if(user && account && accountUser){

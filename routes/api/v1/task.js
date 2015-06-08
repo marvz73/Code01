@@ -27,9 +27,9 @@ module.exports = function(models, io) {
 	  			req.body.ProjectId = req.params.projectId;
 	  			req.body.UserId = req.user.id;
 
-	  			var userPromise  = models.User.find(parseInt(req.user.id));
-	  			var accountPromise = models.Account.find(parseInt(req.params.accountId));
-	  			var projectPromise = models.Project.find({ where: {'id': req.params.projectId, AccountId: req.params.accountId}, include: [ models.User ] });
+	  			var userPromise  = models.User.findById(parseInt(req.user.id));
+	  			var accountPromise = models.Account.findById(parseInt(req.params.accountId));
+	  			var projectPromise = models.Project.findOne({ where: {'id': req.params.projectId, AccountId: req.params.accountId}, include: [ models.User ] });
 
 	  			join(userPromise, accountPromise, projectPromise, function(user, account, project) {
 	  				if(user && account && project){
@@ -81,10 +81,10 @@ module.exports = function(models, io) {
 	router.route('/:taskId')
 		.get( 
 	  		function(req, res, next) {
-	  			var userPromise  = models.User.find(parseInt(req.user.id));
-	  			var accountPromise = models.Account.find(parseInt(req.params.accountId));
-	  			var projectPromise = models.Project.find({ where: {'id': req.params.projectId, AccountId: req.params.accountId}, include: [ models.User ] });
-	  			var taskPromise = models.Task.find({ where: {'id': req.params.taskId, ProjectId: req.params.projectId}, include: [ models.User ] })
+	  			var userPromise  = models.User.findById(parseInt(req.user.id));
+	  			var accountPromise = models.Account.findById(parseInt(req.params.accountId));
+	  			var projectPromise = models.Project.findOne({ where: {'id': req.params.projectId, AccountId: req.params.accountId}, include: [ models.User ] });
+	  			var taskPromise = models.Task.findOne({ where: {'id': req.params.taskId, ProjectId: req.params.projectId}, include: [ models.User ] })
 
 	  			join(userPromise, accountPromise, projectPromise, taskPromise, function(user, account, project, task) {
 	  				if(user && account && project && task){
@@ -126,10 +126,10 @@ module.exports = function(models, io) {
 	  	)
 	  	.post( 
 	  		function(req, res, next) {
-	  			var userPromise  = models.User.find(parseInt(req.user.id));
-	  			var accountPromise = models.Account.find(parseInt(req.params.accountId));
-	  			var projectPromise = models.Project.find({ where: {'id': req.params.projectId, AccountId: req.params.accountId}, include: [ models.User ] });
-	  			var taskPromise = models.Task.find({ where: {'id': req.params.taskId, ProjectId: req.params.projectId}, include: [ models.User ] })
+	  			var userPromise  = models.User.findById(parseInt(req.user.id));
+	  			var accountPromise = models.Account.findById(parseInt(req.params.accountId));
+	  			var projectPromise = models.Project.findOne({ where: {'id': req.params.projectId, AccountId: req.params.accountId}, include: [ models.User ] });
+	  			var taskPromise = models.Task.findOne({ where: {'id': req.params.taskId, ProjectId: req.params.projectId}, include: [ models.User ] })
 
 	  			join(userPromise, accountPromise, projectPromise, taskPromise, function(user, account, project, task) {
 	  				if(user && account && project && task){
@@ -179,10 +179,10 @@ module.exports = function(models, io) {
 	  	)
 	  	.delete( 
 	  		function(req, res, next) {
-	  			var userPromise  = models.User.find(parseInt(req.user.id));
-	  			var accountPromise = models.Account.find(parseInt(req.params.accountId));
-	  			var projectPromise = models.Project.find({ where: {'id': req.params.projectId, AccountId: req.params.accountId}, include: [ models.User ] });
-	  			var taskPromise = models.Task.find({ where: {'id': req.params.taskId, ProjectId: req.params.projectId}, include: [ models.User ] })
+	  			var userPromise  = models.User.findById(parseInt(req.user.id));
+	  			var accountPromise = models.Account.findById(parseInt(req.params.accountId));
+	  			var projectPromise = models.Project.findOne({ where: {'id': req.params.projectId, AccountId: req.params.accountId}, include: [ models.User ] });
+	  			var taskPromise = models.Task.findOne({ where: {'id': req.params.taskId, ProjectId: req.params.projectId}, include: [ models.User ] })
 
 	  			join(userPromise, accountPromise, projectPromise, taskPromise, function(user, account, project, task) {
 	  				if(user && account && project && task){
@@ -234,10 +234,10 @@ module.exports = function(models, io) {
 	router.route('/:taskId/histories')
 		.get(
 			function(req, res, next){
-				var userPromise  = models.User.find(parseInt(req.user.id));
-	  			var accountPromise = models.Account.find(parseInt(req.params.accountId));
-	  			var projectPromise = models.Project.find({ where: {'id': req.params.projectId, AccountId: req.params.accountId}, include: [ models.User ] });
-	  			var taskPromise = models.Task.find({ where: {'id': req.params.taskId, ProjectId: req.params.projectId}, include: [ models.User ] })
+				var userPromise  = models.User.findById(parseInt(req.user.id));
+	  			var accountPromise = models.Account.findById(parseInt(req.params.accountId));
+	  			var projectPromise = models.Project.findOne({ where: {'id': req.params.projectId, AccountId: req.params.accountId}, include: [ models.User ] });
+	  			var taskPromise = models.Task.findOne({ where: {'id': req.params.taskId, ProjectId: req.params.projectId}, include: [ models.User ] })
 
 	  			join(userPromise, accountPromise, projectPromise, taskPromise, function(user, account, project, task) {
 	  				if(user && account && project && task){
@@ -288,10 +288,10 @@ module.exports = function(models, io) {
 	router.route('/:taskId/comments')
 		.get(
 			function(req, res, next){
-				var userPromise  = models.User.find(parseInt(req.user.id));
-	  			var accountPromise = models.Account.find(parseInt(req.params.accountId));
-	  			var projectPromise = models.Project.find({ where: {'id': req.params.projectId, AccountId: req.params.accountId}, include: [ models.User ] });
-	  			var taskPromise = models.Task.find({ where: {'id': req.params.taskId, ProjectId: req.params.projectId}, include: [ models.User ] })
+				var userPromise  = models.User.findById(parseInt(req.user.id));
+	  			var accountPromise = models.Account.findById(parseInt(req.params.accountId));
+	  			var projectPromise = models.Project.findOne({ where: {'id': req.params.projectId, AccountId: req.params.accountId}, include: [ models.User ] });
+	  			var taskPromise = models.Task.findOne({ where: {'id': req.params.taskId, ProjectId: req.params.projectId}, include: [ models.User ] })
 
 	  			join(userPromise, accountPromise, projectPromise, taskPromise, function(user, account, project, task) {
 	  				if(user && account && project && task){
@@ -342,10 +342,10 @@ module.exports = function(models, io) {
 	router.route('/:taskId/attachments')
 		.get(
 			function(req, res, next){
-				var userPromise  = models.User.find(parseInt(req.user.id));
-	  			var accountPromise = models.Account.find(parseInt(req.params.accountId));
-	  			var projectPromise = models.Project.find({ where: {'id': req.params.projectId, AccountId: req.params.accountId}, include: [ models.User ] });
-	  			var taskPromise = models.Task.find({ where: {'id': req.params.taskId, ProjectId: req.params.projectId}, include: [ models.User ] })
+				var userPromise  = models.User.findById(parseInt(req.user.id));
+	  			var accountPromise = models.Account.findById(parseInt(req.params.accountId));
+	  			var projectPromise = models.Project.findOne({ where: {'id': req.params.projectId, AccountId: req.params.accountId}, include: [ models.User ] });
+	  			var taskPromise = models.Task.findOne({ where: {'id': req.params.taskId, ProjectId: req.params.projectId}, include: [ models.User ] })
 
 	  			join(userPromise, accountPromise, projectPromise, taskPromise, function(user, account, project, task) {
 	  				if(user && account && project && task){
@@ -356,7 +356,7 @@ module.exports = function(models, io) {
 				})
 				.spread(function(task, hasAccount, hasProject){
 					if(task && hasAccount && hasProject){
-						return task.getTaskAttachments({ include: [ models.User ]})
+						return task.getAttachments({ where: {attachmentable: 'task'}})
 					} else {
 						return null;
 					}
@@ -394,10 +394,10 @@ module.exports = function(models, io) {
 		)
 		.post(
 			function(req, res, next){
-	  			var userPromise  = models.User.find(parseInt(req.user.id));
-	  			var accountPromise = models.Account.find(parseInt(req.params.accountId));
-	  			var projectPromise = models.Project.find({ where: {'id': req.params.projectId, AccountId: req.params.accountId}, include: [ models.User ] });
-	  			var taskPromise = models.Task.find({ where: {'id': req.params.taskId, ProjectId: req.params.projectId}, include: [ models.User ] })
+	  			var userPromise  = models.User.findById(parseInt(req.user.id));
+	  			var accountPromise = models.Account.findById(parseInt(req.params.accountId));
+	  			var projectPromise = models.Project.findOne({ where: {'id': req.params.projectId, AccountId: req.params.accountId}, include: [ models.User ] });
+	  			var taskPromise = models.Task.findOne({ where: {'id': req.params.taskId, ProjectId: req.params.projectId}, include: [ models.User ] })
 
 	  			join(userPromise, accountPromise, projectPromise, taskPromise, function(user, account, project, task) {
 	  				if(user && account && project && task){
@@ -411,12 +411,12 @@ module.exports = function(models, io) {
 						var attachments = [];
 
 						req.files.file.forEach(function(element, index, array){
-							attachments.push(models.TaskAttachment.create({
+							attachments.push(task.createAttachment({
 								originalName: element.originalname,
 								name: element.name,
 								path: element.path,
 								extension: element.extension,
-								TaskId: req.params.taskId,
+								attachmentable: 'task',
 								UserId: req.user.id
 							}))
 						})
