@@ -22,3 +22,16 @@ m.routes = function mRoutes( defaultRoute, routesMap ){
 
     function noop(){}
 };
+
+m.debounce = function mDebounce(fn, delay) {
+  var timer = null;
+
+  return function () {
+    var context = this, args = arguments
+    clearTimeout(timer)
+
+    timer = setTimeout(function () {
+      fn.apply(context, args)
+    }, delay)
+  }
+}

@@ -348,7 +348,6 @@ var task = {
                         Q('.cd-panel').timer(500, function(){
                             // m.route('/1/'+ m.route.param('aid') + '/' + m.route.param('pid'))
                             window.history.back()
-                            console.log(11111111111)
                         })
                     });
                 }
@@ -476,10 +475,9 @@ var project = {
         //Fetch project image
         m.request({
             method:'get', 
-            url:  baseUrl + '/api/v1/account/' + accountId + '/project/' + m.route.param('pid') + '/attachments'
+            url:  baseUrl + '/api/v1/account/' + accountId + '/project/' + m.route.param('pid') + '/attachment'
         }).then(function(projectImage){
 
-                console.log(projectImage.data.id)
 
             self.ProjectImage = projectImage.data.id;
 
@@ -506,7 +504,7 @@ var project = {
         this.UploadFile = function(formData){
             return m.request({
                 method: "POST",
-                url: '/api/v1/account/' + accountId + '/project/' + m.route.param('pid') + '/attachments',
+                url: '/api/v1/account/' + accountId + '/project/' + m.route.param('pid') + '/attachment',
                 data: formData,
                 //simply pass the FormData object intact to the underlying XMLHttpRequest, instead of JSON.stringify'ing it
                 serialize: function(value) {return value}
@@ -633,6 +631,9 @@ var project = {
 
 
 var projectDetails = {
+    model: function(name) {
+        this.mDetail = m.prop(name);
+    },
     controller: function() {
         var self = this;
         this.projectDetails = {};
@@ -643,31 +644,58 @@ var projectDetails = {
                 url:  baseUrl + '/api/v1/account/' + m.route.param('aid') + '/project/' + m.route.param('pid') + ''
             }).then(function(resp){
                 self.projectDetails = resp.data;
+                self.detail =  new projectDetails.model(resp.data);
+
             },function(){
                 AJAXERROR();
             })
         }
 
-        //Fetch project task
-        // m.request({
-        //     method:'get', 
-        //     url:  baseUrl + '/api/v1/account/' + m.route.param('aid') + '/project/' + m.route.param('pid') + '/tasks'
-        // }).then(function(taskResp){
-        //     if(taskResp.data.length){
-        //         self.TaskList = taskResp.data;
-        //     }
-        // });
-
         this.getProjectDetails();
-        
+
+        //Fetch project task
+        m.request({
+            method:'get', 
+            url:  baseUrl + '/api/v1/account/' + m.route.param('aid') + '/project/' + m.route.param('pid') + '/tasks'
+        }).then(function(taskResp){
+            if(taskResp.data.length){
+                self.TaskList = taskResp.data;
+            }
+        });
+
+        this.updateProjectDesc = function(jsonData){
+            m.request({
+            method:'post', 
+            url:  baseUrl + '/api/v1/account/' + m.route.param('aid') + '/project/' + m.route.param('pid'),
+            data: jsonData
+            }).then(function(taskResp){
+
+            }, function(){
+                AJAXERROR();
+            })
+
+        }
+
     },
     view: function(ctrl){
+
+
 
         function loaded(elm, init, context){
             if( !init ){               
                 setTimeout(function(){
                     Q('.cd-panel').addClass('is-visible');
                 }, 200)
+
+                window.document.getElementById('projectDesc').addEventListener('keypress', Q.debounce(function(params){
+                    var jsonData = {
+                        description: this.value
+                    }
+
+                    ctrl.updateProjectDesc(jsonData);
+
+                }, 1000));  
+
             }
         }
 
@@ -713,7 +741,7 @@ var projectDetails = {
                 {
                     return ctrl.projectDetails.SubProjects.map(function(val, index){
                         return m('li',[
-                            m('a[href="/3/' + m.route.param('aid') + '/' + m.route.param('pid') + '/' + val.id+'"]', {config: m.route}, 'Sub Project #'+val.id,[
+                            m('a[href="/1/' + m.route.param('aid') + '/' + val.id + '"]', {config: m.route}, 'Sub Project #'+val.id,[
                                 m('span.pull-right', val.createdAt)
                             ])
                         ])
@@ -744,13 +772,13 @@ var projectDetails = {
 
         return  m("div.cd-panel.from-right#cd-panel", {config: loaded, onclick: hideRightModal}, [
                     m("header.cd-panel-header.no-touch",[
-                        m("h4.title", ctrl.projectDetails.title),
+                        m("input.title", {onchange: m.withAttr("value", ctrl.detail.mDetail()), value: ctrl.detail.mDetail().title}),
                         m("a.cd-panel-close", {onclick: hideRightModal}, "Close")
                     ]),
                     m("div.cd-panel-container", [
                         m("div.cd-panel-content",[
                             m('div.form-group', [
-                                m('textarea[rows="6"].form-control', ctrl.projectDetails.description),
+                                m('textarea[rows="6"]#projectDesc.form-control', ctrl.projectDetails.description),
                             ]),
                             m('fieldset.settings',[
 
