@@ -83,7 +83,7 @@ module.exports = function(models, io) {
 	  		function(req, res, next) {
 	  			var userPromise  = models.User.findById(parseInt(req.user.id));
 	  			var accountPromise = models.Account.findById(parseInt(req.params.accountId));
-	  			var projectPromise = models.Project.findOne({ where: {'id': req.params.projectId, AccountId: req.params.accountId}, include: [ models.User, { model: models.Project, as: 'SubProjects' }, models.ProjectAttachment ] });
+	  			var projectPromise = models.Project.findOne({ where: {'id': req.params.projectId, AccountId: req.params.accountId}, include: [ models.User, { model: models.Project, as: 'SubProjects' }, models.Attachment ] });
 
 	  			join(userPromise, accountPromise, projectPromise, function(user, account, project) {
 	  				if(user && account && project){

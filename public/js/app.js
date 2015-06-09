@@ -475,7 +475,7 @@ var project = {
         //Fetch project image
         m.request({
             method:'get', 
-            url:  baseUrl + '/api/v1/account/' + accountId + '/project/' + m.route.param('pid') + '/attachment'
+            url:  baseUrl + '/api/v1/account/' + accountId + '/project/' + m.route.param('pid') + '/attachments'
         }).then(function(projectImage){
 
 
@@ -504,7 +504,7 @@ var project = {
         this.UploadFile = function(formData){
             return m.request({
                 method: "POST",
-                url: '/api/v1/account/' + accountId + '/project/' + m.route.param('pid') + '/attachment',
+                url: '/api/v1/account/' + accountId + '/project/' + m.route.param('pid') + '/attachments',
                 data: formData,
                 //simply pass the FormData object intact to the underlying XMLHttpRequest, instead of JSON.stringify'ing it
                 serialize: function(value) {return value}
@@ -631,8 +631,9 @@ var project = {
 
 
 var projectDetails = {
-    model: function(name) {
-        this.mDetail = m.prop(name);
+    model: function(params) {
+        this.title       =  m.prop(params.title);
+        this.description =  m.prop(params.description);
     },
     controller: function() {
         var self = this;
@@ -645,7 +646,6 @@ var projectDetails = {
             }).then(function(resp){
                 self.projectDetails = resp.data;
                 self.detail =  new projectDetails.model(resp.data);
-
             },function(){
                 AJAXERROR();
             })
@@ -673,16 +673,26 @@ var projectDetails = {
             }, function(){
                 AJAXERROR();
             })
-
         }
 
+
+        this.updateProjectTitle = function(jsonData){
+            m.request({
+            method:'post', 
+            url:  baseUrl + '/api/v1/account/' + m.route.param('aid') + '/project/' + m.route.param('pid'),
+            data: jsonData
+            }).then(function(taskResp){
+
+            }, function(){
+                AJAXERROR();
+            })
+        }
     },
     view: function(ctrl){
 
-
-
         function loaded(elm, init, context){
-            if( !init ){               
+            if( !init ){
+
                 setTimeout(function(){
                     Q('.cd-panel').addClass('is-visible');
                 }, 200)
@@ -695,6 +705,16 @@ var projectDetails = {
                     ctrl.updateProjectDesc(jsonData);
 
                 }, 1000));  
+
+                window.document.getElementById('projectTitle').addEventListener('keypress', Q.debounce(function(params){
+                    var jsonData = {
+                        title: this.value
+                    }
+
+                    ctrl.updateProjectTitle(jsonData);
+
+                }, 1000));  
+                
 
             }
         }
@@ -772,13 +792,13 @@ var projectDetails = {
 
         return  m("div.cd-panel.from-right#cd-panel", {config: loaded, onclick: hideRightModal}, [
                     m("header.cd-panel-header.no-touch",[
-                        m("input.title", {onchange: m.withAttr("value", ctrl.detail.mDetail()), value: ctrl.detail.mDetail().title}),
+                        m("input.title#projectTitle", {onchange: m.withAttr("value", ctrl.detail.title()), value: ctrl.detail.title()}),
                         m("a.cd-panel-close", {onclick: hideRightModal}, "Close")
                     ]),
                     m("div.cd-panel-container", [
                         m("div.cd-panel-content",[
                             m('div.form-group', [
-                                m('textarea[rows="6"]#projectDesc.form-control', ctrl.projectDetails.description),
+                                m('textarea[rows="6"]#projectDesc.form-control', {onchange: m.withAttr("value", ctrl.detail.description)}, ctrl.detail.description()),
                             ]),
                             m('fieldset.settings',[
 
