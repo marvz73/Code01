@@ -59,7 +59,7 @@ module.exports = function(models, io) {
 												data : null,
 												error : null
 											}	
-						_response.status = 404;
+						_response.status = 200;
 						res.status(_response.status).json(_response.data);
 					}
 				})
@@ -109,7 +109,7 @@ module.exports = function(models, io) {
 												data : null,
 												error : null
 											}	
-						_response.status = 404;
+						_response.status = 200;
 					}
 					return _response;
 				})

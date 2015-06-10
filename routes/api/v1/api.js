@@ -21,7 +21,7 @@ module.exports = function(models, io) {
 							data : users
 						});
 					else{
-				  		res.status(404).json({
+				  		res.status(200).json({
 							msg : "Return message here...",
 							data : null
 						});
@@ -42,7 +42,7 @@ module.exports = function(models, io) {
 							});
 						})
 					}else{
-				  		res.status(404).json({
+				  		res.status(200).json({
 							msg : "Return message here...",
 							data : null
 						});

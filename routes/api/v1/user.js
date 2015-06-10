@@ -29,7 +29,7 @@ module.exports = function(models) {
 							data : user
 						})
 					}else{
-				  		res.status(404).json({
+				  		res.status(200).json({
 							msg : res.__("user.fail.fetch"),
 							data : null
 						});
