@@ -39,7 +39,7 @@ module.exports = function(models, io) {
 
 	  			join(userPromise, accountPromise, function(user, account) {
 	  				if(user && account){
-		  				return [ account, user.addAccount(account)]
+		  				return [ account, user.addAccount(account, {role: 0})]
 		  			} else {
 		  				return [ null, null]
 		  			}
@@ -348,7 +348,7 @@ module.exports = function(models, io) {
 					}
 				})
 				.spread(function(account, user) {
-					account.addUser(user[0]);
+					account.addUser(user[0],{role:null});
 					if(user[1] && user[0].get('token') != null){
                         var text = req.get('host') + '/verify/' + user[0].get('token', {raw: true});
 

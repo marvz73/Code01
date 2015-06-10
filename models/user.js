@@ -25,8 +25,8 @@ module.exports = function(sequelize, DataTypes) {
         roles: false
       },
       verified: {
-        type: DataTypes.STRING,
-        roles: false
+        type: DataTypes.STRING
+        // roles: false
       },
       plan: {
         type: DataTypes.STRING,

@@ -1581,11 +1581,12 @@ a.cd-panel-close:after {
   border-bottom-left-radius: 5px; 
 }
 
-
+.list-item,
 .project-task-list{
   margin-top: 1rem;
 }
 
+.list-item a,
 .project-task-list a{
   display: block;
   padding: 0.5rem 1rem;
@@ -1596,6 +1597,7 @@ a.cd-panel-close:after {
   cursor: pointer;
 }
 
+.list-item a.no-result,
 .project-task-list a.no-result{
   background-color: #dbe2e9;
   color: #ccc;
