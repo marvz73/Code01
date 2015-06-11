@@ -113,7 +113,7 @@ module.exports = function(passport, io) {
                         user_model.set(req.body).save().then(function(user_model){
                             models.Account.create({name: 'Personal', description: 'My Personal Description'}).then(function(account_model) {
                                 if(account_model){
-                                    account_model.addUser(user_model);
+                                    account_model.addUser(user_model,{role:0});
 
                                     console.log(user_model.toJSON())
                                     res.redirect('/login');

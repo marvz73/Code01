@@ -1016,28 +1016,37 @@ var accounts = {
 }
 
 var accountViews = {
+
+	model: function(params){
+		this.user = m.prop(params.user);
+		this.userList = m.prop(params.users)
+	},
     controller: function() {
         var self = this;
 
-        this.inviteUser = "Test";
+        self.inviteUser =  new accountViews.model({user: "", users: []});
 
         this.accountUsers = function(){
             m.request({method:'get', url: baseUrl + '/api/v1/account/'+m.route.param('aid')+'/accountUsers' })
             .then(function(resp){
-                
+
+                self.userList = new accountViews.model({user: "", users: resp.data});
             },function(){
                 AJAXERROR();
             }) 
         }
 
-        this.addUserAccount = function(){
+        this.accountUsers();
+
+        this.addUserAccount = function(params){
+
             m.request({
                 method:'post', 
                 url: baseUrl + '/api/v1/account/' + m.route.param('aid') + '/inviteUser',
-                data: formData,
+                data: {'email': params},
             })
             .then(function(resp){
-                
+                self.inviteUser =  new accountViews.model({user: "", users: []});
             },function(){
                 AJAXERROR();
             });
@@ -1069,11 +1078,26 @@ var accountViews = {
 
         function addUserAccount(elm, init, context){
             if( !init ){
-                
-                // formData
-                console.log(ctrl.inviteUser)
-
+                ctrl.addUserAccount(ctrl.inviteUser.user());
+                return false;
             }
+        }
+
+        function userList(elm, init, context){
+            if( !init ){
+            	console.log(ctrl.userList.userList())
+            	var list = ctrl.userList.userList();
+            	return list.map(function (val, index){
+            		if(val.User.verified)
+            		{
+	            		return m('li', [
+	            			m('a', val.User.firstName + ' ' + val.User.lastName)
+	            		])
+            		}
+
+            	})
+            }
+
         }
 
         return  m("div.cd-panel.from-right#cd-panel", {config: loaded, onclick: hideRightModal}, [
@@ -1095,16 +1119,24 @@ var accountViews = {
                             m('fieldset.settings',[
 
                                 m('legend', "Invite User's"),
-                                m('div.settings-group', [
+                                m('form.settings-group', {onsubmit: addUserAccount}, [
                                     m('div.form-group', [
-                                        m('input.form-control[type="email"][placeholder="Enter Email Address"]', {onchange: m.withAttr("value", ctrl.inviteUser), value: ctrl.inviteUser}),
+                                        m('input.form-control[type="email"][placeholder="Enter Email Address"]', {onchange: m.withAttr("value", ctrl.inviteUser.user), value: ctrl.inviteUser.user()}),
                                     ]),
                                     m('div.form-group', [
-                                        m('button.btn.btn-primary', {onclick: addUserAccount}, 'Send Invite')
+                                        m('button.btn.btn-primary', 'Send Invite')
                                     ]),
                                 ]),
 
+                            ]),
+
+                            m('fieldset.settings', [
+                            	m('legend', "Group"),
+                            	m('ul.unstyled.list-item', [
+                            		userList()
+                            	])
                             ])
+
 
                         ])
                     ])
