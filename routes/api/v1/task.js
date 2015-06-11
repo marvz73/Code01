@@ -286,7 +286,7 @@ module.exports = function(models, io) {
 				})
 				.spread(function(task, hasAccount, hasProject){
 					if(task && hasAccount && hasProject){
-						return task.getTaskComments({ include: [ models.User ]})
+						return task.getComments({ include: [ models.User ]})
 					} else {
 						return null;
 					}

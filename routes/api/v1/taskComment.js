@@ -8,7 +8,6 @@ module.exports = function(models, io) {
 	router.route('/')
 		.post(
 			function(req, res, next){
-				req.body.TaskId = req.params.taskId;
 	  			req.body.UserId = req.user.id;
 
 	  			var userPromise  = models.User.findById(parseInt(req.user.id));
@@ -25,7 +24,7 @@ module.exports = function(models, io) {
 				})
 				.spread(function(task, hasAccount, hasProject){
 					if(task && hasAccount && hasProject){
-						return models.TaskComment.create(req.body)
+						return task.createComment(req.body)
 					} else {
 						return null;
 					}
@@ -70,7 +69,7 @@ module.exports = function(models, io) {
 	  			var accountPromise = models.Account.findById(parseInt(req.params.accountId));
 	  			var projectPromise = models.Project.findOne({ where: {'id': req.params.projectId, AccountId: req.params.accountId}, include: [ models.User ] });
 	  			var taskPromise = models.Task.findOne({ where: {'id': req.params.taskId, ProjectId: req.params.projectId}, include: [ models.User ] })
-	  			var taskCommentPromise = models.TaskComment.findOne({ where: {'id': req.params.commentId, TaskId: req.params.taskId}, include: [ models.User ] })
+	  			var taskCommentPromise = models.Comment.findOne({ where: {'id': req.params.commentId}, include: [ models.User ] })
 
 	  			join(userPromise, accountPromise, projectPromise, taskPromise, taskCommentPromise, function(user, account, project, task, taskComment) {
 	  				if(user && account && project && task && taskComment){
@@ -116,7 +115,7 @@ module.exports = function(models, io) {
 	  			var accountPromise = models.Account.findById(parseInt(req.params.accountId));
 	  			var projectPromise = models.Project.findOne({ where: {'id': req.params.projectId, AccountId: req.params.accountId}, include: [ models.User ] });
 	  			var taskPromise = models.Task.findOne({ where: {'id': req.params.taskId, ProjectId: req.params.projectId}, include: [ models.User ] })
-	  			var taskCommentPromise = models.TaskComment.findOne({ where: {'id': req.params.commentId, TaskId: req.params.taskId}, include: [ models.User ] })
+	  			var taskCommentPromise = models.Comment.findOne({ where: {'id': req.params.commentId}, include: [ models.User ] })
 
 	  			join(userPromise, accountPromise, projectPromise, taskPromise, taskCommentPromise, function(user, account, project, task, taskComment) {
 	  				if(user && account && project && task && taskComment){
@@ -170,7 +169,7 @@ module.exports = function(models, io) {
 	  			var accountPromise = models.Account.findById(parseInt(req.params.accountId));
 	  			var projectPromise = models.Project.findOne({ where: {'id': req.params.projectId, AccountId: req.params.accountId}, include: [ models.User ] });
 	  			var taskPromise = models.Task.findOne({ where: {'id': req.params.taskId, ProjectId: req.params.projectId}, include: [ models.User ] })
-	  			var taskCommentPromise = models.TaskComment.findOne({ where: {'id': req.params.commentId, TaskId: req.params.taskId}, include: [ models.User ] })
+	  			var taskCommentPromise = models.Comment.findOne({ where: {'id': req.params.commentId}, include: [ models.User ] })
 
 	  			join(userPromise, accountPromise, projectPromise, taskPromise, taskCommentPromise, function(user, account, project, task, taskComment) {
 	  				if(user && account && project && task && taskComment){
