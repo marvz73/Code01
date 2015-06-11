@@ -20,17 +20,14 @@ module.exports = function(models, io) {
     var task = require('./task.js')(models, io);
     router.use('/tasks', task);
 
-    var projectAttachment = require('./projectAttachment.js')(models, io);
-    router.use('/projectAttachments', projectAttachment);
-
     var history = require('./taskHistory.js')(models, io);
     router.use('/histories', history);
 
     var taskComment = require('./taskComment.js')(models, io);
     router.use('/comments', taskComment);
 
-    var taskAttachment = require('./taskAttachment.js')(models, io);
-    router.use('/taskAttachments', taskAttachment);
+    var attachment = require('./attachment.js')(models, io);
+    router.use('/attachments', attachment);
 
 	return router;
 }

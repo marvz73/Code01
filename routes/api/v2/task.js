@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router({mergeParams: true});
 var Promise = require("bluebird");
+var _ = require("underscore");
 var join = Promise.join;
 
 module.exports = function(models, io) {
@@ -9,9 +10,21 @@ module.exports = function(models, io) {
 		router.route('/')
 		.get(
 			function(req, res, next){
+				if(req.query.hasOwnProperty("ids")){
+					req.query.id = req.query.ids;
+					delete req.query.ids;
+				}
+				
 				models.Task.findAll({where: req.query, include: [{ all: true }]}).then(function(tasks) {
+					var parsed = [];
+					_.each(tasks, function(element) {
+						element = element.get({ plain: true });
+						element.attachments = _.pluck(element.Attachments, 'id');
+						delete element.Attachments;
+						parsed.push(element);
+					});
 					res.json({
-						tasks: tasks
+						tasks: parsed
 					});
 				})
 			}
@@ -29,9 +42,12 @@ module.exports = function(models, io) {
 	router.route('/:taskId')
 		.get( 
 	  		function(req, res, next) {
-	  			models.Task.findById(parseInt(req.params.taskId)).then(function(task){
+	  			models.Task.findOne({ where: {id: req.params.taskId}, include: [ {all: true} ]  }).then(function(task){
+	  				parsed = task.get({ plain: true });
+					parsed.attachments = _.pluck(parsed.Attachments, 'id');
+					delete parsed.Attachments;
 	  				res.json({
-						task : task
+						task : parsed
 					});
 	  			});
 	  		}

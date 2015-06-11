@@ -45,10 +45,11 @@ module.exports = function(models, io) {
 	  				parsed = project.get({ plain: true });
 					parsed.tasks = _.pluck(parsed.Tasks, 'id');
 					delete parsed.Tasks;
+					parsed.attachment = parsed.Attachment;
+					delete parsed.Attachment;
 
   					res.json({
-  						project: parsed,
-  						tasks: project.get('Tasks')
+  						project: parsed
   					})
 	  			});
 	  		}
