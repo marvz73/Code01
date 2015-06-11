@@ -16,7 +16,10 @@ module.exports = function(sequelize, DataTypes) {
         Task.hasMany(models.TaskHistory);
         Task.hasMany(models.Attachment, {
           foreignKey: 'attachmentable_id',
-          constraints: false
+          constraints: false,
+          scope: {
+            attachmentable: 'task'
+          }
         });
       }
     }

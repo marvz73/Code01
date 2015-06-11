@@ -16,7 +16,7 @@ module.exports = function(sequelize, DataTypes) {
           foreignKey: 'attachmentable_id',
           constraints: false,
           scope: {
-            commentable: 'task'
+            attachmentable: 'project'
           }
         });
       }
