@@ -68,7 +68,7 @@ module.exports = function(passport, io) {
 				models.User.findOrCreate({ where: {email: req.body.email}, defaults: req.body})
 				.spread(function(user, created) {
 					if(created){
-						var text = req.get('host') + '/verify/' + user.get('token', {raw: true});
+						var text = req.get('host') + '/verify/' + user.get('token');
 
                         transporter.sendMail({
                             from: 'dumingagebpls@gmail.com',

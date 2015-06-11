@@ -17,6 +17,16 @@ module.exports = function(sequelize, DataTypes) {
     classMethods: {
       associate: function(models) {
         Attachment.belongsTo(models.User);
+        Attachment.belongsTo(models.Project, {
+          foreignKey: 'attachmentable_id',
+          constraints: false,
+          as: 'project'
+        });
+        Attachment.belongsTo(models.Task, {
+          foreignKey: 'attachmentable_id',
+          constraints: false,
+          as: 'task'
+        });
       }
     },
   });

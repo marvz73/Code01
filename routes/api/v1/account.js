@@ -3,20 +3,6 @@ var router = express.Router({mergeParams: true});
 var Promise = require("bluebird");
 var join = Promise.join;
 
-router.param(function(name, fn) {
-  if (fn instanceof RegExp) {
-    return function(req, res, next, val) {
-      var captures;
-      if (captures = fn.exec(String(val))) {
-        req.params[name] = captures;
-        next();
-      } else {
-        next('route');
-      }
-    }
-  }
-});
-
 var nodemailer = require('nodemailer');
 
 var transporter = nodemailer.createTransport({
@@ -29,7 +15,6 @@ var transporter = nodemailer.createTransport({
 
 
 module.exports = function(models, io) {
-	router.param('accountId', /^\d+$/);
 
 	router.route('/')
 		.post(

@@ -15,24 +15,20 @@ module.exports = function(sequelize, DataTypes) {
         type: DataTypes.STRING
       },
       password: {
-        type: DataTypes.STRING,
-        roles: false
+        type: DataTypes.STRING
       },
       token: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
-        allowNull: false,
-        roles: false
+        allowNull: false
       },
       verified: {
         type: DataTypes.STRING
-        // roles: false
       },
       plan: {
         type: DataTypes.STRING,
         defaultValue: 'free',
-        allowNull: false,
-        roles: false
+        allowNull: false
       }
     }, {
       classMethods: {

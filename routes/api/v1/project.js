@@ -4,23 +4,7 @@ var Promise = require("bluebird");
 var fs = require('fs');
 var join = Promise.join;
 
-router.param(function(name, fn) {
-  if (fn instanceof RegExp) {
-    return function(req, res, next, val) {
-      var captures;
-      if (captures = fn.exec(String(val))) {
-        req.params[name] = captures;
-        next();
-      } else {
-        next('route');
-      }
-    }
-  }
-});
-
-
 module.exports = function(models, io) {
-	router.param('projectId', /^\d+$/);
 
 	router.route('/')
 		.post( 
@@ -297,7 +281,7 @@ module.exports = function(models, io) {
 				})
 				.spread(function(project, result){
 					if(project && result){
-						return project.getAttachment({where: {attachmentable: 'project'}})
+						return project.getAttachment()
 					} else {
 						return null;
 					}
@@ -358,7 +342,6 @@ module.exports = function(models, io) {
 								name: element.name,
 								path: element.path,
 								extension: element.extension,
-								attachmentable: 'project',
 								UserId: req.user.id
 							}))
 						})

@@ -14,7 +14,10 @@ module.exports = function(sequelize, DataTypes) {
         Project.hasMany(models.Task);
         Project.hasOne(models.Attachment, {
           foreignKey: 'attachmentable_id',
-          constraints: false
+          constraints: false,
+          scope: {
+            commentable: 'task'
+          }
         });
       }
     }
