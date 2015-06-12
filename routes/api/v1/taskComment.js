@@ -17,28 +17,30 @@ module.exports = function(models, io) {
 
 	  			join(userPromise, accountPromise, projectPromise, taskPromise, function(user, account, project, task) {
 	  				if(user && account && project && task){
-		  				return [task, user.hasAccount(account), account.hasProject(project)];
+		  				return [task, user, user.hasAccount(account), account.hasProject(project)];
 		  			} else {
-		  				return [ null, null, null]
+		  				return [ null, null, null, null]
 		  			}
 				})
-				.spread(function(task, hasAccount, hasProject){
+				.spread(function(task, user, hasAccount, hasProject){
 					if(task && hasAccount && hasProject){
-						return task.createComment(req.body)
+						return [task.createComment(req.body), user]
 					} else {
-						return null;
+						return [null, null];
 					}
 				})
-				.then(function(taskComment){
+				.spread(function(taskComment, user){
 					var _response = {}
 					if(taskComment){
+						var parsedComment = taskComment.get({ plain: true });
+						parsedComment.User = user.get({ plain: true });
 						_response.data =  	{
 												msg : res.__("taskComment.success.create"),
-												data : taskComment,
+												data : parsedComment,
 												error : null
 											}
 						_response.status = 200;
-						io.of('/' + req.params.accountId).to(req.params.projectId).emit('taskCommentCreate', taskComment)
+						io.of('/' + req.params.accountId).to(req.params.projectId).emit('taskCommentCreate', parsedComment)
 					} else {
 						_response.data =  	{
 												msg : res.__("taskComment.fail.create"),
