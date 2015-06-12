@@ -257,12 +257,27 @@ console.log(accountId);
 
 // task module
 var task = {
+    model: function(params) {
+        this.title       =  m.prop(params.title);
+        this.description =  m.prop(params.description);
+        this.comments    =  m.prop(params.comments);
+    },
     controller: function() {
 
         var self = this;
 
         this.TaskDetails = {};
         this.TaskComments = [];
+
+        //Task comment observ
+        socket.on('taskCommentCreate', function(data){
+            self.TaskComments.push(data);
+            m.redraw(true)
+        });
+        socket.on('taskUpdate', function(data){
+            self.detail = new task.model({title: "", description: data.desc});
+            m.redraw(true)
+        });
 
         //Fetch task details
         m.request({
@@ -271,6 +286,7 @@ var task = {
         })
         .then(function(resp){
             self.TaskDetails = resp.data;
+            self.detail = new task.model({title: resp.data.title, description: resp.data.desc});
         }).then(function(){
             m.request({
                 method: 'get',
@@ -281,12 +297,6 @@ var task = {
                 AJAXERROR();
             });
         });
-
-        //Task comment observ
-        socket.on('taskCommentCreate', function(data){
-            self.TaskComments.push(data);
-            m.redraw(true)
-        })
 
         //Add Comment
         this.addComment = function(jsonData){
@@ -386,14 +396,14 @@ var task = {
 
         return  m("div.cd-panel.from-right#cd-panel", {config: loaded, onclick: hideRightModal}, [
                     m("header.cd-panel-header.no-touch",[
-                        m("input[type='text'][value='"+ctrl.TaskDetails.id+"'].title#taskTitle"),
+                        m("h4.title#taskTitle", "Issue #"+ctrl.TaskDetails.id),
                         m("a.cd-panel-close", {onclick: hideRightModal}, "Close")
                     ]),
                     m("div.cd-panel-container", [
                         m("div.cd-panel-content", [
                             
                             m('form', [
-                                m('textarea[rows="10"][placeholder="Description here..."]#taskDesc.form-control', ctrl.TaskDetails.desc)
+                                m('textarea[rows="10"][placeholder="Description here..."]#taskDesc.form-control', {onchange: m.withAttr('value', ctrl.detail.description), value: ctrl.detail.description()})
                             ]),
                             m('br'),
                             m('div.clearfix', [
@@ -403,14 +413,21 @@ var task = {
                                     return m('div.media', [
                                         m('div.media-left', [
                                             m('a[href="#"]', [
-                                                m('img[width="60px"][height="60px"][src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9InllcyI/PjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+PGRlZnMvPjxyZWN0IHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgZmlsbD0iI0VFRUVFRSIvPjxnPjx0ZXh0IHg9IjEzLjgxMjUiIHk9IjMyIiBzdHlsZT0iZmlsbDojQUFBQUFBO2ZvbnQtd2VpZ2h0OmJvbGQ7Zm9udC1mYW1pbHk6QXJpYWwsIEhlbHZldGljYSwgT3BlbiBTYW5zLCBzYW5zLXNlcmlmLCBtb25vc3BhY2U7Zm9udC1zaXplOjEwcHQ7ZG9taW5hbnQtYmFzZWxpbmU6Y2VudHJhbCI+NjR4NjQ8L3RleHQ+PC9nPjwvc3ZnPg=="]')
+                                                // ( typeof val.User.ppicture != 'undefined')? m("img[src='"+val.User.ppicture+"']") : 
+                                                m('img[width="60px"][height="60px"][src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9InllcyI/PjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+PGRlZnMvPjxyZWN0IHdpZHRoPSI2NCIgaGVpZ2h0PSI2NCIgZmlsbD0iI0VFRUVFRSIvPjxnPjx0ZXh0IHg9IjEzLjgxMjUiIHk9IjMyIiBzdHlsZT0iZmlsbDojQUFBQUFBO2ZvbnQtd2VpZ2h0OmJvbGQ7Zm9udC1mYW1pbHk6QXJpYWwsIEhlbHZldGljYSwgT3BlbiBTYW5zLCBzYW5zLXNlcmlmLCBtb25vc3BhY2U7Zm9udC1zaXplOjEwcHQ7ZG9taW5hbnQtYmFzZWxpbmU6Y2VudHJhbCI+NjR4NjQ8L3RleHQ+PC9nPjwvc3ZnPg=="]') 
                                             ])
                                         ]),
                                         m('div.media-body', [
-                                            m('h5.media-heading', 'First Name'),
+                                            m('h5.media-heading', val.User.firstName + " " + val.User.lastName + " ", [
+                                                m("a[title='"+val.createdAt+"']", "", [
+                                                    m("i.fa.fa-clock-o")
+                                                ])
+                                            ]),
                                             m('small', val.comment)
                                         ])
                                     ])
+
+
                                 })
 
 
@@ -437,12 +454,21 @@ var project = {
         this.ProjectImage = "";
 
         //Task create observ
+        socket.on('projectAttachmentCreate', function(data){
+            console.log("Project attachment Create event fired::", data);
+            // console.log(self.TaskList)
+            // self.TaskList.push(data)
+            self.ProjectImage = data.id;
+            m.redraw(true)
+        });
+
+        //Task create observ
         socket.on('taskCreate', function(data){
             console.log("Task Create event fired::", data);
             // console.log(self.TaskList)
             self.TaskList.push(data)
             m.redraw(true)
-        })  
+        });  
 
         //Task update observ
         socket.on('taskUpdate', function(data){
