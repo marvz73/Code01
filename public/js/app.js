@@ -16,7 +16,7 @@ function getIndex(params){
 //Global ajax error message
 var AJAXERROR = function(){
     alert("Something went wrong and we don't why!");
-    // window.location.reload();
+    window.location.reload();
 }
 
 var sharedProjectTask = [];
@@ -637,8 +637,22 @@ var projectDetails = {
         this.description =  m.prop(params.description);
     },
     controller: function() {
+
         var self = this;
         this.projectDetails = {};
+
+        //Project create observ
+        socket.on('projectCreate', function(data){
+            self.projectDetails.SubProjects.push(data);
+            m.redraw(true);
+        })  
+
+        //Task create observ
+        socket.on('taskCreate', function(data){
+            self.TaskList.push(data);
+            m.redraw(true);
+        })  
+
 
         this.getProjectDetails = function(){
             m.request({
@@ -685,6 +699,13 @@ var projectDetails = {
             }).then(function(taskResp){
 
             }, function(){
+                AJAXERROR();
+            })
+        }
+
+        this.addSubProject = function(pid){
+            console.log(pid)
+            return m.request({method:'post', url: baseUrl + '/api/v1/account/' + accountId + '/project', data: {ProjectId: pid, title: 'Project Title'}}).then(function(){}, function(){
                 AJAXERROR();
             })
         }
@@ -781,7 +802,15 @@ var projectDetails = {
             {
 
                 return m('m', [
-                    m('legend', "Sub Project's"),
+                    m('legend', "Sub Project's ",[
+                        m('a',{ onclick: function(elm, init){
+                            if(!init){
+                                ctrl.addSubProject(m.route.param('pid'))
+                            }
+                        } } , [
+                            m("i.fa.fa-plus-square")
+                        ])
+                    ]),
                     m('ul.unstyled.project-task-list', [
                         projectSubTask()
                     ])
@@ -793,7 +822,7 @@ var projectDetails = {
 
         return  m("div.cd-panel.from-right#cd-panel", {config: loaded, onclick: hideRightModal}, [
                     m("header.cd-panel-header.no-touch",[
-                        m("input.title#projectTitle", {onchange: m.withAttr("value", ctrl.detail.title()), value: ctrl.detail.title()}),
+                        m("input.title#projectTitle", {onchange: m.withAttr("value", ctrl.detail.title), value: ctrl.detail.title()}),
                         m("a.cd-panel-close", {onclick: hideRightModal}, "Close")
                     ]),
                     m("div.cd-panel-container", [
@@ -811,6 +840,7 @@ var projectDetails = {
                                 ]),
 
                                 m('p',''),
+
                                 projectSubTaskContainer()
 
                             ])
@@ -1237,12 +1267,6 @@ var navigation = {
                 AJAXERROR();
             })  
         };
-
-        this.addSubProject = function(pid){
-            return m.request({method:'post', url: baseUrl + '/api/v1/account/' + accountId + '/project', data: {ProjectId: pid, title: 'Project Title'}}).then(function(){}, function(){
-                AJAXERROR();
-            })
-        }
     
     },
     view: function(ctrl) {
@@ -1262,14 +1286,19 @@ var navigation = {
             {
                 return ctrl.ProjectList.map(function (val, index) {
                     return m("li.clearfix", [
-                        m("a[href='/1/" + val.AccountId + '/' +val.id+ "'].cd-navs.pull-left", {config: m.route }, val.title),
-                        m("a[href='/2/"+ val.AccountId+"/"+val.id+"'].cd-navs.pull-right", {config: m.route}, "View"),
+                       
+                        m("a[href='/1/" + val.AccountId + '/' +val.id+ "'].cd-navs.pull-left", {config: m.route }, val.title, [
+                            m("i.fa.fa-plus-square.pull-left")
+                        ]),
+                        m("a[href='/2/"+ val.AccountId+"/"+val.id+"'].cd-navs.pull-right", {config: m.route}, [
+                            m("i.fa.fa-bars")
+                        ]),
 
-                        m("a.cd-navs", {onclick: function(elm, init, context){
-                            if(!init){
-                                ctrl.addSubProject(val.id);
-                            }
-                        } }, " + ")
+                        // m("a.cd-navs", {onclick: function(elm, init, context){
+                        //     if(!init){
+                        //         ctrl.addSubProject(val.id);
+                        //     }
+                        // } }, " + ")
                         
                     ])
                 })     
@@ -1282,8 +1311,13 @@ var navigation = {
             {
                 return ctrl.AccountList.map(function (val, index) {
                     return m("li.clearfix", [
-                        m("a[href='" + val.id + "'].pull-left.cd-navs", val.name),
-                        m("a[href='/4/" + val.id + "/details'].cd-navs.pull-right",{config: m.route}, "details"),
+                        
+                        m("a[href='" + val.id + "'].pull-left.cd-navs", val.name,[
+                            m("i.fa.fa-users.pull-left")
+                        ]),
+                        m("a[href='/4/" + val.id + "/details'].cd-navs.pull-right",{config: m.route}, [
+                             m("i.fa.fa-bars")
+                        ]),
                     ])
                 })     
             }
@@ -1306,7 +1340,7 @@ var navigation = {
                     m("li.clearfix", [
                         // m("a", { onclick:  ctrl.addTask }, "<i class="fa fa-plus"></i>")
                         m("a[title='Add Project'].pull-left.cd-navs", {onclick: ctrl.addProject},[
-                            m("i.fa.fa-plus")
+                            m("i.fa.fa-plus-square")
                         ]),
                         m("a[title='Add Pins'].pull-left.cd-navs", { onclick:  ctrl.addTask }, [
                             m("i.fa.fa-thumb-tack")
@@ -1331,7 +1365,9 @@ var navigation = {
                     ((ctrl.AccountList.length) ? accountList() : '' ),
 
                     m("li", [
-                        m("a[href='/0/1'].cd-navs", {config: m.route}, "Home")
+                        m("a[href='/0/1'].cd-navs", {config: m.route}, "Home",[
+                            m("i.fa.fa-home.pull-left")
+                        ])
                     ])
 
                 ])        
