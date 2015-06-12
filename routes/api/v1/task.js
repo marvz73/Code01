@@ -340,7 +340,7 @@ module.exports = function(models, io) {
 				})
 				.spread(function(task, hasAccount, hasProject){
 					if(task && hasAccount && hasProject){
-						return task.getAttachments()
+						return task.getAttachments({where: {attachmentable: 'task'}})
 					} else {
 						return null;
 					}
@@ -400,6 +400,7 @@ module.exports = function(models, io) {
 								name: element.name,
 								path: element.path,
 								extension: element.extension,
+								attachmentable: 'task',
 								UserId: req.user.id
 							}))
 						})
@@ -454,4 +455,3 @@ module.exports = function(models, io) {
 
 	return router;
 }
-

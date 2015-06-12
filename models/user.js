@@ -35,6 +35,14 @@ module.exports = function(sequelize, DataTypes) {
         associate: function(models) {
           User.belongsToMany(models.Account, {through: models.AccountUser});
           User.hasMany(models.AccountUser);
+          User.hasOne(models.Attachment, {
+            foreignKey: 'attachmentable_id',
+            constraints: false,
+            as: 'ProfilePicture',
+            scope: {
+              attachmentable: 'user'
+            }
+          });
         }
       }
     });

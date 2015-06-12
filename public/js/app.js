@@ -21,7 +21,7 @@ var AJAXERROR = function(){
 
 var sharedProjectTask = [];
 var accountId = bootstrap.Accounts[getIndex(parseInt(namespace.replace('/', '')))].id;
-var socket = io.connect('localhost:3000/' + accountId);
+var socket = io.connect(baseUrl + '/' + accountId);
 
 
 console.log(accountId);
@@ -627,7 +627,7 @@ var project = {
             {
                 if(typeof ctrl.ProjectImage != 'undefined')
                 {
-                    return m("img[src='http://localhost:3000/api/v1/account/"+accountId+"/project/"+m.route.param('pid')+"/attachment/"+ctrl.ProjectImage+"']");
+                    return m("img[src='" + baseUrl + "/api/v1/account/"+accountId+"/project/"+m.route.param('pid')+"/attachment/"+ctrl.ProjectImage+"']");
                 }
                 else
                 {

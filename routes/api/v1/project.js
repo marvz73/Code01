@@ -281,7 +281,7 @@ module.exports = function(models, io) {
 				})
 				.spread(function(project, result){
 					if(project && result){
-						return project.getAttachment()
+						return project.getAttachment({where: {attachmentable: 'project'}})
 					} else {
 						return null;
 					}
@@ -334,7 +334,6 @@ module.exports = function(models, io) {
 					if(result){
 						var attachments = [];
 						var oldAttachment = project.getAttachment();
-						console.log(req.params);
 						
 						req.files.file.forEach(function(element, index, array){
 							attachments.push(project.createAttachment({
@@ -342,6 +341,7 @@ module.exports = function(models, io) {
 								name: element.name,
 								path: element.path,
 								extension: element.extension,
+								attachmentable: 'project',
 								UserId: req.user.id
 							}))
 						})
