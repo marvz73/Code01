@@ -21,6 +21,8 @@ module.exports = function(models, io) {
 						element = element.get({ plain: true });
 						element.attachments = _.pluck(element.Attachments, 'id');
 						delete element.Attachments;
+						element.comments = _.pluck(element.Comments, 'id');
+						delete element.Comments;
 						parsed.push(element);
 					});
 					res.json({
@@ -46,6 +48,8 @@ module.exports = function(models, io) {
 	  				parsed = task.get({ plain: true });
 					parsed.attachments = _.pluck(parsed.Attachments, 'id');
 					delete parsed.Attachments;
+					parsed.comments = _.pluck(parsed.Comments, 'id');
+					delete parsed.Comments;
 	  				res.json({
 						task : parsed
 					});
