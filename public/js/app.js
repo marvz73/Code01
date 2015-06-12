@@ -477,10 +477,11 @@ var project = {
             method:'get', 
             url:  baseUrl + '/api/v1/account/' + accountId + '/project/' + m.route.param('pid') + '/attachments'
         }).then(function(projectImage){
-
-
-            self.ProjectImage = projectImage.data.id;
-
+            self.ProjectImage = "";
+            if(projectImage.data)
+            {
+                self.ProjectImage = projectImage.data.id;
+            }
         })
 
 
@@ -1015,7 +1016,7 @@ var accounts = {
     }
 }
 
-var accountViews = {
+var accountDetails = {
 
 	model: function(params){
 		this.user = m.prop(params.user);
@@ -1024,13 +1025,13 @@ var accountViews = {
     controller: function() {
         var self = this;
 
-        self.inviteUser =  new accountViews.model({user: "", users: []});
+        self.inviteUser =  new accountDetails.model({user: "", users: []});
 
         this.accountUsers = function(){
             m.request({method:'get', url: baseUrl + '/api/v1/account/'+m.route.param('aid')+'/accountUsers' })
             .then(function(resp){
 
-                self.userList = new accountViews.model({user: "", users: resp.data});
+                self.userList = new accountDetails.model({user: "", users: resp.data});
             },function(){
                 AJAXERROR();
             }) 
@@ -1046,7 +1047,7 @@ var accountViews = {
                 data: {'email': params},
             })
             .then(function(resp){
-                self.inviteUser =  new accountViews.model({user: "", users: []});
+                self.inviteUser =  new accountDetails.model({user: "", users: []});
             },function(){
                 AJAXERROR();
             });
@@ -1083,17 +1084,46 @@ var accountViews = {
             }
         }
 
+        function accountOwner(em, init){
+            if(!init){
+                
+                if(val.role)
+                {
+                    return 
+                }
+                else{
+                    return m('span.pull-right', '')
+                }
+            }
+        }
+
         function userList(elm, init, context){
             if( !init ){
-            	console.log(ctrl.userList.userList())
+            	// console.log(ctrl.userList.userList())
+
             	var list = ctrl.userList.userList();
             	return list.map(function (val, index){
+
             		if(val.User.verified)
             		{
-	            		return m('li', [
-	            			m('a', val.User.firstName + ' ' + val.User.lastName)
-	            		])
+                        if(val.role)
+                        {
+                            return m('li', [
+                                m('a.clearfix', val.User.firstName + ' ' + val.User.lastName, [
+                                    m('span.pull-right', 'Owner')
+                                ])
+                            ]);
+                        }
+                        else{
+                            return m('li', [
+                                m('a.clearfix', val.User.firstName + ' ' + val.User.lastName)
+                            ]);
+                        }
             		}
+                    
+
+
+
 
             	})
             }
@@ -1121,7 +1151,7 @@ var accountViews = {
                                 m('legend', "Invite User's"),
                                 m('form.settings-group', {onsubmit: addUserAccount}, [
                                     m('div.form-group', [
-                                        m('input.form-control[type="email"][placeholder="Enter Email Address"]', {onchange: m.withAttr("value", ctrl.inviteUser.user), value: ctrl.inviteUser.user()}),
+                                        m('input.form-control[type="email"][placeholder="Enter Email Address"][required]', {onchange: m.withAttr("value", ctrl.inviteUser.user), value: ctrl.inviteUser.user()}),
                                     ]),
                                     m('div.form-group', [
                                         m('button.btn.btn-primary', 'Send Invite')
@@ -1232,14 +1262,14 @@ var navigation = {
             {
                 return ctrl.ProjectList.map(function (val, index) {
                     return m("li.clearfix", [
-                        m("a[href='/1/" + val.AccountId + '/' +val.id+ "'].pull-left", {config: m.route }, val.title),
-                        m("a[href='/2/"+ val.AccountId+"/"+val.id+"'].pull-right", {config: m.route}, "View"),
+                        m("a[href='/1/" + val.AccountId + '/' +val.id+ "'].cd-navs.pull-left", {config: m.route }, val.title),
+                        m("a[href='/2/"+ val.AccountId+"/"+val.id+"'].cd-navs.pull-right", {config: m.route}, "View"),
 
-                        m("a", {onclick: function(elm, init, context){
+                        m("a.cd-navs", {onclick: function(elm, init, context){
                             if(!init){
                                 ctrl.addSubProject(val.id);
                             }
-                        } }, " + "),
+                        } }, " + ")
                         
                     ])
                 })     
@@ -1252,42 +1282,56 @@ var navigation = {
             {
                 return ctrl.AccountList.map(function (val, index) {
                     return m("li.clearfix", [
-                        m("a[href='" + val.id + "'].pull-left", val.name),
-                        m("a[href='/4/" + val.id + "/details'].pull-right",{config: m.route}, "details"),
+                        m("a[href='" + val.id + "'].pull-left.cd-navs", val.name),
+                        m("a[href='/4/" + val.id + "/details'].cd-navs.pull-right",{config: m.route}, "details"),
                     ])
                 })     
             }
         }
 
+        function showDropdown(elm, init, context){
+            if(!init){
+                Q('.dropdown').addClass('open')
+            }
+        }
+
         //Navigation Menu
         return m("#cd-nav", [
-            m("a[href='javascript:void(0)'].cd-nav-trigger", {}, "Menu",[
+            m("a[href='javascript:void(0)'].cd-nav-trigger.cd-navs", {}, "Menu",[
                 m("span","")
             ]),
             m("nav#cd-main-nav", [
                 
                 m("ul", [
+                    m("li.clearfix", [
+                        // m("a", { onclick:  ctrl.addTask }, "<i class="fa fa-plus"></i>")
+                        m("a[title='Add Project'].pull-left.cd-navs", {onclick: ctrl.addProject},[
+                            m("i.fa.fa-plus")
+                        ]),
+                        m("a[title='Add Pins'].pull-left.cd-navs", { onclick:  ctrl.addTask }, [
+                            m("i.fa.fa-thumb-tack")
+                             // data-toggle="tooltip" data-placement="left" title="Tooltip on left"
+                        ]),
+                        m("a[title='Add Account'].pull-left.cd-navs", {onclick: ctrl.addAccount},[
+                            m("i.fa.fa-users")
+                             // data-toggle="tooltip" data-placement="left" title="Tooltip on left"
+                        ]),
+                        m("a[title='Settings'][href='/1000/"+m.route.param('aid')+"'].cd-navs.pull-right", {config: m.route}, [
+                            m("i.fa.fa-cog")
+                             // data-toggle="tooltip" data-placement="left" title="Tooltip on left"
+                        ])
+                    ]),
 
                     ((ctrl.ProjectList.length) ? projectList() : '' ),
 
-                    m("li", [
-                        m("a", { onclick:  ctrl.addTask }, "Add Pin")
-                    ]),
-                    m("li", [
-                        m("a", {onclick: ctrl.addProject}, "Add Project")
-                    ]),
+                    // m("li", [
+                    //     m("a.cd-navs", { onclick:  showDropdown }, "Add Pin")
+                    // ]),
 
                     ((ctrl.AccountList.length) ? accountList() : '' ),
 
                     m("li", [
-                        m("a", {onclick: ctrl.addAccount}, "Add Account")
-                    ]),
-
-                    m("li", [
-                        m("a[href='/1000/"+m.route.param('aid')+"']",{config: m.route}, "Settings")
-                    ]),
-                    m("li", [
-                        m("a[href='/0/1']", {config: m.route}, "Home")
+                        m("a[href='/0/1'].cd-navs", {config: m.route}, "Home")
                     ])
 
                 ])        
@@ -1345,7 +1389,7 @@ m.routes( '/0/' + bootstrap.Accounts[0].id, {
     '/4/:aid/details' : {
         '#navigation' : navigation,
         '#account' : '',
-        '#account' : accountViews,
+        '#account' : accountDetails,
         // '#project' : project,
         '#projectdetails' : '',
         '#task' : '',
