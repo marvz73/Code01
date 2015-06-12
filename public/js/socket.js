@@ -30,6 +30,10 @@ socket.on('projectDelete', function(data){
 	console.log(data);
 })
 
+socket.on('projectAttachmentCreate', function(data){
+	console.log(data);
+})
+
 //task events
 socket.on('taskCreate', function(data){
 	console.log(data);

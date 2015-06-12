@@ -365,6 +365,7 @@ module.exports = function(models, io) {
 												error : null
 											}
 						_response.status = 200;
+						io.of('/' + req.params.accountId).emit('projectAttachmentCreate', attachments[0])
 					} else {
 						_response.data =  	{
 												msg : res.__("attachment.fail.create"),
