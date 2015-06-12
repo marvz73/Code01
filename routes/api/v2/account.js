@@ -58,8 +58,7 @@ module.exports = function(models, io) {
 					delete parsed.Projects;
 
   					res.json({
-  						account: parsed,
-  						projects: account.get('Projects')
+  						account: parsed
   					})
 	  			})
 	  		}
