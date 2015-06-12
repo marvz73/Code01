@@ -1075,28 +1075,33 @@ var accounts = {
 var accountDetails = {
 
 	model: function(params){
+        this.name = m.prop(params.name);
 		this.user = m.prop(params.user);
-		this.userList = m.prop(params.users)
+		this.userList = m.prop(params.users);
 	},
     controller: function() {
         var self = this;
 
-        self.inviteUser =  new accountDetails.model({user: "", users: []});
+        self.inviteUser =  new accountDetails.model({user: "", users: [], name:""});
+        self.details = "";
 
-        this.accountUsers = function(){
-            m.request({method:'get', url: baseUrl + '/api/v1/account/'+m.route.param('aid')+'/accountUsers' })
-            .then(function(resp){
+        //get account details
+        m.request({method:'get', url: baseUrl + '/api/v1/account/' + m.route.param('aid')})
+        .then(function(resp){
+            self.details = new accountDetails.model({name: resp.data.name});
+        }, function(){
+            AJAXERROR();
+        });
 
-                self.userList = new accountDetails.model({user: "", users: resp.data});
-            },function(){
-                AJAXERROR();
-            }) 
-        }
-
-        this.accountUsers();
+        //get accounts users
+        m.request({method:'get', url: baseUrl + '/api/v1/account/'+m.route.param('aid')+'/accountUsers' })
+        .then(function(resp){
+            self.userList = new accountDetails.model({user: "", users: resp.data});
+        },function(){
+            AJAXERROR();
+        });
 
         this.addUserAccount = function(params){
-
             m.request({
                 method:'post', 
                 url: baseUrl + '/api/v1/account/' + m.route.param('aid') + '/inviteUser',
@@ -1109,6 +1114,19 @@ var accountDetails = {
             });
         }
 
+        this.updateAccountName = function(params){
+            m.request({
+                method:'post', 
+                url: baseUrl + '/api/v1/account/' + m.route.param('aid'),
+                data: params,
+            })
+            .then(function(resp){
+                self.details = new accountDetails.model({name: resp.data.name});
+            },function(){
+                AJAXERROR();
+            });
+        }
+
     },
     view: function(ctrl){
 
@@ -1116,7 +1134,15 @@ var accountDetails = {
             if( !init ){               
                 setTimeout(function(){
                     Q('.cd-panel').addClass('is-visible');
-                }, 200)
+                }, 200);
+                window.document.getElementById('accountTitle').addEventListener('keypress', Q.debounce(function(params){
+                    var jsonData = {
+                        name: this.value
+                    }
+
+                    ctrl.updateAccountName(jsonData);
+
+                }, 1000)); 
             }
         }
 
@@ -1184,11 +1210,11 @@ var accountDetails = {
             	})
             }
 
-        }
+        }   
 
         return  m("div.cd-panel.from-right#cd-panel", {config: loaded, onclick: hideRightModal}, [
                     m("header.cd-panel-header.no-touch",[
-                        m("h4.title","Account Details"),
+                        m("input.title#accountTitle", {onchange: m.withAttr("value", ctrl.details.name), value: ctrl.details.name()}),
                         m("a.cd-panel-close", {onclick: hideRightModal}, "Close")
                     ]),
                     m("div.cd-panel-container", [
@@ -1407,6 +1433,7 @@ var navigation = {
 //setup routes to start w/ the `#` symbol
 m.route.mode = "hash";
 
+console.log(bootstrap)
 
 m.routes( '/0/' + bootstrap.Accounts[0].id, {
     '/0/:aid' : {
