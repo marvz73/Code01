@@ -814,10 +814,19 @@ header h1 {
     display: block;
     border-bottom: 1px solid #eff2f6;
   }
+  #cd-nav.is-fixed ul li .align,
   #cd-nav.is-fixed ul li a {
     padding: 1em;
     margin-left: 0;
   }
+
+  #cd-nav.is-fixed ul li.icons i{
+    padding-right: 5px;
+  }
+  #cd-nav.is-fixed ul li.icons a{
+    padding-left: 0;
+  }
+
   #cd-nav ul.has-transitions {
 /* this class is used to bring back transitions when the navigation moves at the bottom right */
     -webkit-transition: -webkit-transform 0.3s, visibility 0s 0.3s;
