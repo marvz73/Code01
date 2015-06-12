@@ -17,21 +17,26 @@ module.exports = function(models, io) {
 
 	  			join(userPromise, accountPromise, projectPromise, function(user, account, project) {
 	  				if(user && account && project){
-		  				return [project, user.hasAccount(account), account.hasProject(project)];
+		  				return [project, user, user.hasAccount(account), account.hasProject(project)];
 		  			} else {
-		  				return [ null, null, null]
+		  				return [ null, null, null, null]
 		  			}
 				})
-				.spread(function(project, hasAccount, hasProject){
+				.spread(function(project, user, hasAccount, hasProject){
 					if(project && hasAccount && hasProject){
-						return models.Task.create(req.body)
+						return [user, models.Task.create(req.body)]
 					} else {
-						return null;
+						return [null, null];
 					}
 				})
-				.then(function(task){
+				.spread(function(user, task){
 					var _response = {}
 					if(task){
+						task.createHistory({
+							action: user.get('fullName') + ' created a task.',
+							historyable: 'task',
+							UserId: req.user.id
+						});
 						_response.data =  	{
 												msg : res.__("task.success.create"),
 												data : task,
@@ -132,6 +137,11 @@ module.exports = function(models, io) {
 				.then(function(task){
 					var _response = {}
 					if(task){
+						task.createHistory({
+							action: user.get('fullName') + ' updated a task.',
+							historyable: 'task',
+							UserId: req.user.id
+						});
 						_response.data =  	{
 												msg : res.__("task.success.update"),
 												data : task,
@@ -232,7 +242,7 @@ module.exports = function(models, io) {
 				})
 				.spread(function(task, hasAccount, hasProject){
 					if(task && hasAccount && hasProject){
-						return task.getTaskHistories({ include: [ models.User ]})
+						return task.getHistories({ where: {historyable: 'task'}, include: [ models.User ]})
 					} else {
 						return null;
 					}
@@ -286,7 +296,7 @@ module.exports = function(models, io) {
 				})
 				.spread(function(task, hasAccount, hasProject){
 					if(task && hasAccount && hasProject){
-						return task.getComments({ include: [ models.User ]})
+						return task.getComments({where: {commentable: 'task'}, include: [ models.User ]})
 					} else {
 						return null;
 					}
@@ -385,12 +395,12 @@ module.exports = function(models, io) {
 
 	  			join(userPromise, accountPromise, projectPromise, taskPromise, function(user, account, project, task) {
 	  				if(user && account && project && task){
-		  				return [task, user.hasAccount(account), account.hasProject(project)];
+		  				return [task, user, user.hasAccount(account), account.hasProject(project)];
 		  			} else {
 		  				return [ null, null, null]
 		  			}
 				})
-				.spread(function(task, hasAccount, hasProject){
+				.spread(function(task, user, hasAccount, hasProject){
 					if(task && hasAccount && hasProject){
 						var attachments = [];
 
@@ -404,17 +414,21 @@ module.exports = function(models, io) {
 								UserId: req.user.id
 							}))
 						})
-						return Promise.all(attachments)
-						return true
+						return [task, user, Promise.all(attachments)]
 					} else {
-						return null;
+						return [null, null, null];
 					}
 				})
-				.then(function(attachments){
+				.then(function(task, user, attachments){
 					console.log(attachments)
 					console.log(req.files)
 					var _response = {}
 					if(attachments){
+						task.createHistory({
+							action: user.get('fullName') + ' added '+ attachments.length +' attachment(s).',
+							historyable: 'task',
+							UserId: req.user.id
+						});
 						_response.data =  	{
 												msg : res.__("attachment.success.create"),
 												data : attachments,

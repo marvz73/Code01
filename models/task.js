@@ -12,7 +12,6 @@ module.exports = function(sequelize, DataTypes) {
       associate: function(models) {
         Task.belongsTo(models.Project);
         Task.belongsTo(models.User);
-        Task.hasMany(models.TaskHistory);
         Task.hasMany(models.Attachment, {
           foreignKey: 'attachmentable_id',
           constraints: false,
@@ -25,6 +24,13 @@ module.exports = function(sequelize, DataTypes) {
           constraints: false,
           scope: {
             commentable: 'task'
+          }
+        });
+        Task.hasMany(models.History, {
+          foreignKey: 'historyable_id',
+          constraints: false,
+          scope: {
+            historyable: 'task'
           }
         });
       }

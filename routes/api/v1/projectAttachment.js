@@ -12,7 +12,7 @@ module.exports = function(models, io) {
 				var userPromise  = models.User.findById(parseInt(req.user.id));
 	  			var accountPromise = models.Account.findById(parseInt(req.params.accountId));
 	  			var projectPromise = models.Project.findOne({ where: {'id': req.params.projectId, AccountId: req.params.accountId}, include: [ models.User ] });
-	  			var attachmentPromise = models.Attachment.findById(parseInt(req.params.attachmentId));
+	  			var attachmentPromise = models.Attachment.findOne({ where: {'id': req.params.attachmentId, attachmentable: 'task'}, include: [ models.User ] });
 
 	  			join(userPromise, accountPromise, projectPromise, attachmentPromise, function(user, account, project, attachment) {
 	  				if(user && account && project && attachment){
@@ -61,7 +61,7 @@ module.exports = function(models, io) {
 				var userPromise  = models.User.findById(parseInt(req.user.id));
 	  			var accountPromise = models.Account.findById(parseInt(req.params.accountId));
 	  			var projectPromise = models.Project.findOne({ where: {'id': req.params.projectId, AccountId: req.params.accountId}, include: [ models.User ] });
-	  			var attachmentPromise = models.Attachment.findById(parseInt(req.params.attachmentId));
+	  			var attachmentPromise = models.Attachment.findOne({ where: {'id': req.params.attachmentId, attachmentable: 'task'}, include: [ models.User ] });
 
 	  			join(userPromise, accountPromise, projectPromise, attachmentPromise, function(user, account, project, attachment) {
 	  				if(user && account && project && attachment){

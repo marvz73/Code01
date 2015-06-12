@@ -13,7 +13,7 @@ module.exports = function(models, io) {
 	  			var accountPromise = models.Account.findById(parseInt(req.params.accountId));
 	  			var projectPromise = models.Project.findOne({ where: {'id': req.params.projectId, AccountId: req.params.accountId}, include: [ models.User ] });
 	  			var taskPromise = models.Task.findOne({ where: {'id': req.params.taskId, ProjectId: req.params.projectId}, include: [ models.User ] })
-	  			var taskAttachmentPromise = models.Attachment.findById(parseInt(req.params.taskAttachmentId))
+	  			var taskAttachmentPromise = models.Attachment.findOne({ where: {'id': req.params.taskAttachmentId, attachmentable: 'task'}, include: [ models.User ] });
 
 	  			join(userPromise, accountPromise, projectPromise, taskPromise, taskAttachmentPromise, function(user, account, project, task, attachment) {
 	  				if(user && account && project && task && attachment){
@@ -63,7 +63,7 @@ module.exports = function(models, io) {
 	  			var accountPromise = models.Account.findById(parseInt(req.params.accountId));
 	  			var projectPromise = models.Project.findOne({ where: {'id': req.params.projectId, AccountId: req.params.accountId}, include: [ models.User ] });
 	  			var taskPromise = models.Task.findOne({ where: {'id': req.params.taskId, ProjectId: req.params.projectId}, include: [ models.User ] })
-	  			var taskAttachmentPromise = models.Attachment.findById(parseInt(req.params.taskAttachmentId))
+	  			var taskAttachmentPromise = models.Attachment.findOne({ where: {'id': req.params.taskAttachmentId, attachmentable: 'task'}, include: [ models.User ] });
 
 	  			join(userPromise, accountPromise, projectPromise, taskPromise, taskAttachmentPromise, function(user, account, project, task, attachment) {
 	  				if(user && account && project && task && attachment){
@@ -82,6 +82,11 @@ module.exports = function(models, io) {
 				.then(function(attachment){
 					var _response = {}
 					if(attachment){
+						task.createHistory({
+							action: user.get('fullName') + ' deleted '+ attachment.get('name') +' attachment.',
+							historyable: 'task',
+							UserId: req.user.id
+						});
 						 fs.unlink(__dirname + '/../../../uploads/' + attachment.get('name'))
 						_response.data =  	{
 												msg : res.__("attachment.success.delete"),

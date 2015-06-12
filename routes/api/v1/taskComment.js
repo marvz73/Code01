@@ -24,14 +24,19 @@ module.exports = function(models, io) {
 				})
 				.spread(function(task, user, hasAccount, hasProject){
 					if(task && hasAccount && hasProject){
-						return [task.createComment(req.body), user]
+						return [task, task.createComment(req.body), user]
 					} else {
-						return [null, null];
+						return [null, null, null];
 					}
 				})
-				.spread(function(taskComment, user){
+				.spread(function(task, taskComment, user){
 					var _response = {}
 					if(taskComment){
+						task.createHistory({
+							action: user.get('fullName') + ' created a comment.',
+							historyable: 'task',
+							UserId: req.user.id
+						});
 						var parsedComment = taskComment.get({ plain: true });
 						parsedComment.User = user.get({ plain: true });
 						_response.data =  	{
@@ -71,7 +76,7 @@ module.exports = function(models, io) {
 	  			var accountPromise = models.Account.findById(parseInt(req.params.accountId));
 	  			var projectPromise = models.Project.findOne({ where: {'id': req.params.projectId, AccountId: req.params.accountId}, include: [ models.User ] });
 	  			var taskPromise = models.Task.findOne({ where: {'id': req.params.taskId, ProjectId: req.params.projectId}, include: [ models.User ] })
-	  			var taskCommentPromise = models.Comment.findOne({ where: {'id': req.params.commentId}, include: [ models.User ] })
+	  			var taskCommentPromise = models.Comment.findOne({ where: {'id': req.params.commentId, commentable: 'task'}, include: [ models.User ] })
 
 	  			join(userPromise, accountPromise, projectPromise, taskPromise, taskCommentPromise, function(user, account, project, task, taskComment) {
 	  				if(user && account && project && task && taskComment){
@@ -117,25 +122,30 @@ module.exports = function(models, io) {
 	  			var accountPromise = models.Account.findById(parseInt(req.params.accountId));
 	  			var projectPromise = models.Project.findOne({ where: {'id': req.params.projectId, AccountId: req.params.accountId}, include: [ models.User ] });
 	  			var taskPromise = models.Task.findOne({ where: {'id': req.params.taskId, ProjectId: req.params.projectId}, include: [ models.User ] })
-	  			var taskCommentPromise = models.Comment.findOne({ where: {'id': req.params.commentId}, include: [ models.User ] })
+	  			var taskCommentPromise = models.Comment.findOne({ where: {'id': req.params.commentId, commentable: 'task'}, include: [ models.User ] })
 
 	  			join(userPromise, accountPromise, projectPromise, taskPromise, taskCommentPromise, function(user, account, project, task, taskComment) {
 	  				if(user && account && project && task && taskComment){
-		  				return [taskComment, user.hasAccount(account), account.hasProject(project), project.hasTask(task)];
+		  				return [task, user, taskComment, user.hasAccount(account), account.hasProject(project), project.hasTask(task)];
 		  			} else {
-		  				return [ null, null, null, null]
+		  				return [ null, null, null, null, null, null]
 		  			}
 				})
-				.spread(function(taskComment, hasAccount, hasProject, hasTask){
+				.spread(function(task, user, taskComment, hasAccount, hasProject, hasTask){
 					if(taskComment && hasAccount && hasProject && hasTask){
-						return taskComment.updateAttributes(req.body)
+						return [task, user, taskComment.updateAttributes(req.body)]
 					} else {
-						return null;
+						return [null, null, null];
 					}
 				})
-				.then(function(taskComment){
+				.then(function(task, user, taskComment){
 					var _response = {}
 					if(taskComment){
+						task.createHistory({
+							action: user.get('fullName') + ' updated a comment.',
+							historyable: 'task',
+							UserId: req.user.id
+						});
 						_response.data =  	{
 												msg : res.__("taskComment.success.update"),
 												data : taskComment,
@@ -171,25 +181,30 @@ module.exports = function(models, io) {
 	  			var accountPromise = models.Account.findById(parseInt(req.params.accountId));
 	  			var projectPromise = models.Project.findOne({ where: {'id': req.params.projectId, AccountId: req.params.accountId}, include: [ models.User ] });
 	  			var taskPromise = models.Task.findOne({ where: {'id': req.params.taskId, ProjectId: req.params.projectId}, include: [ models.User ] })
-	  			var taskCommentPromise = models.Comment.findOne({ where: {'id': req.params.commentId}, include: [ models.User ] })
+	  			var taskCommentPromise = models.Comment.findOne({ where: {'id': req.params.commentId, commentable: 'task'}, include: [ models.User ] })
 
 	  			join(userPromise, accountPromise, projectPromise, taskPromise, taskCommentPromise, function(user, account, project, task, taskComment) {
 	  				if(user && account && project && task && taskComment){
-		  				return [taskComment, user.hasAccount(account), account.hasProject(project), project.hasTask(task)];
+		  				return [task, user, taskComment, user.hasAccount(account), account.hasProject(project), project.hasTask(task)];
 		  			} else {
-		  				return [ null, null, null, null]
+		  				return [ null, null, null, null, null, null]
 		  			}
 				})
-				.spread(function(taskComment, hasAccount, hasProject, hasTask){
+				.spread(function(task, user, taskComment, hasAccount, hasProject, hasTask){
 					if(taskComment && hasAccount && hasProject && hasTask){
-						return taskComment.destroy()
+						return [task, user, taskComment.destroy()]
 					} else {
-						return null;
+						return [null, null, null];
 					}
 				})
-				.then(function(taskComment){
+				.then(function(task, user, taskComment){
 					var _response = {}
 					if(taskComment){
+						task.createHistory({
+							action: user.get('fullName') + ' deleted a comment.',
+							historyable: 'task',
+							UserId: req.user.id
+						});
 						_response.data =  	{
 												msg : res.__("taskComment.success.delete"),
 												data : taskComment,

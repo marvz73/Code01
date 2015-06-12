@@ -8,7 +8,7 @@ module.exports = function(models, io) {
 	router.route('/')
 		.post(
 			function(req, res, next){
-				req.body.TaskId = req.params.taskId;
+				req.body.historyable = 'task';
 	  			req.body.UserId = req.user.id;
 
 	  			var userPromise  = models.User.findById(parseInt(req.user.id));
@@ -25,7 +25,7 @@ module.exports = function(models, io) {
 				})
 				.spread(function(task, hasAccount, hasProject){
 					if(task && hasAccount && hasProject){
-						return models.TaskHistory.create(req.body)
+						return task.createHistory(req.body)
 					} else {
 						return null;
 					}
@@ -70,7 +70,7 @@ module.exports = function(models, io) {
 	  			var accountPromise = models.Account.findById(parseInt(req.params.accountId));
 	  			var projectPromise = models.Project.findOne({ where: {'id': req.params.projectId, AccountId: req.params.accountId}, include: [ models.User ] });
 	  			var taskPromise = models.Task.findOne({ where: {'id': req.params.taskId, ProjectId: req.params.projectId}, include: [ models.User ] })
-	  			var taskHistoryPromise = models.TaskHistory.findOne({ where: {'id': req.params.historyId, TaskId: req.params.taskId}, include: [ models.User ] })
+	  			var taskHistoryPromise = models.History.findOne({ where: {'id': req.params.historyId, historyable: 'task'}, include: [ models.User ] })
 
 	  			join(userPromise, accountPromise, projectPromise, taskPromise, taskHistoryPromise, function(user, account, project, task, taskHistory) {
 	  				if(user && account && project && task && taskHistory){
@@ -116,7 +116,7 @@ module.exports = function(models, io) {
 	  			var accountPromise = models.Account.findById(parseInt(req.params.accountId));
 	  			var projectPromise = models.Project.findOne({ where: {'id': req.params.projectId, AccountId: req.params.accountId}, include: [ models.User ] });
 	  			var taskPromise = models.Task.findOne({ where: {'id': req.params.taskId, ProjectId: req.params.projectId}, include: [ models.User ] })
-	  			var taskHistoryPromise = models.TaskHistory.findOne({ where: {'id': req.params.historyId, TaskId: req.params.taskId}, include: [ models.User ] })
+	  			var taskHistoryPromise = models.History.findOne({ where: {'id': req.params.historyId, historyable: 'task'}, include: [ models.User ] })
 
 	  			join(userPromise, accountPromise, projectPromise, taskPromise, taskHistoryPromise, function(user, account, project, task, taskHistory) {
 	  				if(user && account && project && task && taskHistory){
@@ -170,7 +170,7 @@ module.exports = function(models, io) {
 	  			var accountPromise = models.Account.findById(parseInt(req.params.accountId));
 	  			var projectPromise = models.Project.findOne({ where: {'id': req.params.projectId, AccountId: req.params.accountId}, include: [ models.User ] });
 	  			var taskPromise = models.Task.findOne({ where: {'id': req.params.taskId, ProjectId: req.params.projectId}, include: [ models.User ] })
-	  			var taskHistoryPromise = models.TaskHistory.findOne({ where: {'id': req.params.historyId, TaskId: req.params.taskId}, include: [ models.User ] })
+	  			var taskHistoryPromise = models.History.findOne({ where: {'id': req.params.historyId, historyable: 'task'}, include: [ models.User ] })
 
 	  			join(userPromise, accountPromise, projectPromise, taskPromise, taskHistoryPromise, function(user, account, project, task, taskHistory) {
 	  				if(user && account && project && task && taskHistory){

@@ -31,6 +31,9 @@ module.exports = function(sequelize, DataTypes) {
         allowNull: false
       }
     }, {
+      getterMethods   : {
+        fullName       : function()  { return this.firstName + ' ' + this.lastName }
+      },
       classMethods: {
         associate: function(models) {
           User.belongsToMany(models.Account, {through: models.AccountUser});
