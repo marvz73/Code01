@@ -15,7 +15,7 @@ module.exports = function(models, io) {
 					delete req.query.ids;
 				}
 				
-				models.TaskHistory.findAll({where: req.query, include: [{ all: true }]}).then(function(histories) {
+				models.History.findAll({where: req.query, include: [{ all: true }]}).then(function(histories) {
 					var parsed = [];
 					// _.each(tasks, function(element) {
 					// 	element = element.get({ plain: true });
@@ -33,7 +33,7 @@ module.exports = function(models, io) {
 		)
 	  	.post(
 	  		function(req, res, next) {
-	  			models.TaskHistory.create(req.body.history).then(function(history) {
+	  			models.History.create(req.body.history).then(function(history) {
 					res.json({
 						history : history
 					});
@@ -44,7 +44,7 @@ module.exports = function(models, io) {
 	router.route('/:historyId')
 		.get( 
 	  		function(req, res, next) {
-	  			models.TaskHistory.findOne({ where: {id: req.params.historyId}, include: [ {all: true} ]  }).then(function(history){
+	  			models.History.findOne({ where: {id: req.params.historyId}, include: [ {all: true} ]  }).then(function(history){
 	  				parsed = history.get({ plain: true });
 	  				res.json({
 						history : parsed
@@ -54,7 +54,7 @@ module.exports = function(models, io) {
 	  	)
 	  	.put( 
 	  		function(req, res, next) {
-	  			models.TaskHistory.findById(parseInt(req.params.historyId)).then(function(history){
+	  			models.History.findById(parseInt(req.params.historyId)).then(function(history){
 	  				return history.updateAttributes(req.body.history);
 	  			}).then(function(history){
 	  				res.json({
@@ -65,7 +65,7 @@ module.exports = function(models, io) {
 	  	)
 	  	.delete( 
 	  		function(req, res, next) {
-	  			models.TaskHistory.findById(parseInt(req.params.historyId)).then(function(history){
+	  			models.History.findById(parseInt(req.params.historyId)).then(function(history){
 	  				return history.destroy();
 	  			}).then(function(history){
 	  				res.json({

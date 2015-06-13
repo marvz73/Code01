@@ -23,6 +23,8 @@ module.exports = function(models, io) {
 						delete element.Attachments;
 						element.comments = _.pluck(element.Comments, 'id');
 						delete element.Comments;
+						element.histories = _.pluck(element.Histories, 'id');
+						delete element.Histories;
 						parsed.push(element);
 					});
 					res.json({
@@ -50,6 +52,8 @@ module.exports = function(models, io) {
 					delete parsed.Attachments;
 					parsed.comments = _.pluck(parsed.Comments, 'id');
 					delete parsed.Comments;
+					parsed.histories = _.pluck(parsed.Histories, 'id');
+					delete parsed.Histories;
 	  				res.json({
 						task : parsed
 					});
