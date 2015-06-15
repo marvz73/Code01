@@ -122,19 +122,19 @@ module.exports = function(models, io) {
 
 	  			join(userPromise, accountPromise, projectPromise, taskPromise, function(user, account, project, task) {
 	  				if(user && account && project && task){
-		  				return [task, user.hasAccount(account), account.hasProject(project)];
+		  				return [task, user, user.hasAccount(account), account.hasProject(project)];
 		  			} else {
 		  				return [ null, null, null]
 		  			}
 				})
-				.spread(function(task, hasAccount, hasProject){
+				.spread(function(task, user, hasAccount, hasProject){
 					if(task && hasAccount && hasProject){
-						return task.updateAttributes(req.body)
+						return [user, task.updateAttributes(req.body)]
 					} else {
-						return null;
+						return [null, null];
 					}
 				})
-				.then(function(task){
+				.then(function(user, task){
 					var _response = {}
 					if(task){
 						task.createHistory({
