@@ -1381,10 +1381,11 @@ header h1 {
   border: 0 none;
   font-size: 20px;
   padding: 7px;
+  margin-top: 8px;
 }
 
 .cd-panel-header h4{
-  margin-top: 15px;
+
 }
 
 .from-right .cd-panel-header, .from-left .cd-panel-header {
