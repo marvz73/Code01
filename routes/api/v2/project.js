@@ -23,7 +23,11 @@ module.exports = function(models, io) {
 						parsed.push(element);
 					});
 					res.json({
-						projects: parsed
+						projects: parsed,
+						meta: {
+							status: 'info',
+							msg: res.__("project.success.fetch")
+						}
 					});
 				})
 			}
@@ -32,7 +36,11 @@ module.exports = function(models, io) {
 	  		function(req, res, next) {
 	  			models.Project.create(req.body.project).then(function(project) {
 					res.json({
-						project : project
+						project : project,
+						meta: {
+							status: 'success',
+							msg: res.__("project.success.create")
+						}
 					});
 				})
 	  		}
@@ -49,7 +57,11 @@ module.exports = function(models, io) {
 					delete parsed.Attachment;
 
   					res.json({
-  						project: parsed
+  						project: parsed,
+  						meta: {
+  							status: 'info',
+							msg: res.__("project.success.fetch")
+						}
   					})
 	  			});
 	  		}
@@ -60,7 +72,11 @@ module.exports = function(models, io) {
 	  				return project.updateAttributes(req.body.project);
 	  			}).then(function(project){
 	  				res.json({
-						project : project
+						project : project,
+						meta: {
+							status: 'success',
+							msg: res.__("project.success.update")
+						}
 					});
 	  			});
 	  		}
@@ -71,7 +87,11 @@ module.exports = function(models, io) {
 	  				return project.destroy();
 	  			}).then(function(project){
 	  				res.json({
-	  					project: project
+	  					project: project,
+	  					meta: {
+	  						status: 'success',
+							msg: res.__("project.success.delete")
+						}
 	  				})
 	  			});
 	  		}

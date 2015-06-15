@@ -34,7 +34,11 @@ module.exports = function(models, io) {
 						parsed.push(element);
 					});
 					res.json({
-						accounts: parsed
+						accounts: parsed,
+						meta: {
+							status: 'info',
+							msg: res.__("account.success.fetch")
+						}
 					});
 				})
 			}
@@ -43,7 +47,11 @@ module.exports = function(models, io) {
 	  		function(req, res, next) {
 	  			models.Account.create(req.body.account).then(function(account) {
 					res.json({
-						account : account
+						account : account,
+						meta: {
+							status: 'success',
+							msg: res.__("account.success.create")
+						}
 					});
 				})
 	  		}
@@ -58,7 +66,11 @@ module.exports = function(models, io) {
 					delete parsed.Projects;
 
   					res.json({
-  						account: parsed
+  						account: parsed,
+  						meta: {
+  							status: 'info',
+							msg: res.__("account.success.fetch")
+						}
   					})
 	  			})
 	  		}
@@ -69,7 +81,11 @@ module.exports = function(models, io) {
 	  				return account.updateAttributes(req.body.account);
 	  			}).then(function(account){
 	  				res.json({
-	  					account: account
+	  					account: account,
+	  					meta: {
+	  						status: 'success',
+							msg: res.__("account.success.update")
+						}
 	  				})
 	  			});
 	  		}
@@ -80,7 +96,11 @@ module.exports = function(models, io) {
 	  				return account.destroy();
 	  			}).then(function(account){
 	  				res.json({
-	  					account: account
+	  					account: account,
+	  					meta: {
+	  						status: 'delete',
+							msg: res.__("account.success.delete")
+						}
 	  				})
 	  			});
 	  		}

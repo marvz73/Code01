@@ -26,7 +26,11 @@ module.exports = function(models, io) {
 					// 	parsed.push(element);
 					// });
 					res.json({
-						comments: comments
+						comments: comments,
+						meta: {
+							status: 'info',
+							msg: res.__("taskComment.success.fetch")
+						}
 					});
 				})
 			}
@@ -35,7 +39,11 @@ module.exports = function(models, io) {
 	  		function(req, res, next) {
 	  			models.Comment.create(req.body.comment).then(function(comment) {
 					res.json({
-						comment : comment
+						comment : comment,
+						meta: {
+							status: 'success',
+							msg: res.__("taskComment.success.create")
+						}
 					});
 				})
 	  		}
@@ -47,7 +55,11 @@ module.exports = function(models, io) {
 	  			models.Comment.findOne({ where: {id: req.params.commentId}, include: [ {all: true} ]  }).then(function(comment){
 	  				parsed = comment.get({ plain: true });
 	  				res.json({
-						comment : parsed
+						comment : parsed,
+						meta: {
+							status: 'info',
+							msg: res.__("taskComment.success.fetch")
+						}
 					});
 	  			});
 	  		}
@@ -58,7 +70,11 @@ module.exports = function(models, io) {
 	  				return comment.updateAttributes(req.body.comment);
 	  			}).then(function(comment){
 	  				res.json({
-						comment : comment
+						comment : comment,
+						meta: {
+							status: 'success',
+							msg: res.__("taskComment.success.update")
+						}
 					});
 	  			});
 	  		}
@@ -69,7 +85,11 @@ module.exports = function(models, io) {
 	  				return comment.destroy();
 	  			}).then(function(comment){
 	  				res.json({
-	  					comment: comment
+	  					comment: comment,
+	  					meta: {
+	  						status: 'success',
+							msg: res.__("taskComment.success.delete")
+						}
 	  				})
 	  			});
 	  		}

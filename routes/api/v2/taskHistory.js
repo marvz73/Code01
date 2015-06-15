@@ -26,7 +26,11 @@ module.exports = function(models, io) {
 					// 	parsed.push(element);
 					// });
 					res.json({
-						histories: histories
+						histories: histories,
+						meta: {
+							status: 'info',
+							msg: res.__("taskHistory.success.fetch")
+						}
 					});
 				})
 			}
@@ -35,7 +39,11 @@ module.exports = function(models, io) {
 	  		function(req, res, next) {
 	  			models.History.create(req.body.history).then(function(history) {
 					res.json({
-						history : history
+						history : history,
+						meta: {
+							status: 'success',
+							msg: res.__("taskHistory.success.create")
+						}
 					});
 				})
 	  		}
@@ -47,7 +55,11 @@ module.exports = function(models, io) {
 	  			models.History.findOne({ where: {id: req.params.historyId}, include: [ {all: true} ]  }).then(function(history){
 	  				parsed = history.get({ plain: true });
 	  				res.json({
-						history : parsed
+						history : parsed,
+						meta: {
+							status: 'info',
+							msg: res.__("taskHistory.success.fetch")
+						}
 					});
 	  			});
 	  		}
@@ -58,7 +70,11 @@ module.exports = function(models, io) {
 	  				return history.updateAttributes(req.body.history);
 	  			}).then(function(history){
 	  				res.json({
-						history : history
+						history : history,
+						meta: {
+							status: 'success',
+							msg: res.__("taskHistory.success.update")
+						}
 					});
 	  			});
 	  		}
@@ -69,7 +85,11 @@ module.exports = function(models, io) {
 	  				return history.destroy();
 	  			}).then(function(history){
 	  				res.json({
-	  					history: history
+	  					history: history,
+	  					meta: {
+	  						status: 'success',
+							msg: res.__("taskHistory.success.delete")
+						}
 	  				})
 	  			});
 	  		}

@@ -23,7 +23,11 @@ module.exports = function(models, io) {
 						parsed.push(element);
 					});
 					res.json({
-						attachments: parsed
+						attachments: parsed,
+						meta: {
+							status: 'info',
+							msg: res.__("attachment.success.fetch")
+						}
 					});
 				})
 			}
@@ -32,7 +36,11 @@ module.exports = function(models, io) {
 	  		function(req, res, next) {
 	  			models.Attachment.create(req.body.attachment).then(function(attachment) {
 					res.json({
-						attachment : attachment
+						attachment : attachment,
+						meta: {
+							status: 'success',
+							msg: res.__("attachment.success.create")
+						}
 					});
 				})
 	  		}
@@ -43,7 +51,11 @@ module.exports = function(models, io) {
 	  		function(req, res, next) {
 	  			models.Attachment.findOne({ where: {id: req.params.attachment_id}, include: [ {all: true} ]  }).then(function(attachment){
 	  				res.json({
-						attachment : attachment
+						attachment : attachment,
+						meta: {
+							status: 'info',
+							msg: res.__("attachment.success.fetch")
+						}
 					});
 	  			});
 	  		}
@@ -54,7 +66,11 @@ module.exports = function(models, io) {
 	  				return attachment.updateAttributes(req.body.attachment);
 	  			}).then(function(attachment){
 	  				res.json({
-						attachment : attachment
+						attachment : attachment,
+						meta: {
+							status: 'success',
+							msg: res.__("attachment.success.update")
+						}
 					});
 	  			});
 	  		}
@@ -65,7 +81,11 @@ module.exports = function(models, io) {
 	  				return attachment.destroy();
 	  			}).then(function(attachment){
 	  				res.json({
-	  					attachment: attachment
+	  					attachment: attachment,
+	  					meta: {
+	  						status: 'delete',
+							msg: res.__("attachment.success.delete")
+						}
 	  				})
 	  			});
 	  		}

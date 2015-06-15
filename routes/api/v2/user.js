@@ -21,7 +21,11 @@ module.exports = function(models) {
 						parsed.push(element);
 					});
 					res.json({
-						users : parsed
+						users : parsed,
+						meta: {
+							status: 'info',
+							msg: res.__("user.success.fetch")
+						}
 					});
 				})
 			}
@@ -30,7 +34,11 @@ module.exports = function(models) {
 			function(req, res, next) {
 				models.User.create(req.body.user).then(function(user) {
 					res.json({
-						user : user
+						user : user,
+						meta: {
+							status: 'success',
+							msg: res.__("user.success.create")
+						}
 					});
 				})
 	  		}
@@ -44,7 +52,11 @@ module.exports = function(models) {
 					parsed.accounts = _.pluck(parsed.Accounts, 'id');
 					delete parsed.Accounts;
 					res.json({
-						user : user
+						user : user,
+						meta: {
+							status: 'info',
+							msg: res.__("user.success.fetch")
+						}
 					});
 				})
 	  		}
@@ -59,7 +71,11 @@ module.exports = function(models) {
 				  	}
 				}).then(function(user){
 					res.json({
-						user : user
+						user : user,
+						meta: {
+							status: 'success',
+							msg: res.__("user.success.update")
+						}
 					});
 				})
 	  		}
@@ -74,7 +90,11 @@ module.exports = function(models) {
 				  	}
 				}).then(function(user){
 					res.json({
-						user : user
+						user : user,
+						meta: {
+							status: 'success',
+							msg: res.__("user.success.create")
+						}
 					});
 				})
 	  		}
