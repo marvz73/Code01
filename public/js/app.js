@@ -258,6 +258,7 @@ console.log(accountId);
 // task module
 var task = {
     model: function(params) {
+        this.completed    = m.prop(true);
         this.title       =  m.prop(params.title);
         this.description =  m.prop(params.description);
         this.comments    =  m.prop(params.comments);
@@ -274,8 +275,9 @@ var task = {
             self.TaskComments.push(data);
             m.redraw(true)
         });
+
         socket.on('taskUpdate', function(data){
-            self.detail = new task.model({title: "", description: data.desc});
+            self.detail = new task.model({completed: data.completed, title: "", description: data.desc});
             m.redraw(true)
         });
 
@@ -286,7 +288,7 @@ var task = {
         })
         .then(function(resp){
             self.TaskDetails = resp.data;
-            self.detail = new task.model({title: resp.data.title, description: resp.data.desc});
+            self.detail = new task.model({completed: resp.data.completed, title: resp.data.title, description: resp.data.desc});
         }).then(function(){
             m.request({
                 method: 'get',
@@ -394,9 +396,25 @@ var task = {
             }
         }
 
+       
+        function markComplete(elm, init, context){
+            if(!init){
+                ctrl.detail.completed = ! ctrl.detail.completed;
+            }
+        }
+
         return  m("div.cd-panel.from-right#cd-panel", {config: loaded, onclick: hideRightModal}, [
                     m("header.cd-panel-header.no-touch",[
-                        m("h4.title#taskTitle", "Issue #"+ctrl.TaskDetails.id),
+
+                        m('div.title',[
+
+                            m('i.fa.fa-square-o.pull-left',{style: ctrl.detail.completed ? 'display:none' : 'display:block', onclick: markComplete }),
+                            m('i.fa.fa-check-square-o.pull-left',{style: ctrl.detail.completed ? 'display:block' : 'display:none',onclick: markComplete }),
+
+                            m("h4#taskTitle.pull-left", "Issue #"+ctrl.TaskDetails.id),
+                        ]),
+
+
                         m("a.cd-panel-close", {onclick: hideRightModal}, "Close")
                     ]),
                     m("div.cd-panel-container", [
@@ -659,6 +677,7 @@ var project = {
 
 var projectDetails = {
     model: function(params) {
+        this.progress    =  m.prop(0); 
         this.title       =  m.prop(params.title);
         this.description =  m.prop(params.description);
     },
@@ -730,7 +749,7 @@ var projectDetails = {
         }
 
         this.addSubProject = function(pid){
-            console.log(pid)
+
             return m.request({method:'post', url: baseUrl + '/api/v1/account/' + accountId + '/project', data: {ProjectId: pid, title: 'Project Title'}}).then(function(){}, function(){
                 AJAXERROR();
             })
@@ -781,23 +800,34 @@ var projectDetails = {
             }
         }
 
+        var totalCompleted = 0;
         function projectTask(elm, init, context){
+
             if(!init)
             {
                 if(sharedProjectTask.length)
                 {
+
                     return sharedProjectTask.map(function(val, index){
-                        return m('li',[
-                            m('a[href="/3/' + m.route.param('aid') + '/' + m.route.param('pid') + '/' + val.id+'"]', {config: m.route}, 'Issue #'+val.id,[
-                                m('span.pull-right', val.createdAt)
-                            ])
-                        ])
-                    })
+                        if(val.completed)
+                        {
+                            return m('li',[
+                                m('a[href="/3/' + m.route.param('aid') + '/' + m.route.param('pid') + '/' + val.id+'"]', {config: m.route}, 'Issue #'+val.id,[
+                                    m('span.pull-right', val.createdAt)
+                                ])
+                            ])                      
+                        }else{
+                            totalCompleted++;
+                            ctrl.detail.progress = ((totalCompleted / sharedProjectTask.length) * 100);
+                        }
+                    });
+
                 }else{
                     return m('li',[
                         m('a.no-result', 'No Result')
                     ])   
                 }
+
             }
         }
 
@@ -845,7 +875,6 @@ var projectDetails = {
             }
         }
 
-
         return  m("div.cd-panel.from-right#cd-panel", {config: loaded, onclick: hideRightModal}, [
                     m("header.cd-panel-header.no-touch",[
                         m("input.title#projectTitle", {onchange: m.withAttr("value", ctrl.detail.title), value: ctrl.detail.title()}),
@@ -856,6 +885,17 @@ var projectDetails = {
                             m('div.form-group', [
                                 m('textarea[rows="6"]#projectDesc.form-control', {onchange: m.withAttr("value", ctrl.detail.description)}, ctrl.detail.description()),
                             ]),
+
+                            m('div.progress',[
+                                m('div.progress-bar[progressbar]', {config: function(elm, init){
+                                    console.log(ctrl.detail.progress)
+                                    if(!init){
+                                        elm.innerHTML = ctrl.detail.progress + '%';
+                                        elm.style.width = ctrl.detail.progress + '%';
+                                    }
+                                }})
+                            ]),
+
                             m('fieldset.settings',[
 
                                 m('legend', "Project Task's"),
