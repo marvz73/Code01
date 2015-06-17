@@ -1467,50 +1467,96 @@ var navigation = {
             }
         }
 
-        //Navigation Menu
-        return m("#cd-nav", [
-            m("a[href='javascript:void(0)'].cd-nav-trigger.cd-navs", {}, "Menu",[
-                m("span","")
-            ]),
-            m("nav#cd-main-nav", [
-                
-                m("ul", [
-                    m("li.clearfix", [
-                        // m("a", { onclick:  ctrl.addTask }, "<i class="fa fa-plus"></i>")
-                        m("a[title='Add Project'].pull-left.cd-navs", {onclick: ctrl.addProject},[
-                            m("i.fa.fa-plus-square")
-                        ]),
-                        m("a[title='Add Pins'].pull-left.cd-navs", { onclick:  ctrl.addTask }, [
-                            m("i.fa.fa-thumb-tack")
-                             // data-toggle="tooltip" data-placement="left" title="Tooltip on left"
-                        ]),
-                        m("a[title='Add Account'].pull-left.cd-navs", {onclick: ctrl.addAccount},[
-                            m("i.fa.fa-users")
-                             // data-toggle="tooltip" data-placement="left" title="Tooltip on left"
-                        ]),
-                        m("a[title='Settings'][href='/1000/"+m.route.param('aid')+"'].cd-navs.pull-right", {config: m.route}, [
-                            m("i.fa.fa-cog")
-                             // data-toggle="tooltip" data-placement="left" title="Tooltip on left"
-                        ])
+        return m("nav.navbar.navbar-default.navbar-static-top", [
+            m("div.container", [
+                m("div.navbar-header", [
+                    m('button[type="button"][data-toggle="collapse"][data-target="#navbar"].navbar-toggle.collapsed', [
+                        m('span.sr-only', 'Toggle navigation'),
+                        m('span.icon-bar'),
+                        m('span.icon-bar'),
+                        m('span.icon-bar')
                     ]),
+                    m('a.navbar-brand', 'Project name')
+                ]),
+                m('div#navbar.navbar-collapse.collapse', [
+                    m('ul.nav.navbar-nav', [
+                        m('li', [ m('a[href="#"]', 'Home')]),
+                        m('li', [ m('a[href="#"]', 'About')]),
+                        m('li', [ m('a[href="#"]', 'Contact Us')]),
+                        m('li.dropdown', [ 
+                            m('a[href="#"][data-toggle="dropdown"][role="button"][aria-haspopup="true"][aria-expanded="false"].dropdown-toggle', 'Dropdown',[
+                                m('span.caret')
+                            ]),
+                            m('ul.dropdown-menu', [
+                                m('li', [
+                                    m('a[href="#"]', 'Action')
+                                ]),
+                                m('li', [
+                                    m('a[href="#"]', 'Another action')
+                                ]),
+                                m('li', [
+                                    m('a[href="#"]', 'Something else here')
+                                ])
+                            ])
 
-                    ((ctrl.ProjectList.length) ? projectList() : '' ),
-
-                    // m("li", [
-                    //     m("a.cd-navs", { onclick:  showDropdown }, "Add Pin")
-                    // ]),
-
-                    ((ctrl.AccountList.length) ? accountList() : '' ),
-
-                    m("li", [
-                        m("a[href='/0/1'].cd-navs", {config: m.route}, "Home",[
-                            m("i.fa.fa-home.pull-left")
                         ])
                     ])
-
-                ])        
+                ])
             ])
-        ])
+
+        ]);
+
+
+
+
+
+
+
+
+        // //Navigation Menu
+        // return m("#cd-nav", [
+        //     m("a[href='javascript:void(0)'].cd-nav-trigger.cd-navs", {}, "Menu",[
+        //         m("span","")
+        //     ]),
+        //     m("nav#cd-main-nav", [
+                
+        //         m("ul", [
+        //             m("li.clearfix", [
+        //                 // m("a", { onclick:  ctrl.addTask }, "<i class="fa fa-plus"></i>")
+        //                 m("a[title='Add Project'].pull-left.cd-navs", {onclick: ctrl.addProject},[
+        //                     m("i.fa.fa-plus-square")
+        //                 ]),
+        //                 m("a[title='Add Pins'].pull-left.cd-navs", { onclick:  ctrl.addTask }, [
+        //                     m("i.fa.fa-thumb-tack")
+        //                      // data-toggle="tooltip" data-placement="left" title="Tooltip on left"
+        //                 ]),
+        //                 m("a[title='Add Account'].pull-left.cd-navs", {onclick: ctrl.addAccount},[
+        //                     m("i.fa.fa-users")
+        //                      // data-toggle="tooltip" data-placement="left" title="Tooltip on left"
+        //                 ]),
+        //                 m("a[title='Settings'][href='/1000/"+m.route.param('aid')+"'].cd-navs.pull-right", {config: m.route}, [
+        //                     m("i.fa.fa-cog")
+        //                      // data-toggle="tooltip" data-placement="left" title="Tooltip on left"
+        //                 ])
+        //             ]),
+
+        //             ((ctrl.ProjectList.length) ? projectList() : '' ),
+
+
+        //             ((ctrl.AccountList.length) ? accountList() : '' ),
+
+        //             m("li", [
+        //                 m("a[href='/0/1'].cd-navs", {config: m.route}, "Home",[
+        //                     m("i.fa.fa-home.pull-left")
+        //                 ])
+        //             ])
+
+        //         ])        
+        //     ])
+        // ]);
+
+
+
     }
 }
 
