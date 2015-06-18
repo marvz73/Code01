@@ -7,14 +7,32 @@ module.exports = function(models) {
 	router.route('/')
 		.get(
 			function(req, res){
+				var params = {
+					include : [{ all: true }]
+				};
 				if(req.query.hasOwnProperty("ids")){
 					req.query.id = req.query.ids;
 					delete req.query.ids;
 				}
-				
-				models.User.findAll({where: req.query, include: [{ all: true }]}).then(function(users) {
+				if(req.query.hasOwnProperty("page")){
+					var page = req.query.page;
+					params.offset = (req.query.page-1)*req.query.per_page;
+					delete req.query.page;
+				}
+				if(req.query.hasOwnProperty("per_page")){
+					params.limit = req.query.per_page;
+					delete req.query.per_page;
+				}
+				if(req.query.hasOwnProperty("order")){
+					params.order = req.query.order;
+					delete req.query.order;
+				}
+
+				params.where =  req.query;
+								
+				models.User.findAndCountAll(params).then(function(users) {
 					var parsed = [];
-					_.each(users, function(element) {
+					_.each(users.rows, function(element) {
 						element = element.get({ plain: true });
 						element.accounts = _.pluck(element.Accounts, 'id');
 						delete element.Accounts;
@@ -23,6 +41,9 @@ module.exports = function(models) {
 					res.json({
 						users : parsed,
 						meta: {
+							page: page,
+							per_page: params.limit,
+							total_pages: Math.ceil(users.count/params.limit),
 							status: 'info',
 							msg: res.__("user.success.fetch")
 						}
@@ -63,7 +84,7 @@ module.exports = function(models) {
 	  	)
 	  	.put( 
 			function(req, res, next) {
-				models.User.find(parseInt(req.params.userId)).then(function(user) {
+				models.User.findById(parseInt(req.params.userId)).then(function(user) {
 					if(user){
 						return user.updateAttributes(req.body.user)
 					}else{
@@ -82,7 +103,7 @@ module.exports = function(models) {
 	  	)
 	  	.delete( 
 			function(req, res, next) {
-				models.User.find(parseInt(req.params.userId)).then(function(user) {
+				models.User.findById(parseInt(req.params.userId)).then(function(user) {
 					if(user){
 						return user.destroy()
 					}else{
@@ -93,7 +114,7 @@ module.exports = function(models) {
 						user : user,
 						meta: {
 							status: 'success',
-							msg: res.__("user.success.create")
+							msg: res.__("user.success.delete")
 						}
 					});
 				})

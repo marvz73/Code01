@@ -13,6 +13,7 @@ module.exports = function(sequelize, DataTypes) {
       associate: function(models) {
         Task.belongsTo(models.Project);
         Task.belongsTo(models.User);
+        Task.belongsTo(models.User, {as: "Assignee"});
         Task.hasMany(models.Attachment, {
           foreignKey: 'attachmentable_id',
           constraints: false,
