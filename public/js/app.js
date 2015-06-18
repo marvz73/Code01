@@ -315,7 +315,20 @@ var task = {
         }
 
         this.updateTaskDesc = function(jsonData){
-          m.request({
+            m.request({
+                method: 'post',
+                data: jsonData,
+                url: baseUrl + '/api/v1/account/' +m.route.param('aid')+ '/project/' +m.route.param('pid')+ '/task/' + m.route.param('tid')
+            })
+            .then(function(){
+                
+            }, function(){
+                AJAXERROR();
+            });
+        }
+
+        this.taskStatus = function(jsonData){
+            m.request({
                 method: 'post',
                 data: jsonData,
                 url: baseUrl + '/api/v1/account/' +m.route.param('aid')+ '/project/' +m.route.param('pid')+ '/task/' + m.route.param('tid')
@@ -400,6 +413,14 @@ var task = {
         function markComplete(elm, init, context){
             if(!init){
                 ctrl.detail.completed = ! ctrl.detail.completed;
+
+                if(ctrl.detail.completed)
+                {
+                    ctrl.taskStatus({completed: 0});
+                }
+                else{
+                     ctrl.taskStatus({completed: 1});
+                }
             }
         }
 
@@ -408,8 +429,8 @@ var task = {
 
                         m('div.title',[
 
-                            m('i.fa.fa-square-o.pull-left',{style: ctrl.detail.completed ? 'display:none' : 'display:block', onclick: markComplete }),
-                            m('i.fa.fa-check-square-o.pull-left',{style: ctrl.detail.completed ? 'display:block' : 'display:none',onclick: markComplete }),
+                            m('i.fa.fa-square-o.pull-left',{style: ctrl.detail.completed ? 'display:block' : 'display:none', onclick: markComplete }),
+                            m('i.fa.fa-check-square-o.pull-left',{style: !ctrl.detail.completed ? 'display:block' : 'display:none',onclick: markComplete }),
 
                             m("h4#taskTitle.pull-left", "Issue #"+ctrl.TaskDetails.id),
                         ]),
@@ -602,12 +623,15 @@ var project = {
         function taskList(elm, init, context){
             if(!init){
                 return ctrl.TaskList.map(function (t, index) {
+                    if(!t.completed)
+                    {
                     return m("li#drag-drop.cd-single-point", {"data-id": t.id, "data-index": index, style:{position: 'absolute', left: t.X,  top: t.Y}, config: draggable}, [
                         m("a[href='javascript:void(0)'].cd-btn#cd-btn", [
                             m("i.fa.fa-map-marker" )
                         ]),
                         m("div.cd-more-info.cd-top")
                     ])
+                    }
                 })
             }
         }
@@ -728,8 +752,8 @@ var projectDetails = {
             method:'post', 
             url:  baseUrl + '/api/v1/account/' + m.route.param('aid') + '/project/' + m.route.param('pid'),
             data: jsonData
-            }).then(function(taskResp){
-
+            }).then(function(resp){
+                self.detail = new projectDetails.model(resp.data)
             }, function(){
                 AJAXERROR();
             })
@@ -741,15 +765,14 @@ var projectDetails = {
             method:'post', 
             url:  baseUrl + '/api/v1/account/' + m.route.param('aid') + '/project/' + m.route.param('pid'),
             data: jsonData
-            }).then(function(taskResp){
-
+            }).then(function(resp){
+                self.detail = new projectDetails.model(resp.data)
             }, function(){
                 AJAXERROR();
             })
         }
 
         this.addSubProject = function(pid){
-
             return m.request({method:'post', url: baseUrl + '/api/v1/account/' + accountId + '/project', data: {ProjectId: pid, title: 'Project Title'}}).then(function(){}, function(){
                 AJAXERROR();
             })
@@ -801,35 +824,54 @@ var projectDetails = {
         }
 
         var totalCompleted = 0;
-        function projectTask(elm, init, context){
+
+        function projectUncompletedTask(elm, init, context){
 
             if(!init)
             {
                 if(sharedProjectTask.length)
                 {
-
-                    return sharedProjectTask.map(function(val, index){
-                        if(val.completed)
+                    var template = sharedProjectTask.map(function(val, index){
+                        if(val.completed == 0)
                         {
                             return m('li',[
                                 m('a[href="/3/' + m.route.param('aid') + '/' + m.route.param('pid') + '/' + val.id+'"]', {config: m.route}, 'Issue #'+val.id,[
                                     m('span.pull-right', val.createdAt)
                                 ])
-                            ])                      
+                            ]);
                         }else{
                             totalCompleted++;
                             ctrl.detail.progress = ((totalCompleted / sharedProjectTask.length) * 100);
                         }
                     });
 
+
+
+
+                    if(sharedProjectTask.length === totalCompleted)
+                    {
+                        return m('li',[
+                            m('a.no-result', 'No Task')
+                        ]);
+                    }else{
+                        return template;
+                    }
+
+
+
+
+
                 }else{
                     return m('li',[
-                        m('a.no-result', 'No Result')
+                        m('a.no-result', 'No Task')
                     ])   
                 }
 
             }
         }
+
+
+
 
         function projectSubTask(elm, init, context){
             if(!init)
@@ -853,7 +895,7 @@ var projectDetails = {
             }
         }
 
-         function projectSubTaskContainer(elm, init, context){
+        function projectSubTaskContainer(elm, init, context){
             if(!init && !ctrl.projectDetails.ProjectId)
             {
 
@@ -877,7 +919,7 @@ var projectDetails = {
 
         return  m("div.cd-panel.from-right#cd-panel", {config: loaded, onclick: hideRightModal}, [
                     m("header.cd-panel-header.no-touch",[
-                        m("input.title#projectTitle", {onchange: m.withAttr("value", ctrl.detail.title), value: ctrl.detail.title()}),
+                        m("input.title#projectTitle", {onchange: m.withAttr("value", ctrl.detail.title), value: ctrl.detail.title() }),
                         m("a.cd-panel-close", {onclick: hideRightModal}, "Close")
                     ]),
                     m("div.cd-panel-container", [
@@ -888,9 +930,8 @@ var projectDetails = {
 
                             m('div.progress',[
                                 m('div.progress-bar[progressbar]', {config: function(elm, init){
-                                    console.log(ctrl.detail.progress)
                                     if(!init){
-                                        elm.innerHTML = ctrl.detail.progress + '%';
+                                        elm.innerHTML = ctrl.detail.progress + '% Complete';
                                         elm.style.width = ctrl.detail.progress + '%';
                                     }
                                 }})
@@ -898,10 +939,15 @@ var projectDetails = {
 
                             m('fieldset.settings',[
 
-                                m('legend', "Project Task's"),
+                                m('legend', "Project Task's ",[
+                                    m('a',[
+                                        m('i.fa.fa-archive')
+                                    ])
+                                ]),
                                 m('ul.unstyled.project-task-list', [
 
-                                    projectTask()
+                                    projectUncompletedTask(),
+                                    // projectCompletedTask()
 
                                 ]),
 
@@ -1421,50 +1467,96 @@ var navigation = {
             }
         }
 
-        //Navigation Menu
-        return m("#cd-nav", [
-            m("a[href='javascript:void(0)'].cd-nav-trigger.cd-navs", {}, "Menu",[
-                m("span","")
-            ]),
-            m("nav#cd-main-nav", [
-                
-                m("ul", [
-                    m("li.clearfix", [
-                        // m("a", { onclick:  ctrl.addTask }, "<i class="fa fa-plus"></i>")
-                        m("a[title='Add Project'].pull-left.cd-navs", {onclick: ctrl.addProject},[
-                            m("i.fa.fa-plus-square")
-                        ]),
-                        m("a[title='Add Pins'].pull-left.cd-navs", { onclick:  ctrl.addTask }, [
-                            m("i.fa.fa-thumb-tack")
-                             // data-toggle="tooltip" data-placement="left" title="Tooltip on left"
-                        ]),
-                        m("a[title='Add Account'].pull-left.cd-navs", {onclick: ctrl.addAccount},[
-                            m("i.fa.fa-users")
-                             // data-toggle="tooltip" data-placement="left" title="Tooltip on left"
-                        ]),
-                        m("a[title='Settings'][href='/1000/"+m.route.param('aid')+"'].cd-navs.pull-right", {config: m.route}, [
-                            m("i.fa.fa-cog")
-                             // data-toggle="tooltip" data-placement="left" title="Tooltip on left"
-                        ])
+        return m("nav.navbar.navbar-default.navbar-static-top", [
+            m("div.container", [
+                m("div.navbar-header", [
+                    m('button[type="button"][data-toggle="collapse"][data-target="#navbar"].navbar-toggle.collapsed', [
+                        m('span.sr-only', 'Toggle navigation'),
+                        m('span.icon-bar'),
+                        m('span.icon-bar'),
+                        m('span.icon-bar')
                     ]),
+                    m('a.navbar-brand', 'Project name')
+                ]),
+                m('div#navbar.navbar-collapse.collapse', [
+                    m('ul.nav.navbar-nav', [
+                        m('li', [ m('a[href="#"]', 'Home')]),
+                        m('li', [ m('a[href="#"]', 'About')]),
+                        m('li', [ m('a[href="#"]', 'Contact Us')]),
+                        m('li.dropdown', [ 
+                            m('a[href="#"][data-toggle="dropdown"][role="button"][aria-haspopup="true"][aria-expanded="false"].dropdown-toggle', 'Dropdown',[
+                                m('span.caret')
+                            ]),
+                            m('ul.dropdown-menu', [
+                                m('li', [
+                                    m('a[href="#"]', 'Action')
+                                ]),
+                                m('li', [
+                                    m('a[href="#"]', 'Another action')
+                                ]),
+                                m('li', [
+                                    m('a[href="#"]', 'Something else here')
+                                ])
+                            ])
 
-                    ((ctrl.ProjectList.length) ? projectList() : '' ),
-
-                    // m("li", [
-                    //     m("a.cd-navs", { onclick:  showDropdown }, "Add Pin")
-                    // ]),
-
-                    ((ctrl.AccountList.length) ? accountList() : '' ),
-
-                    m("li", [
-                        m("a[href='/0/1'].cd-navs", {config: m.route}, "Home",[
-                            m("i.fa.fa-home.pull-left")
                         ])
                     ])
-
-                ])        
+                ])
             ])
-        ])
+
+        ]);
+
+
+
+
+
+
+
+
+        // //Navigation Menu
+        // return m("#cd-nav", [
+        //     m("a[href='javascript:void(0)'].cd-nav-trigger.cd-navs", {}, "Menu",[
+        //         m("span","")
+        //     ]),
+        //     m("nav#cd-main-nav", [
+                
+        //         m("ul", [
+        //             m("li.clearfix", [
+        //                 // m("a", { onclick:  ctrl.addTask }, "<i class="fa fa-plus"></i>")
+        //                 m("a[title='Add Project'].pull-left.cd-navs", {onclick: ctrl.addProject},[
+        //                     m("i.fa.fa-plus-square")
+        //                 ]),
+        //                 m("a[title='Add Pins'].pull-left.cd-navs", { onclick:  ctrl.addTask }, [
+        //                     m("i.fa.fa-thumb-tack")
+        //                      // data-toggle="tooltip" data-placement="left" title="Tooltip on left"
+        //                 ]),
+        //                 m("a[title='Add Account'].pull-left.cd-navs", {onclick: ctrl.addAccount},[
+        //                     m("i.fa.fa-users")
+        //                      // data-toggle="tooltip" data-placement="left" title="Tooltip on left"
+        //                 ]),
+        //                 m("a[title='Settings'][href='/1000/"+m.route.param('aid')+"'].cd-navs.pull-right", {config: m.route}, [
+        //                     m("i.fa.fa-cog")
+        //                      // data-toggle="tooltip" data-placement="left" title="Tooltip on left"
+        //                 ])
+        //             ]),
+
+        //             ((ctrl.ProjectList.length) ? projectList() : '' ),
+
+
+        //             ((ctrl.AccountList.length) ? accountList() : '' ),
+
+        //             m("li", [
+        //                 m("a[href='/0/1'].cd-navs", {config: m.route}, "Home",[
+        //                     m("i.fa.fa-home.pull-left")
+        //                 ])
+        //             ])
+
+        //         ])        
+        //     ])
+        // ]);
+
+
+
     }
 }
 
