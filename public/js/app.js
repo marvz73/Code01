@@ -28,17 +28,57 @@ console.log(accountId);
 
 //------------------------MITHRILJS COMPONENTS---------------------------------------------
 
-var MenuLists = {
+var AccountLists = {
     view: function(ctrl, args) {
-        return m("ul.dropdown-menu", [
-            args.lists.map(function(item) {
-                return m("li", [
-                    m("a[href='#']", item.name)
-                ])
-            })
-        ])
+        if(args.lists.length)
+        {
+            return m("ul.dropdown-menu", [            
+                args.lists.map(function(item) {               
+                    return m("li", [
+                        m("a[href='"+item.id+"']", item.name)
+                    ])
+                })
+            ])
+        }
+        else{
+            return m("ul")
+        }
+
+
     }
 }
+
+var ProjectLists = {
+    view: function(ctrl, args) {
+
+        if(args.lists.length)
+        {
+            return m("ul.dropdown-menu", [  
+                args.lists.map(function(item) {               
+                    return m("li", [
+                        m("a[href='"+item.id+"']", item.title)
+                    ])
+                })
+            ])
+        }
+        else{
+            return m("ul")
+        }
+
+    }
+}
+
+// m("a[href='/1/" + val.AccountId + '/' + val.id + "'].cd-navs.pull-left", {config: m.route }, val.title, [
+//     m("i.fa.fa-plus-square.pull-left")
+// ]),
+
+// m("a[href='" + val.id + "'].pull-left.cd-navs", val.name,[
+//     m("i.fa.fa-users.pull-left")
+// ]),
+// m("a[href='/4/" + val.id + "/details'].cd-navs.pull-right",{config: m.route}, [
+//     m("i.fa.fa-bars")
+// ]),
+
 
 //----------------------------------------------------------------------------------------
 
@@ -1212,19 +1252,12 @@ var navigation = {
                 return ctrl.ProjectList.map(function (val, index) {
                     return m("li.clearfix", [
                        
-                        m("a[href='/1/" + val.AccountId + '/' +val.id+ "'].cd-navs.pull-left", {config: m.route }, val.title, [
+                        m("a[href='/1/" + val.AccountId + '/' + val.id + "'].cd-navs.pull-left", {config: m.route }, val.title, [
                             m("i.fa.fa-plus-square.pull-left")
                         ]),
-                        m("a[href='/2/"+ val.AccountId+"/"+val.id+"'].cd-navs.pull-right", {config: m.route}, [
+                        m("a[href='/2/" + val.AccountId + "/" + val.id + "'].cd-navs.pull-right", {config: m.route}, [
                             m("i.fa.fa-bars")
-                        ]),
-
-                        // m("a.cd-navs", {onclick: function(elm, init, context){
-                        //     if(!init){
-                        //         ctrl.addSubProject(val.id);
-                        //     }
-                        // } }, " + ")
-                        
+                        ]),                        
                     ])
                 })     
             }
@@ -1235,22 +1268,15 @@ var navigation = {
             if(!init)
             {
                 return ctrl.AccountList.map(function (val, index) {
-                    return m("li.clearfix", [
-                        
+                    return m("li.clearfix", [                        
                         m("a[href='" + val.id + "'].pull-left.cd-navs", val.name,[
                             m("i.fa.fa-users.pull-left")
                         ]),
                         m("a[href='/4/" + val.id + "/details'].cd-navs.pull-right",{config: m.route}, [
-                             m("i.fa.fa-bars")
+                            m("i.fa.fa-bars")
                         ]),
                     ])
                 })     
-            }
-        }
-
-        function showDropdown(elm, init, context){
-            if(!init){
-                Q('.dropdown').addClass('open')
             }
         }
 
@@ -1270,50 +1296,84 @@ var navigation = {
 
                 m('div#navbar.navbar-collapse.collapse', [
                     m('ul.nav.navbar-nav', [
-                        m('li', [ m('a[href="#"]', 'Home')]),
-                        m('li', [ m('a[href="#"]', 'About')]),
-                        m('li', [ m('a[href="#"]', 'Contact Us')]),
+                        m('li', [ m('a[href="/"]', {config: m.route}, 'Home')]),
 
-                        m('li.dropdown',   [
-
-                            m('a[role="button"].dropdown-toggle', {onclick: function(elm, init){
+                        m('li.dropdown#project-dropdown', { onclick: function(elm, init){
                                 if(!init){
-                                    // elm.className = " open";
-                                    console.log(elm)
+
+                                    console.log(elm.target.offsetParent.className)
+
+                                    Q(".dropdown").removeClass('open');
+
+                                    if(elm.target.offsetParent.className != 'dropdown open')
+                                    {
+                                        Q("#project-dropdown").addClass('open');
+                                    }else{
+                                        Q("#project-dropdown").removeClass('open');
+                                    }
+                                    
+                                    }
                                 }
-                            }},'Accounts', [
+                        }, [
+
+                            m('a[role="button"].dropdown-toggle','Projects', [
                                 m('span.caret')
                             ]),
 
-                            m.component(MenuLists, {lists: ctrl.AccountList}),
+                            m.component(ProjectLists, {lists: ctrl.ProjectList}),
 
                         ]),
-                        
+                    ]),
 
+                    m('ul.nav.navbar-nav.pull-right', [
+                        m('li.dropdown#account-dropdown', {
+                            onmouseover: function(elm, init){
+                                 Q(".dropdown").removeClass('open');
+                                if(!init){
+                                    Q('#account-dropdown').addClass('open')
+                                }
+                            },
+                            onmouseout: function(elm, init){
+                                if(!init){ 
+                                    Q('#account-dropdown').removeClass('open')
+                                }
+                            }
+                        }, [
 
-
-                        m('li.dropdown', [ 
-                            m('a[href="#"][data-toggle="dropdown"][role="button"][aria-haspopup="true"][aria-expanded="false"].dropdown-toggle', 'Dropdown',[
+                            m('a[role="button"].dropdown-toggle','Accounts', [
                                 m('span.caret')
                             ]),
-                            m('ul.dropdown-menu', [
 
+                            m.component(AccountLists, {lists: ctrl.AccountList}),
+
+                        ]),
+                        m('li.dropdown#user-dropdown', { onclick: function(elm, init){
+                                if(!init){
+                                    // Q(".dropdown").removeClass('open');
+                                    console.log(elm.target.offsetParent.className)
+                                    if(elm.target.offsetParent.className != 'dropdown open')
+                                    {
+                                        Q("#user-dropdown").addClass('open');
+                                    }else{
+                                        Q("#user-dropdown").removeClass('open');
+                                    }
+                                    }
+                                }
+                        }, [
+                            m('a[role="button"]', bootstrap.fullName + " ", [
+                                m('span.caret'),
+                                m('span.fa.fa-user.pull-left',{style:"font-size: 1.4rem"}),
+                            ]),
+                            m('ul.dropdown-menu.pull-right',[
                                 m('li', [
-                                    m('a[href="#"]', 'Action')
-                                ]),
-                                m('li', [
-                                    m('a[href="#"]', 'Another action')
-                                ]),
-                                m('li', [
-                                    m('a[href="#"]', 'Something else here')
+                                    m('a[href="/logout"]', 'Logout')
                                 ])
                             ])
-
                         ])
-
-
-
                     ])
+
+
+
                 ])
             ])
 
