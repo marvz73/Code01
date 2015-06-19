@@ -1275,12 +1275,13 @@ var navigation = {
                         m('li', [ m('a[href="#"]', 'Contact Us')]),
 
                         m('li.dropdown',   [
-                            m('a[role="button"].dropdown-toggle', {onclick: function(elm, init, context){
-                                if(!init){
 
+                            m('a[role="button"].dropdown-toggle', {onclick: function(elm, init){
+                                if(!init){
+                                    // elm.className = " open";
+                                    console.log(elm)
                                 }
-                            }
-                        },'Accounts',[
+                            }},'Accounts', [
                                 m('span.caret')
                             ]),
 
