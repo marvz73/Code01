@@ -26,234 +26,21 @@ var socket = io.connect(baseUrl + '/' + accountId);
 
 console.log(accountId);
 
+//------------------------MITHRILJS COMPONENTS---------------------------------------------
 
-// var todo = {};
-// // var socket = io();
-// //for simplicity, we use this module to namespace the model classes
+var MenuLists = {
+    view: function(ctrl, args) {
+        return m("ul.dropdown-menu", [
+            args.lists.map(function(item) {
+                return m("li", [
+                    m("a[href='#']", item.name)
+                ])
+            })
+        ])
+    }
+}
 
-// //the Todo class has two properties
-// todo.Todo = function (data) {
-//     this.description = m.prop(data.description);
-//     this.done = m.prop(false);
-// };
-
-// //the TodoList class is a list of Todo's
-// todo.TodoList = Array;
-
-
-// //the Todo class has two properties
-// todo.Todo = function (data) {
-//     this.description = m.prop(data.description);
-//     this.done = m.prop(false);
-
-//     this.projects = function(){
-//         return m.request({method:'get', url: baseUrl + '/api/v1/account/1/projects'});
-//     }
-
-// };
-
-// // todo.getProjectList = function() {
-// //     return m.request({method:'get', url: 'api/v1/account/' + m.route.param('aid') + '/projects'});
-// // };
-
-// todo.getProject = function() {
-//     return m.request({method:'get', url: baseUrl + '/api/v1/account/' + m.route.param('aid') + '/project' + m.route.param('pid')});
-// };
-
-// todo.getTaskList = function() {
-//     return m.request({method:'get', url: baseUrl + '/api/v1/account/' + m.route.param('aid') + '/project/' + m.route.param('pid') + '/tasks'});
-// };
-
-// todo.controller = function () {
-
-//     var self = this;
-
-//     // this.ProjectList = m.prop('');
-//     this.TaskList = m.prop('');
-//     // ProjectList.then(function(resp){
-//     //     console.log(12312)
-//     this.TaskList = todo.getTaskList();
-//     // })
-
-//     this.addTask = function (elm, init, context ) {
-//         var jsonData = {
-//             'desc' : '',
-//             'X': '23px',
-//             'Y': '25px'
-//         }
-//         m.request({method:'post', url: baseUrl + '/api/v1/account/' +m.route.param('aid')+ '/project/' +m.route.param('pid')+ '/task', data: jsonData}).then(function(resp){
-//             self.TaskList().data.push(resp.data)
-//             // self.list.push(m.prop({id: list.length + 1, count: 1, axisX: '23px', axisY: '25px'}))
-//         })
-//     };
-    
-//     this.updateTask = function(taskData){
-
-//         var jsonData = {
-//             Y: taskData.Y,
-//             X: taskData.X
-//         }
-
-//         m.request({method:'post', url: baseUrl + '/api/v1/account/' +m.route.param('aid')+ '/project/' +m.route.param('pid')+ '/task/' + taskData.id, data: jsonData }).then(function(resp){
-//             // self.list.push(resp.data)
-//         })
-//     };
-
-
-
-//     // socket.on('connect', function () {
-//     //     socket.emit('getBootstrap', function(data){
-//     //         console.dir(data);
-//     //     })
-//     // });
-
-//     // this.description = m.prop("");
-//     // this.done = m.prop(false);
-//     // this.editMode = m.prop(false);
-
-//     // this.add = function () {
-//     //     if (self.description()) {
-//     //         self.list.push(new todo.Todo({
-//     //             description: self.description(),
-//     //             done: self.done()
-//     //         }));
-//     //         self.description("");
-//     //     }
-//     // };
-
-
-// /*
-//  * ----------- HELPERS -----------
-//  */
-
-//     this.addClass = function(element, classToAdd) {
-//         var currentClassValue = element.className;
-          
-//         if (currentClassValue.indexOf(classToAdd) == -1) {
-//             if ((currentClassValue == null) || (currentClassValue === "")) {
-//                 element.className = classToAdd;
-//             } else {
-//                 element.className += " " + classToAdd;
-//             }
-//         }
-//     }
-
-//     this.removeClass = function(element, classToRemove) {
-//         var currentClassValue = element.className;
-//         if (currentClassValue == classToRemove) {
-//             element.className = "";
-//             return;
-//         }
-//         var classValues = currentClassValue.split(" ");
-//         var filteredList = [];
-//         for (var i = 0 ; i < classValues.length; i++) {
-//             if (classToRemove != classValues[i]) {
-//                 filteredList.push(classValues[i]);
-//             }
-//         }
-//         element.className = filteredList.join(" ");
-//     }
-
-//     this.on = function(element, evnt, fn){
-//         element.addEventListener(evnt, fn);
-//     }
-
-//     this.is = function(elm){
-
-//         var span = document.getElementById("mySPAN");
-//         var div = document.getElementById("myDIV").contains(span);
-//     }
-
-
-// };
-
-// //here's the view
-// todo.view = function (ctrl) {
-
-
-
-//     // function showRightModal(elm, init, context){
-
-//     //     if( !init ){
-//     //         document.getElementById("cd-panel").className += " is-visible";
-//     //     }
-
-//     // }
-
-//     // function hideRightModal(elm, init, context){
-//     //     if( !init ){
-//     //         var strClass = elm.target.className;
-//     //         if(strClass.indexOf('cd-panel') == 0 || strClass.indexOf('cd-panel-close') == 0){
-//     //             document.getElementById("cd-panel").className = "cd-panel from-right";
-//     //         }
-//     //     }
-//     // }
-
-//     return m("div", [
-
-//                 //pins annotation
-//                 m("div.cd-product.cd-container", [
-//                     m("div#wrapper.cd-product-wrapper", [
-//                         m("ul", [
-//                             ((ctrl.TaskList.length) ? taskList() : '' )
-//                         ]),
-
-//                         //Project images
-//                         m("img[src='./images/cd-app-image.jpg']")
-//                     ])
-//                 ]),
-
-
-//                 // rightModal()
-
-//                 // m("input", {
-//                 //     onkeyup: ctrl.fireOnEnter,
-//                 //     value: ctrl.description()
-//                 // }),
-//                 // m("button", {
-//                 //     onclick: ctrl.add,
-//                 //     style: {display: ctrl.editMode() ? 'none': 'inline-block' }
-//                 // }, "Add"),
-//                 // m("button", {
-//                 //     onclick: ctrl.editUpdate,
-
-//                 //     style: {display: !ctrl.editMode() ? 'none': 'inline-block' }
-//                 // }, "Edit"),
-
-//                 // m("button", {
-//                 //     onclick: ctrl.changeInput
-//                 // }, "Change"),
-
-//                 // m("table", [
-//                 //     ctrl.list.map(function (task, index) {
-//                 //             return m("tr", [
-
-//                 //             m("td", [
-
-//                 //               m("input[type='checkbox']",  {
-//                 //                 onclick: m.withAttr("checked", task.done),
-//                 //                 checked: task.done()
-//                 //                 })
-//                 //             ]),
-
-//                 //             m("td",  {style: {textDecoration: task.done() ? "line-through" : "none"}, onclick: ctrl.editInit.bind({i:index}),  onclick: this.focus()}, task.description()), ]);
-                        
-//                 //     })
-//                 // ]);
-
-//     ]);
-// };
-
-//initialize the application
-// m.module(document.getElementById('app'), todo);
-
-
-
-
-
-
-
-
+//----------------------------------------------------------------------------------------
 
 // task module
 var task = {
@@ -1476,18 +1263,40 @@ var navigation = {
                         m('span.icon-bar'),
                         m('span.icon-bar')
                     ]),
-                    m('a.navbar-brand', 'Project name')
+                    //m('a.navbar-brand', 'Project name')
                 ]),
+
+                
+
                 m('div#navbar.navbar-collapse.collapse', [
                     m('ul.nav.navbar-nav', [
                         m('li', [ m('a[href="#"]', 'Home')]),
                         m('li', [ m('a[href="#"]', 'About')]),
                         m('li', [ m('a[href="#"]', 'Contact Us')]),
+
+                        m('li.dropdown',   [
+                            m('a[role="button"].dropdown-toggle', {onclick: function(elm, init, context){
+                                if(!init){
+
+                                }
+                            }
+                        },'Accounts',[
+                                m('span.caret')
+                            ]),
+
+                            m.component(MenuLists, {lists: ctrl.AccountList}),
+
+                        ]),
+                        
+
+
+
                         m('li.dropdown', [ 
                             m('a[href="#"][data-toggle="dropdown"][role="button"][aria-haspopup="true"][aria-expanded="false"].dropdown-toggle', 'Dropdown',[
                                 m('span.caret')
                             ]),
                             m('ul.dropdown-menu', [
+
                                 m('li', [
                                     m('a[href="#"]', 'Action')
                                 ]),
@@ -1500,6 +1309,9 @@ var navigation = {
                             ])
 
                         ])
+
+
+
                     ])
                 ])
             ])
@@ -1627,3 +1439,9 @@ m.routes( '/0/' + bootstrap.Accounts[0].id, {
 
 
 // m.route("/" + bootstrap.Accounts[0].id);
+
+
+
+
+
+
