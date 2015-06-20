@@ -29,10 +29,30 @@ console.log(accountId);
 //------------------------MITHRILJS COMPONENTS---------------------------------------------
 
 var AccountLists = {
+    controller: function(){
+        var self = this;
+
+        this.addAccount = function(){
+            return m.request({method:'post', url: baseUrl + '/api/v1/account', data: {name: 'Account Name'}})
+            .then(function(resp){
+                m.route('/4/' + resp.data.id)
+            }, function(){
+                AJAXERROR();
+            })  
+        };
+    },
     view: function(ctrl, args) {
         if(args.lists.length)
         {
-            return m("ul.dropdown-menu", [            
+
+            return m("ul.dropdown-menu", [   
+                m("li", [
+                    m("a", {onclick: ctrl.addAccount},  m("i.fa.fa-plus"), " Account",[])
+                ]), 
+                m("li", [
+                    m("a[href='/4/" + m.route.param('aid') + "/details']", {config: m.route},  " Account Details",[])
+                ]), 
+                m("li.divider"),
                 args.lists.map(function(item) {               
                     return m("li", [
                         m("a[href='"+item.id+"']", item.name)
@@ -41,7 +61,13 @@ var AccountLists = {
             ])
         }
         else{
-            return m("ul")
+            return m("ul.dropdown-menu", [  
+                m("li", [
+                    m("a", {onclick: ctrl.addAccount},  m("i.fa.fa-plus"), " Account", [
+                        
+                    ])
+                ])
+            ])
         }
 
 
@@ -49,34 +75,43 @@ var AccountLists = {
 }
 
 var ProjectLists = {
+    controller: function(){
+        this.addProject = function () {
+            return m.request({method:'post', url: baseUrl + '/api/v1/account/' + accountId + '/project', data: {title: 'Project Title'}}).then(function(){}, function(){
+                AJAXERROR();
+            })
+        };
+    },
     view: function(ctrl, args) {
 
         if(args.lists.length)
         {
             return m("ul.dropdown-menu", [  
+
+                m("li", [
+                    m("a", {onclick: ctrl.addProject},  m("i.fa.fa-plus"), " Project",[])
+                ]),
+                m("li.divider"),              
                 args.lists.map(function(item) {               
                     return m("li", [
-                        m("a[href='"+item.id+"']", item.title)
+                        m("a[href='/1/" + item.AccountId + "/" + item.id + "']", {config: m.route}, item.title)
                     ])
                 })
             ])
         }
         else{
-            return m("ul")
+            return m("ul.dropdown-menu", [  
+                m("li", [
+                    m("a", {onclick: ctrl.addProject}, m("i.fa.fa-plus"), " Project", [])
+                ])
+            ])
         }
 
     }
 }
 
 // m("a[href='/1/" + val.AccountId + '/' + val.id + "'].cd-navs.pull-left", {config: m.route }, val.title, [
-//     m("i.fa.fa-plus-square.pull-left")
-// ]),
-
-// m("a[href='" + val.id + "'].pull-left.cd-navs", val.name,[
-//     m("i.fa.fa-users.pull-left")
-// ]),
-// m("a[href='/4/" + val.id + "/details'].cd-navs.pull-right",{config: m.route}, [
-//     m("i.fa.fa-bars")
+// m("i.fa.fa-plus-square.pull-left")
 // ]),
 
 
@@ -1171,36 +1206,64 @@ var accountDetails = {
 
 
 var navigation = {
+    model: function(param){
+        this.accountTitle = param.atitle;
+        this.projectTitle = param.ptitle;
+    },
     controller: function() {
         var self = this;
         this.ProjectList = [];
         this.AccountList = [];
 
         socket.on('projectCreate', function(data){
-             self.ProjectList.push(data);
-             m.redraw(true);
+            self.ProjectList.push(data);
+            m.redraw(true);
         });
+
 
         m.request({method:'get', url: baseUrl + '/api/v1/account/' + accountId + '/projects'})
         .then(function(projectResp){
             if(projectResp.data.length)
             {
-                if(m.route.param('pid') == 0){
-                    // m.route('/0/1/' + projectResp.data[0].id)
+                self.ProjectList = projectResp.data;
+                console.log(typeof m.route.param('pid'))
+                if(typeof m.route.param('pid') != 'undefined')
+                {
+                    self.ProjectList.map(function(item){
+                        if(m.route.param('pid') == item.id){
+                            self.ptitle = item.title;
+                        }
+                    });
+                }else{
+                    self.ptitle = "Projects";
                 }
 
-                self.ProjectList = projectResp.data;
+
+            }else{
+                self.ptitle = "Projects";
             }
         }, function(){
             AJAXERROR();
         });
 
+
+
         m.request({method:'get', url: baseUrl + '/api/v1/accounts'})
         .then(function(resp){
             self.AccountList = resp.data;
+
+            self.AccountList.map(function(item){
+                if(accountId == item.id){
+                console.log(accountId ,'-', item.name)
+                    self.atitle = item.name;
+                }
+            })
+
         }, function(){
             AJAXERROR();
         })
+
+
 
 
 
@@ -1218,20 +1281,9 @@ var navigation = {
 
         };
 
-        this.addProject = function () {
-            return m.request({method:'post', url: baseUrl + '/api/v1/account/' + accountId + '/project', data: {title: 'Project Title'}}).then(function(){}, function(){
-                AJAXERROR();
-            })
-        };
 
-        this.addAccount = function(){
-            return m.request({method:'post', url: baseUrl + '/api/v1/account', data: {name: 'Account Name'}})
-            .then(function(resp){
-                m.route('/4/' + resp.data.id)
-            }, function(){
-                AJAXERROR();
-            })  
-        };
+
+
     
     },
     view: function(ctrl) {
@@ -1239,9 +1291,7 @@ var navigation = {
         function projectDetails(elm, init, context){
             if(!init)
             {
-
                 return m.render(document.getElementById("task"), projectDetails);
-
             }
         }
 
@@ -1267,6 +1317,7 @@ var navigation = {
         function accountList(elm, init, context){
             if(!init)
             {
+
                 return ctrl.AccountList.map(function (val, index) {
                     return m("li.clearfix", [                        
                         m("a[href='" + val.id + "'].pull-left.cd-navs", val.name,[
@@ -1280,7 +1331,14 @@ var navigation = {
             }
         }
 
-        return m("nav.navbar.navbar-default.navbar-static-top", [
+        function loaded(elm, init){
+            if(!init){
+            
+                console.log(ctrl.titles)
+
+            }
+        }
+        return m("nav.navbar.navbar-default.navbar-static-top", {config: loaded}, [
             m("div.container", [
                 m("div.navbar-header", [
                     m('button[type="button"][data-toggle="collapse"][data-target="#navbar"].navbar-toggle.collapsed', [
@@ -1289,34 +1347,30 @@ var navigation = {
                         m('span.icon-bar'),
                         m('span.icon-bar')
                     ]),
-                    //m('a.navbar-brand', 'Project name')
+                    m('a[href="/"].navbar-brand', {style:"font-size: 1.4rem"}, [
+                        m('i.fa..fa-bug.fa-6')
+                    ])
                 ]),
-
-                
 
                 m('div#navbar.navbar-collapse.collapse', [
                     m('ul.nav.navbar-nav', [
-                        m('li', [ m('a[href="/"]', {config: m.route}, 'Home')]),
+                        // m('li', [ m('a[href="/"]', {config: m.route}, 'Home')]),
 
-                        m('li.dropdown#project-dropdown', { onclick: function(elm, init){
+                        m('li.dropdown#project-dropdown', { 
+                            onmouseover: function(elm, init){
+                                 Q(".dropdown").removeClass('open');
                                 if(!init){
-
-                                    console.log(elm.target.offsetParent.className)
-
-                                    Q(".dropdown").removeClass('open');
-
-                                    if(elm.target.offsetParent.className != 'dropdown open')
-                                    {
-                                        Q("#project-dropdown").addClass('open');
-                                    }else{
-                                        Q("#project-dropdown").removeClass('open');
-                                    }
-                                    
-                                    }
+                                    Q('#project-dropdown').addClass('open')
                                 }
+                            },
+                            onmouseout: function(elm, init){
+                                if(!init){ 
+                                    Q('#project-dropdown').removeClass('open')
+                                }
+                            }
                         }, [
 
-                            m('a[role="button"].dropdown-toggle','Projects', [
+                            m('a[role="button"].dropdown-toggle' , ctrl.ptitle + " ", [
                                 m('span.caret')
                             ]),
 
@@ -1327,47 +1381,44 @@ var navigation = {
 
                     m('ul.nav.navbar-nav.pull-right', [
                         m('li.dropdown#account-dropdown', {
-                            onmouseover: function(elm, init){
-                                 Q(".dropdown").removeClass('open');
+                            onclick: function(elm, init){
                                 if(!init){
-                                    Q('#account-dropdown').addClass('open')
-                                }
-                            },
-                            onmouseout: function(elm, init){
-                                if(!init){ 
-                                    Q('#account-dropdown').removeClass('open')
-                                }
+
+                                    console.log(elm.target.offsetParent.className)
+
+                                    // Q(".dropdown").removeClass('open');
+
+                                    if(elm.target.offsetParent.className != 'dropdown open')
+                                    {
+                                        Q("#account-dropdown").addClass('open');
+                                    }else{
+                                        Q("#account-dropdown").removeClass('open');
+                                    }
+                                    
+                                    }
                             }
                         }, [
 
-                            m('a[role="button"].dropdown-toggle','Accounts', [
+                            m('a[role="button"].dropdown-toggle', ctrl.atitle + " ", [
                                 m('span.caret')
                             ]),
 
                             m.component(AccountLists, {lists: ctrl.AccountList}),
 
                         ]),
-                        m('li.dropdown#user-dropdown', { onclick: function(elm, init){
-                                if(!init){
-                                    // Q(".dropdown").removeClass('open');
-                                    console.log(elm.target.offsetParent.className)
-                                    if(elm.target.offsetParent.className != 'dropdown open')
-                                    {
-                                        Q("#user-dropdown").addClass('open');
-                                    }else{
-                                        Q("#user-dropdown").removeClass('open');
-                                    }
-                                    }
-                                }
-                        }, [
-                            m('a[role="button"]', bootstrap.fullName + " ", [
-                                m('span.caret'),
+                        m('li.dropdown#user-dropdown',  [
+                            m('a[role="button"][href="/profile"]', bootstrap.fullName + " ", [
                                 m('span.fa.fa-user.pull-left',{style:"font-size: 1.4rem"}),
-                            ]),
-                            m('ul.dropdown-menu.pull-right',[
-                                m('li', [
-                                    m('a[href="/logout"]', 'Logout')
-                                ])
+                            ])
+                        ]),
+                        m('li.dropdown#user-dropdown',  [
+                            m('a[role="button"][href="/1000/'+m.route.param('aid')+'"]', {config: m.route}, [
+                                m('span.fa.fa-cog.pull-left',{style:"font-size: 1.4rem"}),
+                            ])
+                        ]),
+                        m('li.dropdown#user-dropdown',  [
+                            m('a[role="button"][href="/logout"]', "", [
+                                m('span.fa.fa-power-off.pull-left',{style:"font-size: 1.4rem"}),
                             ])
                         ])
                     ])
