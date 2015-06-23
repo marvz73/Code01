@@ -26,234 +26,96 @@ var socket = io.connect(baseUrl + '/' + accountId);
 
 console.log(accountId);
 
+//------------------------MITHRILJS COMPONENTS---------------------------------------------
 
-// var todo = {};
-// // var socket = io();
-// //for simplicity, we use this module to namespace the model classes
+var AccountLists = {
+    controller: function(){
+        var self = this;
 
-// //the Todo class has two properties
-// todo.Todo = function (data) {
-//     this.description = m.prop(data.description);
-//     this.done = m.prop(false);
-// };
+        this.addAccount = function(){
+            return m.request({method:'post', url: baseUrl + '/api/v1/account', data: {name: 'Account Name'}})
+            .then(function(resp){
+                m.route('/4/' + resp.data.id)
+            }, function(){
+                AJAXERROR();
+            })  
+        };
+    },
+    view: function(ctrl, args) {
+        if(args.lists.length)
+        {
 
-// //the TodoList class is a list of Todo's
-// todo.TodoList = Array;
-
-
-// //the Todo class has two properties
-// todo.Todo = function (data) {
-//     this.description = m.prop(data.description);
-//     this.done = m.prop(false);
-
-//     this.projects = function(){
-//         return m.request({method:'get', url: baseUrl + '/api/v1/account/1/projects'});
-//     }
-
-// };
-
-// // todo.getProjectList = function() {
-// //     return m.request({method:'get', url: 'api/v1/account/' + m.route.param('aid') + '/projects'});
-// // };
-
-// todo.getProject = function() {
-//     return m.request({method:'get', url: baseUrl + '/api/v1/account/' + m.route.param('aid') + '/project' + m.route.param('pid')});
-// };
-
-// todo.getTaskList = function() {
-//     return m.request({method:'get', url: baseUrl + '/api/v1/account/' + m.route.param('aid') + '/project/' + m.route.param('pid') + '/tasks'});
-// };
-
-// todo.controller = function () {
-
-//     var self = this;
-
-//     // this.ProjectList = m.prop('');
-//     this.TaskList = m.prop('');
-//     // ProjectList.then(function(resp){
-//     //     console.log(12312)
-//     this.TaskList = todo.getTaskList();
-//     // })
-
-//     this.addTask = function (elm, init, context ) {
-//         var jsonData = {
-//             'desc' : '',
-//             'X': '23px',
-//             'Y': '25px'
-//         }
-//         m.request({method:'post', url: baseUrl + '/api/v1/account/' +m.route.param('aid')+ '/project/' +m.route.param('pid')+ '/task', data: jsonData}).then(function(resp){
-//             self.TaskList().data.push(resp.data)
-//             // self.list.push(m.prop({id: list.length + 1, count: 1, axisX: '23px', axisY: '25px'}))
-//         })
-//     };
-    
-//     this.updateTask = function(taskData){
-
-//         var jsonData = {
-//             Y: taskData.Y,
-//             X: taskData.X
-//         }
-
-//         m.request({method:'post', url: baseUrl + '/api/v1/account/' +m.route.param('aid')+ '/project/' +m.route.param('pid')+ '/task/' + taskData.id, data: jsonData }).then(function(resp){
-//             // self.list.push(resp.data)
-//         })
-//     };
-
-
-
-//     // socket.on('connect', function () {
-//     //     socket.emit('getBootstrap', function(data){
-//     //         console.dir(data);
-//     //     })
-//     // });
-
-//     // this.description = m.prop("");
-//     // this.done = m.prop(false);
-//     // this.editMode = m.prop(false);
-
-//     // this.add = function () {
-//     //     if (self.description()) {
-//     //         self.list.push(new todo.Todo({
-//     //             description: self.description(),
-//     //             done: self.done()
-//     //         }));
-//     //         self.description("");
-//     //     }
-//     // };
-
-
-// /*
-//  * ----------- HELPERS -----------
-//  */
-
-//     this.addClass = function(element, classToAdd) {
-//         var currentClassValue = element.className;
-          
-//         if (currentClassValue.indexOf(classToAdd) == -1) {
-//             if ((currentClassValue == null) || (currentClassValue === "")) {
-//                 element.className = classToAdd;
-//             } else {
-//                 element.className += " " + classToAdd;
-//             }
-//         }
-//     }
-
-//     this.removeClass = function(element, classToRemove) {
-//         var currentClassValue = element.className;
-//         if (currentClassValue == classToRemove) {
-//             element.className = "";
-//             return;
-//         }
-//         var classValues = currentClassValue.split(" ");
-//         var filteredList = [];
-//         for (var i = 0 ; i < classValues.length; i++) {
-//             if (classToRemove != classValues[i]) {
-//                 filteredList.push(classValues[i]);
-//             }
-//         }
-//         element.className = filteredList.join(" ");
-//     }
-
-//     this.on = function(element, evnt, fn){
-//         element.addEventListener(evnt, fn);
-//     }
-
-//     this.is = function(elm){
-
-//         var span = document.getElementById("mySPAN");
-//         var div = document.getElementById("myDIV").contains(span);
-//     }
-
-
-// };
-
-// //here's the view
-// todo.view = function (ctrl) {
-
-
-
-//     // function showRightModal(elm, init, context){
-
-//     //     if( !init ){
-//     //         document.getElementById("cd-panel").className += " is-visible";
-//     //     }
-
-//     // }
-
-//     // function hideRightModal(elm, init, context){
-//     //     if( !init ){
-//     //         var strClass = elm.target.className;
-//     //         if(strClass.indexOf('cd-panel') == 0 || strClass.indexOf('cd-panel-close') == 0){
-//     //             document.getElementById("cd-panel").className = "cd-panel from-right";
-//     //         }
-//     //     }
-//     // }
-
-//     return m("div", [
-
-//                 //pins annotation
-//                 m("div.cd-product.cd-container", [
-//                     m("div#wrapper.cd-product-wrapper", [
-//                         m("ul", [
-//                             ((ctrl.TaskList.length) ? taskList() : '' )
-//                         ]),
-
-//                         //Project images
-//                         m("img[src='./images/cd-app-image.jpg']")
-//                     ])
-//                 ]),
-
-
-//                 // rightModal()
-
-//                 // m("input", {
-//                 //     onkeyup: ctrl.fireOnEnter,
-//                 //     value: ctrl.description()
-//                 // }),
-//                 // m("button", {
-//                 //     onclick: ctrl.add,
-//                 //     style: {display: ctrl.editMode() ? 'none': 'inline-block' }
-//                 // }, "Add"),
-//                 // m("button", {
-//                 //     onclick: ctrl.editUpdate,
-
-//                 //     style: {display: !ctrl.editMode() ? 'none': 'inline-block' }
-//                 // }, "Edit"),
-
-//                 // m("button", {
-//                 //     onclick: ctrl.changeInput
-//                 // }, "Change"),
-
-//                 // m("table", [
-//                 //     ctrl.list.map(function (task, index) {
-//                 //             return m("tr", [
-
-//                 //             m("td", [
-
-//                 //               m("input[type='checkbox']",  {
-//                 //                 onclick: m.withAttr("checked", task.done),
-//                 //                 checked: task.done()
-//                 //                 })
-//                 //             ]),
-
-//                 //             m("td",  {style: {textDecoration: task.done() ? "line-through" : "none"}, onclick: ctrl.editInit.bind({i:index}),  onclick: this.focus()}, task.description()), ]);
+            return m("ul.dropdown-menu", [   
+                m("li", [
+                    m("a", {onclick: ctrl.addAccount},  m("i.fa.fa-plus"), " Account",[])
+                ]), 
+                m("li", [
+                    m("a[href='/4/" + m.route.param('aid') + "/details']", {config: m.route},  " Account Details",[])
+                ]), 
+                m("li.divider"),
+                args.lists.map(function(item) {               
+                    return m("li", [
+                        m("a[href='"+item.id+"']", item.name)
+                    ])
+                })
+            ])
+        }
+        else{
+            return m("ul.dropdown-menu", [  
+                m("li", [
+                    m("a", {onclick: ctrl.addAccount},  m("i.fa.fa-plus"), " Account", [
                         
-//                 //     })
-//                 // ]);
-
-//     ]);
-// };
-
-//initialize the application
-// m.module(document.getElementById('app'), todo);
+                    ])
+                ])
+            ])
+        }
 
 
+    }
+}
+
+var ProjectLists = {
+    controller: function(){
+        this.addProject = function () {
+            return m.request({method:'post', url: baseUrl + '/api/v1/account/' + accountId + '/project', data: {title: 'Project Title'}}).then(function(){}, function(){
+                AJAXERROR();
+            })
+        };
+    },
+    view: function(ctrl, args) {
+
+        if(args.lists.length)
+        {
+            return m("ul.dropdown-menu", [  
+
+                m("li", [
+                    m("a", {onclick: ctrl.addProject},  m("i.fa.fa-plus"), " Project",[])
+                ]),
+                m("li.divider"),              
+                args.lists.map(function(item) {               
+                    return m("li", [
+                        m("a[href='/1/" + item.AccountId + "/" + item.id + "']", {config: m.route}, item.title)
+                    ])
+                })
+            ])
+        }
+        else{
+            return m("ul.dropdown-menu", [  
+                m("li", [
+                    m("a", {onclick: ctrl.addProject}, m("i.fa.fa-plus"), " Project", [])
+                ])
+            ])
+        }
+
+    }
+}
+
+// m("a[href='/1/" + val.AccountId + '/' + val.id + "'].cd-navs.pull-left", {config: m.route }, val.title, [
+// m("i.fa.fa-plus-square.pull-left")
+// ]),
 
 
-
-
-
-
+//----------------------------------------------------------------------------------------
 
 // task module
 var task = {
@@ -1344,36 +1206,64 @@ var accountDetails = {
 
 
 var navigation = {
+    model: function(param){
+        this.accountTitle = param.atitle;
+        this.projectTitle = param.ptitle;
+    },
     controller: function() {
         var self = this;
         this.ProjectList = [];
         this.AccountList = [];
 
         socket.on('projectCreate', function(data){
-             self.ProjectList.push(data);
-             m.redraw(true);
+            self.ProjectList.push(data);
+            m.redraw(true);
         });
+
 
         m.request({method:'get', url: baseUrl + '/api/v1/account/' + accountId + '/projects'})
         .then(function(projectResp){
             if(projectResp.data.length)
             {
-                if(m.route.param('pid') == 0){
-                    // m.route('/0/1/' + projectResp.data[0].id)
+                self.ProjectList = projectResp.data;
+                console.log(typeof m.route.param('pid'))
+                if(typeof m.route.param('pid') != 'undefined')
+                {
+                    self.ProjectList.map(function(item){
+                        if(m.route.param('pid') == item.id){
+                            self.ptitle = item.title;
+                        }
+                    });
+                }else{
+                    self.ptitle = "Projects";
                 }
 
-                self.ProjectList = projectResp.data;
+
+            }else{
+                self.ptitle = "Projects";
             }
         }, function(){
             AJAXERROR();
         });
 
+
+
         m.request({method:'get', url: baseUrl + '/api/v1/accounts'})
         .then(function(resp){
             self.AccountList = resp.data;
+
+            self.AccountList.map(function(item){
+                if(accountId == item.id){
+                console.log(accountId ,'-', item.name)
+                    self.atitle = item.name;
+                }
+            })
+
         }, function(){
             AJAXERROR();
         })
+
+
 
 
 
@@ -1391,20 +1281,9 @@ var navigation = {
 
         };
 
-        this.addProject = function () {
-            return m.request({method:'post', url: baseUrl + '/api/v1/account/' + accountId + '/project', data: {title: 'Project Title'}}).then(function(){}, function(){
-                AJAXERROR();
-            })
-        };
 
-        this.addAccount = function(){
-            return m.request({method:'post', url: baseUrl + '/api/v1/account', data: {name: 'Account Name'}})
-            .then(function(resp){
-                m.route('/4/' + resp.data.id)
-            }, function(){
-                AJAXERROR();
-            })  
-        };
+
+
     
     },
     view: function(ctrl) {
@@ -1412,9 +1291,7 @@ var navigation = {
         function projectDetails(elm, init, context){
             if(!init)
             {
-
                 return m.render(document.getElementById("task"), projectDetails);
-
             }
         }
 
@@ -1425,19 +1302,12 @@ var navigation = {
                 return ctrl.ProjectList.map(function (val, index) {
                     return m("li.clearfix", [
                        
-                        m("a[href='/1/" + val.AccountId + '/' +val.id+ "'].cd-navs.pull-left", {config: m.route }, val.title, [
+                        m("a[href='/1/" + val.AccountId + '/' + val.id + "'].cd-navs.pull-left", {config: m.route }, val.title, [
                             m("i.fa.fa-plus-square.pull-left")
                         ]),
-                        m("a[href='/2/"+ val.AccountId+"/"+val.id+"'].cd-navs.pull-right", {config: m.route}, [
+                        m("a[href='/2/" + val.AccountId + "/" + val.id + "'].cd-navs.pull-right", {config: m.route}, [
                             m("i.fa.fa-bars")
-                        ]),
-
-                        // m("a.cd-navs", {onclick: function(elm, init, context){
-                        //     if(!init){
-                        //         ctrl.addSubProject(val.id);
-                        //     }
-                        // } }, " + ")
-                        
+                        ]),                        
                     ])
                 })     
             }
@@ -1447,27 +1317,28 @@ var navigation = {
         function accountList(elm, init, context){
             if(!init)
             {
+
                 return ctrl.AccountList.map(function (val, index) {
-                    return m("li.clearfix", [
-                        
+                    return m("li.clearfix", [                        
                         m("a[href='" + val.id + "'].pull-left.cd-navs", val.name,[
                             m("i.fa.fa-users.pull-left")
                         ]),
                         m("a[href='/4/" + val.id + "/details'].cd-navs.pull-right",{config: m.route}, [
-                             m("i.fa.fa-bars")
+                            m("i.fa.fa-bars")
                         ]),
                     ])
                 })     
             }
         }
 
-        function showDropdown(elm, init, context){
+        function loaded(elm, init){
             if(!init){
-                Q('.dropdown').addClass('open')
+            
+                console.log(ctrl.titles)
+
             }
         }
-
-        return m("nav.navbar.navbar-default.navbar-static-top", [
+        return m("nav.navbar.navbar-default.navbar-static-top", {config: loaded}, [
             m("div.container", [
                 m("div.navbar-header", [
                     m('button[type="button"][data-toggle="collapse"][data-target="#navbar"].navbar-toggle.collapsed', [
@@ -1476,31 +1347,84 @@ var navigation = {
                         m('span.icon-bar'),
                         m('span.icon-bar')
                     ]),
-                    m('a.navbar-brand', 'Project name')
+                    m('a[href="/"].navbar-brand', {style:"font-size: 1.4rem"}, [
+                        m('i.fa..fa-bug.fa-6')
+                    ])
                 ]),
+
                 m('div#navbar.navbar-collapse.collapse', [
                     m('ul.nav.navbar-nav', [
-                        m('li', [ m('a[href="#"]', 'Home')]),
-                        m('li', [ m('a[href="#"]', 'About')]),
-                        m('li', [ m('a[href="#"]', 'Contact Us')]),
-                        m('li.dropdown', [ 
-                            m('a[href="#"][data-toggle="dropdown"][role="button"][aria-haspopup="true"][aria-expanded="false"].dropdown-toggle', 'Dropdown',[
+                        // m('li', [ m('a[href="/"]', {config: m.route}, 'Home')]),
+
+                        m('li.dropdown#project-dropdown', { 
+                            onmouseover: function(elm, init){
+                                 Q(".dropdown").removeClass('open');
+                                if(!init){
+                                    Q('#project-dropdown').addClass('open')
+                                }
+                            },
+                            onmouseout: function(elm, init){
+                                if(!init){ 
+                                    Q('#project-dropdown').removeClass('open')
+                                }
+                            }
+                        }, [
+
+                            m('a[role="button"].dropdown-toggle' , ctrl.ptitle + " ", [
                                 m('span.caret')
                             ]),
-                            m('ul.dropdown-menu', [
-                                m('li', [
-                                    m('a[href="#"]', 'Action')
-                                ]),
-                                m('li', [
-                                    m('a[href="#"]', 'Another action')
-                                ]),
-                                m('li', [
-                                    m('a[href="#"]', 'Something else here')
-                                ])
-                            ])
 
+                            m.component(ProjectLists, {lists: ctrl.ProjectList}),
+
+                        ]),
+                    ]),
+
+                    m('ul.nav.navbar-nav.pull-right', [
+                        m('li.dropdown#account-dropdown', {
+                            onclick: function(elm, init){
+                                if(!init){
+
+                                    console.log(elm.target.offsetParent.className)
+
+                                    // Q(".dropdown").removeClass('open');
+
+                                    if(elm.target.offsetParent.className != 'dropdown open')
+                                    {
+                                        Q("#account-dropdown").addClass('open');
+                                    }else{
+                                        Q("#account-dropdown").removeClass('open');
+                                    }
+                                    
+                                    }
+                            }
+                        }, [
+
+                            m('a[role="button"].dropdown-toggle', ctrl.atitle + " ", [
+                                m('span.caret')
+                            ]),
+
+                            m.component(AccountLists, {lists: ctrl.AccountList}),
+
+                        ]),
+                        m('li.dropdown#user-dropdown',  [
+                            m('a[role="button"][href="/profile"]', bootstrap.fullName + " ", [
+                                m('span.fa.fa-user.pull-left',{style:"font-size: 1.4rem"}),
+                            ])
+                        ]),
+                        m('li.dropdown#user-dropdown',  [
+                            m('a[role="button"][href="/1000/'+m.route.param('aid')+'"]', {config: m.route}, [
+                                m('span.fa.fa-cog.pull-left',{style:"font-size: 1.4rem"}),
+                            ])
+                        ]),
+                        m('li.dropdown#user-dropdown',  [
+                            m('a[role="button"][href="/logout"]', "", [
+                                m('span.fa.fa-power-off.pull-left',{style:"font-size: 1.4rem"}),
+                            ])
                         ])
                     ])
+
+
+
                 ])
             ])
 
@@ -1627,3 +1551,9 @@ m.routes( '/0/' + bootstrap.Accounts[0].id, {
 
 
 // m.route("/" + bootstrap.Accounts[0].id);
+
+
+
+
+
+
