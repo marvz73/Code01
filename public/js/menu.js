@@ -78,8 +78,18 @@ setTimeout(function(){
     // In our Library we get our selector with querySelectorAll (we do not support < ie8)
     // We also add selector length, version and twitter/github or whatever you like as information about your library.
     var Library = function (params) {
+
+
+
         // Get params
-        var selector = document.querySelectorAll(params),
+        var selector = params;
+        if(typeof params == 'string')
+        {
+            selector = document.querySelectorAll(params);
+        }
+        
+
+
             i = 0;
         // Get selector length
         this.length = selector.length;
@@ -183,6 +193,39 @@ setTimeout(function(){
 	        	return this;
 
         }, 
+
+        hasClass: function (cls) {
+            var len = this.length;
+            var bool = false;
+            while (len--) {
+                bool = (' ' + this[len].className + ' ').indexOf(' ' + cls + ' ') > -1;
+            }
+            
+            return bool;
+        },
+
+        attr: function(attrs){
+            var len = this.length;
+            var attr="";
+            while (len--) {
+
+                console.log(':::',attr)
+                attr = this[len].getAttribute(attrs)
+            }
+
+            return attr;
+        },
+
+
+        data: function(attrs){
+            var len = this.length;
+            var attr="";
+            while (len--) {
+                attr = this[len].getAttribute(attrs)
+            }
+
+            return attr;
+        },
 
         debounce: function(func, wait, immediate){
             var timeout;

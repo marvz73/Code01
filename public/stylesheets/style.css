@@ -1395,6 +1395,10 @@ header h1 {
   margin-top: 17px;
 
 }
+.cd-panel-header .title .task-user{
+  margin-left: 1rem;  
+  color: #777;
+}
 
 .from-right .cd-panel-header, .from-left .cd-panel-header {
   top: -50px;
@@ -1634,7 +1638,7 @@ a.cd-panel-close:after {
 .hover{
   border: 3px dotted red;
 }
-
+#task,
 #settings,
 #projectdetails,
 #account{

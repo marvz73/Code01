@@ -46,18 +46,20 @@ var AccountLists = {
         {
 
             return m("ul.dropdown-menu", [   
-                m("li", [
-                    m("a", {onclick: ctrl.addAccount},  m("i.fa.fa-plus"), " Account",[])
-                ]), 
-                m("li", [
-                    m("a[href='/4/" + m.route.param('aid') + "/details']", {config: m.route},  " Account Details",[])
-                ]), 
-                m("li.divider"),
+
                 args.lists.map(function(item) {               
                     return m("li", [
                         m("a[href='"+item.id+"']", item.name)
                     ])
-                })
+                }),
+                m("li.divider"),
+                m("li", [
+                    m("a", {onclick: ctrl.addAccount},  m("i.fa.fa-plus"), " Account",[])
+                ]), 
+                m("li", [
+                    m("a[href='/4/" + m.route.param('aid') + "/details']", {config: m.route}, m("i.fa.fa-info-circle") , " Details",[])
+                ]), 
+
             ])
         }
         else{
@@ -84,19 +86,36 @@ var ProjectLists = {
     },
     view: function(ctrl, args) {
 
+        function activeProject(elm, init){
+    
+            if(!init){
+                if(m.route.param('pid'))
+                {
+                    return m("li", [
+                        m("a[href='/2/"+m.route.param('aid')+"/"+m.route.param('pid')+"']",{config: m.route}, m("i.fa.fa-info-circle"), " Details",[])
+                    ])
+                }
+            } 
+
+        }
+
         if(args.lists.length)
         {
             return m("ul.dropdown-menu", [  
 
-                m("li", [
-                    m("a", {onclick: ctrl.addProject},  m("i.fa.fa-plus"), " Project",[])
-                ]),
-                m("li.divider"),              
                 args.lists.map(function(item) {               
                     return m("li", [
                         m("a[href='/1/" + item.AccountId + "/" + item.id + "']", {config: m.route}, item.title)
                     ])
-                })
+                }),
+
+                m("li.divider"),  
+
+                m("li", [
+                    m("a", {onclick: ctrl.addProject},  m("i.fa.fa-plus"), " Project",[])
+                ]),
+
+                activeProject()
             ])
         }
         else{
@@ -110,6 +129,40 @@ var ProjectLists = {
     }
 }
 
+var AccountUsersLists = {
+    controller: function(){
+        var self = this;
+
+        this.assigned = function(assigneeId){
+            m.request({method:'post', url: baseUrl + '/api/v1/account/' + accountId + '/project/' +m.route.param('pid') + '/task/'+ m.route.param('tid'), data: {AssigneeId: assigneeId}}).then(function(){}, function(){
+                AJAXERROR();
+            })
+        }
+    },
+    view: function(ctrl, args){
+
+        function assignee(elm, init){
+            if(!init)
+            {     
+                ctrl.assigned(elm.target.parentElement.id);
+            }
+        }
+
+        if(args.lists.length > 0){
+            return m("ul.dropdown-menu", [ 
+                args.lists.map(function(item) {
+                    return m("li[id='"+item.id+"']",{onclick: assignee}, [
+                        m("a", item.fullName),
+                    ])
+                })
+            ]);
+        }
+        else{
+            return m("ul.dropdown-menu")
+        }
+    }
+
+}
 // m("a[href='/1/" + val.AccountId + '/' + val.id + "'].cd-navs.pull-left", {config: m.route }, val.title, [
 // m("i.fa.fa-plus-square.pull-left")
 // ]),
@@ -120,10 +173,11 @@ var ProjectLists = {
 // task module
 var task = {
     model: function(params) {
-        this.completed    = m.prop(true);
+        this.completed   = m.prop(true);
         this.title       =  m.prop(params.title);
         this.description =  m.prop(params.description);
         this.comments    =  m.prop(params.comments);
+        this.assignee    =  m.prop(params.assignee);
     },
     controller: function() {
 
@@ -131,7 +185,7 @@ var task = {
 
         this.TaskDetails = {};
         this.TaskComments = [];
-
+        this.usersList = [];
         //Task comment observ
         socket.on('taskCommentCreate', function(data){
             self.TaskComments.push(data);
@@ -139,7 +193,7 @@ var task = {
         });
 
         socket.on('taskUpdate', function(data){
-            self.detail = new task.model({completed: data.completed, title: "", description: data.desc});
+            self.detail = new task.model({assignee: resp.data.Assignee,completed: data.completed, title: "", description: data.desc});
             m.redraw(true)
         });
 
@@ -150,7 +204,7 @@ var task = {
         })
         .then(function(resp){
             self.TaskDetails = resp.data;
-            self.detail = new task.model({completed: resp.data.completed, title: resp.data.title, description: resp.data.desc});
+            self.detail = new task.model({assignee: resp.data.Assignee, completed: resp.data.completed, title: resp.data.title, description: resp.data.desc});
         }).then(function(){
             m.request({
                 method: 'get',
@@ -201,6 +255,16 @@ var task = {
                 AJAXERROR();
             });
         }
+
+        this.getUsers = function(callback){
+            m.request({
+                method:'get', 
+                url: baseUrl + '/api/v1/account/'+m.route.param('aid')+'/users'
+            }).then(function(resp){
+               callback(resp);
+            })
+        }
+
 
     },
     view: function(ctrl) {
@@ -295,6 +359,31 @@ var task = {
                             m('i.fa.fa-check-square-o.pull-left',{style: !ctrl.detail.completed ? 'display:block' : 'display:none',onclick: markComplete }),
 
                             m("h4#taskTitle.pull-left", "Issue #"+ctrl.TaskDetails.id),
+                            
+                            m("span.dropdown#assignee",{onclick: function(elm, init){
+                                if(!init){
+
+                                    // if(Q("#assignee").hasClass('open'))
+                                    // {   
+                                    //     Q("#assignee").removeClass('open')
+                                    // }else{
+                                    // }
+                                        Q("#assignee").addClass('open')
+                                        ctrl.getUsers(function(res){
+                                            ctrl.usersList = res.data;
+                                        })
+                                        
+                                }
+                            }}, [
+                                m("a[title='" + (ctrl.detail.assignee() ? ctrl.detail.assignee().fullName : "Assignee")  + "']",[
+                                    m("i.fa.fa-user.task-user")
+                                ]),
+                                m.component(AccountUsersLists,{lists: ctrl.usersList}),
+                            ])
+
+
+
+
                         ]),
 
 
@@ -639,6 +728,7 @@ var projectDetails = {
                 AJAXERROR();
             })
         }
+
     },
     view: function(ctrl){
 
@@ -871,14 +961,14 @@ var settings = {
                         m("a.cd-panel-close", {onclick: hideRightModal}, "Close")
                     ]),
                     m("div.cd-panel-container", [
-                        m('ul.nav.nav-tabs', [
-                            m('li', [
-                                m('a[href="#"]', 'Menu 1')
-                            ]),
-                            m('li', [
-                                m('a[href="#"]', 'Menu 2')
-                            ])
-                        ]),
+                        // m('ul.nav.nav-tabs', [
+                        //     m('li', [
+                        //         m('a[href="#"]', 'Menu 1')
+                        //     ]),
+                        //     m('li', [
+                        //         m('a[href="#"]', 'Menu 2')
+                        //     ])
+                        // ]),
                         m("div.cd-panel-content",[
 
 
@@ -1263,28 +1353,24 @@ var navigation = {
             AJAXERROR();
         })
 
-
-
-
-
         this.addTask = function (elm, init, context ) {
+
+        var w = document.documentElement.clientWidth, 
+            h = document.documentElement.clientHeight;
+
+        var wx = (w - elm.target.offsetWidth)/2 + 'px';
+        var hx = (h - elm.target.offsetHeight)/2 + window.pageYOffset + 'px';
 
             var jsonData = {
                 'desc' : '',
-                'X': '23px',
-                'Y': '25px'
+                'X': wx,
+                'Y': hx
             }
 
             m.request({method:'post', url: baseUrl + '/api/v1/account/' +m.route.param('aid')+ '/project/' +m.route.param('pid')+ '/task', data: jsonData}).then(function(){}, function(){
                 AJAXERROR();
             });
-
         };
-
-
-
-
-    
     },
     view: function(ctrl) {
 
@@ -1356,6 +1442,14 @@ var navigation = {
                     m('ul.nav.navbar-nav', [
                         // m('li', [ m('a[href="/"]', {config: m.route}, 'Home')]),
 
+                    ]),
+
+                    m('ul.nav.navbar-nav.pull-right', [
+                        m('li',[
+                            m('a[title="Pins"]', { onclick:  ctrl.addTask },[
+                                m('i.fa.fa-thumb-tack',{style: "font-size: 1.4rem"})
+                            ])
+                        ]),
                         m('li.dropdown#project-dropdown', { 
                             onmouseover: function(elm, init){
                                  Q(".dropdown").removeClass('open');
@@ -1377,25 +1471,17 @@ var navigation = {
                             m.component(ProjectLists, {lists: ctrl.ProjectList}),
 
                         ]),
-                    ]),
-
-                    m('ul.nav.navbar-nav.pull-right', [
                         m('li.dropdown#account-dropdown', {
-                            onclick: function(elm, init){
+                            onmouseover: function(elm, init){
+                                 Q(".dropdown").removeClass('open');
                                 if(!init){
-
-                                    console.log(elm.target.offsetParent.className)
-
-                                    // Q(".dropdown").removeClass('open');
-
-                                    if(elm.target.offsetParent.className != 'dropdown open')
-                                    {
-                                        Q("#account-dropdown").addClass('open');
-                                    }else{
-                                        Q("#account-dropdown").removeClass('open');
-                                    }
-                                    
-                                    }
+                                    Q('#account-dropdown').addClass('open')
+                                }
+                            },
+                            onmouseout: function(elm, init){
+                                if(!init){ 
+                                    Q('#account-dropdown').removeClass('open')
+                                }
                             }
                         }, [
 
@@ -1407,15 +1493,11 @@ var navigation = {
 
                         ]),
                         m('li.dropdown#user-dropdown',  [
-                            m('a[role="button"][href="/profile"]', bootstrap.fullName + " ", [
+                            m('a[role="button"][href="/1000/'+m.route.param('aid')+'"]',{config: m.route}, bootstrap.fullName + " ", [
                                 m('span.fa.fa-user.pull-left',{style:"font-size: 1.4rem"}),
                             ])
                         ]),
-                        m('li.dropdown#user-dropdown',  [
-                            m('a[role="button"][href="/1000/'+m.route.param('aid')+'"]', {config: m.route}, [
-                                m('span.fa.fa-cog.pull-left',{style:"font-size: 1.4rem"}),
-                            ])
-                        ]),
+
                         m('li.dropdown#user-dropdown',  [
                             m('a[role="button"][href="/logout"]', "", [
                                 m('span.fa.fa-power-off.pull-left',{style:"font-size: 1.4rem"}),
