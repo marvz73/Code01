@@ -312,6 +312,58 @@ module.exports = function(models, io) {
 	  		}
 		)
 
+	router.route('/:accountId/users')
+		.get(
+			function(req, res, next) {
+				var userPromise  = models.User.findById(parseInt(req.user.id));
+	  			var accountPromise = models.Account.findById(parseInt(req.params.accountId));
+
+	  			join(userPromise, accountPromise, function(user, account) {
+	  				if(user && account){
+		  				return [account, user.hasAccount(account)];
+		  			} else {
+		  				return [ null, null]
+		  			}
+				})
+				.spread(function(account, result){
+					if(account && result){
+						return account.getUsers(/*{ include: [ models.User ]}*/)
+					} else {
+						return null
+					}
+				})
+				.then(function(users){
+					var _response = {}
+					if(users){
+						_response.data =  	{
+												msg : res.__("user.success.fetch"),
+												data : users,
+												error : null
+											}
+						_response.status = 200;
+					} else {
+						_response.data =  	{
+												msg : res.__("user.fail.fetch"),
+												data : null,
+												error : null
+											}	
+						_response.status = 200;
+					}
+					return _response;
+				})
+				.then(function(_response){
+					res.status(_response.status).json(_response.data);
+				})
+				.error(function(e){
+					res.status(500).json({
+						msg : res.__("user.error.server"),
+						data : null,
+						error : e
+					});	
+				});
+	  		}
+		)
+
 	router.route('/:accountId/inviteUser')
 		.post(
 			function(req, res, next) {
