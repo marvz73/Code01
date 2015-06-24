@@ -442,6 +442,8 @@ var project = {
 
         this.TaskList = [];
         this.ProjectImage = "";
+        
+        console.log("Project")
 
         //Task create observ
         socket.on('projectAttachmentCreate', function(data){
@@ -488,6 +490,8 @@ var project = {
             AJAXERROR();
         });
 
+
+       
         //Fetch project image
         m.request({
             method:'get', 
@@ -1316,7 +1320,7 @@ var navigation = {
             if(projectResp.data.length)
             {
                 self.ProjectList = projectResp.data;
-                console.log(typeof m.route.param('pid'))
+                
                 if(typeof m.route.param('pid') != 'undefined')
                 {
                     self.ProjectList.map(function(item){
@@ -1626,8 +1630,8 @@ m.routes( '/0/' + bootstrap.Accounts[0].id, {
         '#navigation' : navigation,
         '#account' : '',
         '#settings' : settings,
-        // '#project' : project,
-        // '#task' : task
+        '#project' : project,
+        // '#task' : ''
     },
 })
 
