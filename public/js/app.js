@@ -25,7 +25,7 @@ var socket = io.connect(baseUrl + '/' + accountId);
 
 
 console.log(accountId);
-
+var lastProjectId = 0;
 //------------------------MITHRILJS COMPONENTS---------------------------------------------
 
 var AccountLists = {
@@ -57,7 +57,7 @@ var AccountLists = {
                     m("a", {onclick: ctrl.addAccount},  m("i.fa.fa-plus"), " Account",[])
                 ]), 
                 m("li", [
-                    m("a[href='/4/" + m.route.param('aid') + "/details']", {config: m.route}, m("i.fa.fa-info-circle") , " Details",[])
+                    m("a[href='/4/" + m.route.param('aid') + "/"+lastProjectId+"']", {config: m.route}, m("i.fa.fa-info-circle") , " Details",[])
                 ]), 
 
             ])
@@ -92,7 +92,7 @@ var ProjectLists = {
                 if(m.route.param('pid'))
                 {
                     return m("li", [
-                        m("a[href='/2/"+m.route.param('aid')+"/"+m.route.param('pid')+"']",{config: m.route}, m("i.fa.fa-info-circle"), " Details",[])
+                        m("a[href='/2/"+m.route.param('aid')+"/"+lastProjectId+"']",{config: m.route}, m("i.fa.fa-info-circle"), " Details",[])
                     ])
                 }
             } 
@@ -443,7 +443,17 @@ var project = {
         this.TaskList = [];
         this.ProjectImage = "";
         
-        console.log("Project")
+        console.log(':::::::::', m.route.param('cid'))
+
+        if(typeof m.route.param('cid') != 'undefined')
+        {
+            lastProjectId = m.route.param('cid')
+        }
+        else if(typeof m.route.param('pid') != 'undefined'){
+            lastProjectId = m.route.param('pid')
+        }else{
+            lastProjectId = m.route.param('any');
+        }
 
         //Task create observ
         socket.on('projectAttachmentCreate', function(data){
@@ -457,7 +467,6 @@ var project = {
         //Task create observ
         socket.on('taskCreate', function(data){
             console.log("Task Create event fired::", data);
-            // console.log(self.TaskList)
             self.TaskList.push(data)
             m.redraw(true)
         });  
@@ -475,35 +484,37 @@ var project = {
             }
         });
 
-        //Fetch project task
-        m.request({
-            method:'get', 
-            url:  baseUrl + '/api/v1/account/' + accountId + '/project/' + m.route.param('pid') + '/tasks'
-        }).then(function(taskResp){
-            if(taskResp.data.length){
-                self.TaskList = taskResp.data;
-                sharedProjectTask = taskResp.data;
-            }else{
-                sharedProjectTask = []
-            }
-        }, function(){
-            AJAXERROR();
-        });
-
-
-       
-        //Fetch project image
-        m.request({
-            method:'get', 
-            url:  baseUrl + '/api/v1/account/' + accountId + '/project/' + m.route.param('pid') + '/attachments'
-        }).then(function(projectImage){
-            self.ProjectImage = "";
-            if(projectImage.data)
-            {
-                self.ProjectImage = projectImage.data.id;
-            }
-        })
-
+        if(typeof m.route.param('pid') != 'undefined')
+        {
+            //Fetch project task
+            m.request({
+                method:'get', 
+                url:  baseUrl + '/api/v1/account/' + accountId + '/project/' + lastProjectId + '/tasks'
+            }).then(function(taskResp){
+                if(taskResp.data.length){
+                    self.TaskList = taskResp.data;
+                    sharedProjectTask = taskResp.data;
+                }else{
+                    sharedProjectTask = []
+                }
+            }, function(){
+                AJAXERROR();
+            });
+        }
+        if(lastProjectId != 0)
+        {
+            //Fetch project image
+            m.request({
+                method:'get', 
+                url:  baseUrl + '/api/v1/account/' + accountId + '/project/' + lastProjectId + '/attachments'
+            }).then(function(projectImage){
+                self.ProjectImage = "";
+                if(projectImage.data)
+                {
+                    self.ProjectImage = projectImage.data.id;
+                }
+            })
+        }
 
         //Update task position
         this.updateTask = function(taskData){
@@ -513,7 +524,7 @@ var project = {
                 X: taskData.X
             }
 
-            m.request({method:'post', url: baseUrl + '/api/v1/account/' +m.route.param('aid')+ '/project/' +m.route.param('pid')+ '/task/' + taskData.id, data: jsonData })
+            m.request({method:'post', url: baseUrl + '/api/v1/account/' +m.route.param('aid')+ '/project/' + lastProjectId + '/task/' + taskData.id, data: jsonData })
             .then(function(resp){
                 
             },function(){
@@ -525,7 +536,7 @@ var project = {
         this.UploadFile = function(formData){
             return m.request({
                 method: "POST",
-                url: '/api/v1/account/' + accountId + '/project/' + m.route.param('pid') + '/attachments',
+                url: '/api/v1/account/' + accountId + '/project/' + lastProjectId + '/attachments',
                 data: formData,
                 //simply pass the FormData object intact to the underlying XMLHttpRequest, instead of JSON.stringify'ing it
                 serialize: function(value) {return value}
@@ -555,13 +566,12 @@ var project = {
                         var tid = this.getAttribute("data-id");
 
                         if(dragged){
-                            m.route('/3/' + m.route.param('aid') + '/' + m.route.param('pid') + '/' + tid)
-                            // console.log(ctrl.list[0])
+                            m.route('/3/' + m.route.param('aid') + '/' + lastProjectId + '/' + tid)
                         }else{
                             var xPosition = 0;
                             var yPosition = 0;
                             var elm = element;
-                            // console.log(tid, element.offsetLeft, element.offsetTop)
+
                             ctrl.updateTask({index: taskIndex, id: tid, X: element.offsetLeft + 'px', Y: element.offsetTop + 'px'});
                         }
                     },
@@ -624,7 +634,7 @@ var project = {
             {
                 if(typeof ctrl.ProjectImage != 'undefined')
                 {
-                    return m("img[src='" + baseUrl + "/api/v1/account/"+accountId+"/project/"+m.route.param('pid')+"/attachment/"+ctrl.ProjectImage+"']");
+                    return m("img[src='" + baseUrl + "/api/v1/account/"+accountId+"/project/"+lastProjectId+"/attachment/"+ctrl.ProjectImage+"']");
                 }
                 else
                 {
@@ -632,7 +642,6 @@ var project = {
                 }
             }
         }
-
 
         return m("div", [
                     //pins annotation
@@ -653,6 +662,114 @@ var project = {
     }
 }
 
+var subproject = {
+    controller: function() {
+
+
+    },
+    view: function(ctrl){
+        //Bind an event to the element
+        function draggable(element, init, context){
+         
+            if( !init ){
+                var dragged = 0;
+                var dragdrop = DragDrop.bind(element, {
+                    // anchor: anchor,
+                    boundingBox: 'offsetParent',
+                    dragstart: function() {
+                        console.log('dragstart')
+                        dragged = 1;
+                    },
+                    dragend: function(){
+                        console.log('dragend')
+
+                        var taskIndex = this.getAttribute("data-index");
+                        var tid = this.getAttribute("data-id");
+
+                        if(dragged){
+                            m.route('/3/' + m.route.param('aid') + '/' + m.route.param('pid') + '/' + tid)
+                            // console.log(ctrl.list[0])
+                        }else{
+                            var xPosition = 0;
+                            var yPosition = 0;
+                            var elm = element;
+                            // console.log(tid, element.offsetLeft, element.offsetTop)
+                            ctrl.updateTask({index: taskIndex, id: tid, X: element.offsetLeft + 'px', Y: element.offsetTop + 'px'});
+                        }
+                    },
+                    drag: function(){
+                        dragged = 0;
+                        console.log('draggedx')
+                         $('.cd-btn').unbind('click')
+                    }
+                });
+
+            }
+        }
+
+        function dragDropUpload(elm, init, context){
+
+            if(!init)
+            {
+                var elms = document.getElementsByTagName("body")[0];
+             
+                elms.ondragover = function () { this.className = 'hover'; return false; };
+                elms.ondragend = function () { this.className = ''; return false; };
+                elms.ondrop = function (event) {
+                    event.preventDefault && event.preventDefault();
+                    this.className = '';
+                
+                    var files = event.dataTransfer.files;
+
+                    var formData = new FormData;        
+                    for (var i = 0; i < files.length; i++) {
+                        formData.append("file", files[i])
+                    }
+
+                    ctrl.UploadFile(formData);
+
+                    return false;
+                } 
+            }
+
+        }
+
+        function projectImage(elm, init, context){
+
+            if(!init)
+            {
+                if(typeof ctrl.ProjectImage != 'undefined')
+                {
+                    return m("img[src='" + baseUrl + "/api/v1/account/"+accountId+"/project/"+lastProjectId+"/attachment/"+ctrl.ProjectImage+"']");
+                }
+                else
+                {
+                    return m('h1',{style: "color: red"}, 'No image attach!');
+                }
+            }
+        }
+
+        return m("div", [
+            //pins annotation
+            m("div.cd-product.cd-container", [
+                m("div#wrapper", { config: dragDropUpload },[
+
+                    // m("ul", [
+                    //     ((ctrl.TaskList.length) ? taskList() : '' )
+                    // ]),
+     
+                    //Project images
+                    projectImage()
+
+                 
+                ])
+            ])
+        ]);
+    }
+}
+
+
+
 
 var projectDetails = {
     model: function(params) {
@@ -670,6 +787,7 @@ var projectDetails = {
             self.projectDetails.SubProjects.push(data);
             m.redraw(true);
         })  
+
 
         //Task create observ
         socket.on('taskCreate', function(data){
@@ -826,18 +944,14 @@ var projectDetails = {
             }
         }
 
-
-
-
         function projectSubTask(elm, init, context){
             if(!init)
             {
-
                 if(ctrl.projectDetails.SubProjects.length)
                 {
                     return ctrl.projectDetails.SubProjects.map(function(val, index){
                         return m('li',[
-                            m('a[href="/1/' + m.route.param('aid') + '/' + val.id + '"]', {config: m.route}, 'Sub Project #'+val.id,[
+                            m('a[href="/1/' + m.route.param('aid') + '/' + lastProjectId + '/' + val.id + '"]', {config: m.route}, 'Sub Project #'+val.id,[
                                 m('span.pull-right', val.createdAt)
                             ])
                         ])
@@ -1497,7 +1611,7 @@ var navigation = {
 
                         ]),
                         m('li.dropdown#user-dropdown',  [
-                            m('a[role="button"][href="/1000/'+m.route.param('aid')+'"]',{config: m.route}, bootstrap.fullName + " ", [
+                            m('a[role="button"][href="/1000/'+m.route.param('aid')+'/'+lastProjectId+'"]',{config: m.route}, bootstrap.fullName + " ", [
                                 m('span.fa.fa-user.pull-left',{style:"font-size: 1.4rem"}),
                             ])
                         ]),
@@ -1593,6 +1707,14 @@ m.routes( '/0/' + bootstrap.Accounts[0].id, {
         '#projectdetails' : '',
         '#settings' : '',
     },
+    '/1/:aid/:pid/:cid' : {
+        '#navigation' : navigation,
+        '#account' : '',
+        '#project' : project,
+        '#task' : '',
+        '#projectdetails' : '',
+        '#settings' : '',
+    },
     '/2/:aid/:pid' : {
         '#navigation' : navigation,
         '#account' : '',
@@ -1617,16 +1739,16 @@ m.routes( '/0/' + bootstrap.Accounts[0].id, {
         '#task' : '',
         '#settings' : '',
     },
-    '/4/:aid/details' : {
+    '/4/:aid/:any' : {
         '#navigation' : navigation,
         '#account' : '',
         '#account' : accountDetails,
-        // '#project' : project,
+        '#project' : project,
         '#projectdetails' : '',
         '#task' : '',
         '#settings' : '',
     },
-    '/1000/:aid' : {
+    '/1000/:aid/:any' : {
         '#navigation' : navigation,
         '#account' : '',
         '#settings' : settings,
