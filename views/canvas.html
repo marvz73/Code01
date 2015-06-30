@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Shapes</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <script type="text/javascript" src="/js/paperjs/paper-full.js"></script>
+    <script type="text/paperscript" canvas="canvas">
+        var hitOptions = {
+            segments: true,
+            stroke: true,
+            fill: true,
+            tolerance: 5
+        };
+        var segment, path, bounds;
+        var movePath = false;
+
+        tool1 = new Tool();
+        tool1.minDistance = 5;
+        tool1.onMouseDown = function(event){
+            path = new Path();
+            path.strokeColor = color;
+            path.strokeWidth = strokeWidth;
+            path.add(event.point);
+        };
+        tool1.onMouseDrag = function(event) {
+            path.add(event.point);
+        }
+
+        tool2 = new Tool();
+        tool2.onMouseDown = function(event){
+            path = new Shape.Circle({
+                center: event.point
+            });
+            path.strokeColor = color;
+            path.strokeWidth = strokeWidth;
+            path.fillColor = color;
+            path.fillColor.alpha = 0;
+        };
+        tool2.onMouseDrag = function(event) {
+            path.set({ radius: event.point.getDistance(path.position) })
+        }
+        tool2.onMouseUp = function(event) {
+            var object = new Path.Circle({
+                center: path.position,
+                radius: path.radius
+            });
+            object.strokeColor = color;
+            object.strokeWidth = strokeWidth;
+            object.fillColor = color;
+            object.fillColor.alpha = 0;
+            path.remove()
+        }
+
+        tool3 = new Tool();
+        tool3.onMouseDown = function(event){
+            path = new Shape.Rectangle({
+                point: event.point
+            });
+            path.strokeColor = color;
+            path.strokeWidth = strokeWidth;
+            path.fillColor = color;
+            path.fillColor.alpha = 0;
+        };
+        tool3.onMouseDrag = function(event) {
+            path.set({ size: event.point.getDistance(path.position) })
+        }
+        tool3.onMouseUp = function(event) {
+            var object = new Path.Rectangle(path.bounds);
+            object.strokeColor = color;
+            object.strokeWidth = strokeWidth;
+            object.fillColor = color;
+            object.fillColor.alpha = 0;
+            path.remove()
+        }
+
+        tool4 = new Tool();
+        tool4.onMouseDown = function(event){
+            path = new Shape.Ellipse({
+                point: event.point
+            });
+            path.strokeColor = color;
+            path.strokeWidth = strokeWidth;
+            path.fillColor = color;
+            path.fillColor.alpha = 0;
+        };
+        tool4.onMouseDrag = function(event) {
+            path.set({ size: path.position - event.point })
+        }
+        tool4.onMouseUp = function(event) {
+            var object = new Path.Ellipse(path.bounds);
+            object.strokeColor = color;
+            object.strokeWidth = strokeWidth;
+            object.fillColor = color;
+            object.fillColor.alpha = 0;
+            path.remove()
+        }
+
+        tool5 = new Tool();
+        tool5.onMouseDown = function(event) {
+            segment = path = null;
+            var hitResult = project.hitTest(event.point, hitOptions);
+            if (!hitResult)
+                return;
+
+            if (event.modifiers.shift) {
+                if (hitResult.type == 'segment') {
+                    hitResult.segment.remove();
+                };
+                return;
+            }
+
+            if (hitResult) {
+                path = hitResult.item;
+                if (hitResult.type == 'segment') {
+                    segment = hitResult.segment;
+                } else if (hitResult.type == 'stroke') {
+                    var location = hitResult.location;
+                    segment = path.insert(location.index + 1, event.point);
+                }
+            }
+            movePath = hitResult.type == 'fill';
+            if (movePath)
+                project.activeLayer.addChild(hitResult.item);
+        }
+
+        tool5.onMouseMove = function(event) {
+            project.activeLayer.selected = false;
+            if (event.item)
+                event.item.selected = true;
+        }
+
+        tool5.onMouseDrag = function(event) {
+            project.activeLayer.selected = false;
+            if (event.item)
+                event.item.selected = true;
+            if (segment) {
+                segment.point += event.delta;
+            } else if (path) {
+                path.position += event.delta;
+            }
+        }
+        tool5.onKeyUp = function (event) {
+            if (event.key == 'delete') {
+                project.activeLayer.children.forEach(function(element, index, array){
+                    if(element.selected){
+                        element.remove()
+                    }
+                })
+                project.activeLayer.selected = false;
+            }else if (event.key == ']') {
+                project.activeLayer.children.forEach(function(element, index, array){
+                    if(element.selected){
+                        element.scale(1.05);
+                    }
+                })
+            }else if (event.key == '[') {
+                project.activeLayer.children.forEach(function(element, index, array){
+                    if(element.selected){
+                        element.scale(0.95);
+                    }
+                })
+            }else{
+                console.log(event.key)
+            }
+        }
+
+        tool6 = new Tool();
+        tool6.onMouseDown = function(event) {
+            event.item.fillColor = color;
+            event.item.fillColor.alpha = opacity;
+        }
+        tool6.onMouseMove = function(event) {
+            project.activeLayer.selected = false;
+            if (event.item)
+                event.item.selected = true;
+        }
+    </script>
+    <script type="text/javascript">
+        function loadDefaults(){
+            color = document.getElementById("color").value;
+            opacity = document.getElementById("opacity").value;
+            strokeWidth = document.getElementById("strokeWidth").value;
+        }
+        function canvasClear(){
+            paper.project.activeLayer.removeChildren();
+            paper.view.draw();
+        }
+        function changeColor(){
+            color = document.getElementById("color").value;
+        }
+        function changeOpacity(){
+            opacity = document.getElementById("opacity").value;
+        }
+        function changeStrokeWidth(){
+            strokeWidth = document.getElementById("strokeWidth").value;
+        }
+    </script>
+</head>
+<body onload="loadDefaults();">
+    <div>
+        <a href="#" onclick="tool5.activate();">Select/Move/Edit/Resize/Delete</a>
+        <a href="#" onclick="tool1.activate();">Free Hand Draw</a>
+        <a href="#" onclick="tool2.activate();">Circle</a>
+        <a href="#" onclick="tool3.activate();">Rectangle</a>
+        <a href="#" onclick="tool4.activate();">Ellipse</a>
+        <a href="#" onclick="tool6.activate();">Fill</a>
+        <a href="#" onclick="canvasClear();">Clear</a>
+        Color:<input type="color" id="color" onchange="changeColor();">
+        Opacity: <input type="range" id="opacity" min="0" max="1" step="0.01" onchange="changeOpacity();">
+        Stroke Width: <input type="range" id="strokeWidth" min="1" max="100" onchange="changeStrokeWidth();">
+    </div>
+    <div>
+        <canvas id="canvas" resize></canvas>
+    </div>
+</body>
+</html>
+
+
