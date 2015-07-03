@@ -173,7 +173,7 @@ var AccountUsersLists = {
 // task module
 var task = {
     model: function(params) {
-        this.completed   = m.prop(true);
+        this.completed   =  m.prop(params.completed);
         this.title       =  m.prop(params.title);
         this.description =  m.prop(params.description);
         this.comments    =  m.prop(params.comments);
@@ -338,6 +338,10 @@ var task = {
        
         function markComplete(elm, init, context){
             if(!init){
+
+              
+
+
                 ctrl.detail.completed = ! ctrl.detail.completed;
 
                 if(ctrl.detail.completed)
@@ -350,13 +354,15 @@ var task = {
             }
         }
 
+  console.log('TASK:::::::',ctrl.detail.completed())
+
         return  m("div.cd-panel.from-right#cd-panel", {config: loaded, onclick: hideRightModal}, [
                     m("header.cd-panel-header.no-touch",[
 
                         m('div.title',[
 
-                            m('i.fa.fa-square-o.pull-left',{style: ctrl.detail.completed ? 'display:block' : 'display:none', onclick: markComplete }),
-                            m('i.fa.fa-check-square-o.pull-left',{style: !ctrl.detail.completed ? 'display:block' : 'display:none',onclick: markComplete }),
+m('i.fa.fa-square-o.pull-left',{style: !ctrl.detail.completed() ? 'display:block' : 'display:none', onclick: markComplete }),
+m('i.fa.fa-check-square-o.pull-left',{style: ctrl.detail.completed() ? 'display:block' : 'display:none',onclick: markComplete }),
 
                             m("h4#taskTitle.pull-left", "Issue #"+ctrl.TaskDetails.id),
                             
@@ -781,7 +787,7 @@ var projectDetails = {
 
         var self = this;
         this.projectDetails = {};
-
+        this.archived = 0;
         //Project create observ
         socket.on('projectCreate', function(data){
             self.projectDetails.SubProjects.push(data);
@@ -897,7 +903,20 @@ var projectDetails = {
             }
         }
 
+
+
         var totalCompleted = 0;
+        
+
+        function archived(elm, init, context){
+            if(!init){
+                if(ctrl.archived == 0){
+                    ctrl.archived = 1;
+                }else{
+                    ctrl.archived = 0;
+                }
+            }
+        }
 
         function projectUncompletedTask(elm, init, context){
 
@@ -906,7 +925,8 @@ var projectDetails = {
                 if(sharedProjectTask.length)
                 {
                     var template = sharedProjectTask.map(function(val, index){
-                        if(val.completed == 0)
+
+                        if( (val.completed == 0 && ctrl.archived == 0) || (val.completed == 1 && ctrl.archived == 1))
                         {
                             return m('li',[
                                 m('a[href="/3/' + m.route.param('aid') + '/' + m.route.param('pid') + '/' + val.id+'"]', {config: m.route}, 'Issue #'+val.id,[
@@ -917,10 +937,8 @@ var projectDetails = {
                             totalCompleted++;
                             ctrl.detail.progress = ((totalCompleted / sharedProjectTask.length) * 100);
                         }
+
                     });
-
-
-
 
                     if(sharedProjectTask.length === totalCompleted)
                     {
@@ -930,11 +948,6 @@ var projectDetails = {
                     }else{
                         return template;
                     }
-
-
-
-
-
                 }else{
                     return m('li',[
                         m('a.no-result', 'No Task')
@@ -1010,9 +1023,11 @@ var projectDetails = {
                             m('fieldset.settings',[
 
                                 m('legend', "Project Task's ",[
-                                    m('a',[
+
+                                    m('a[title="Completed Task"]',{ onclick: archived },[
                                         m('i.fa.fa-archive')
                                     ])
+
                                 ]),
                                 m('ul.unstyled.project-task-list', [
 
