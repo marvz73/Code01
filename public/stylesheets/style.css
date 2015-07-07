@@ -107,6 +107,7 @@ main {
 }
 body {
   line-height: 1;
+  padding-top: 52px;
 }
 ol,
 ul {
@@ -1644,9 +1645,6 @@ a.cd-panel-close:after {
   z-index: 9999;
 }
 
-.uploading{
-  overflow: hidden;
-}
 
 #upload{
   background: rgba(0, 0, 0, 0.9) none repeat scroll 0 0;
@@ -1656,6 +1654,7 @@ a.cd-panel-close:after {
   right: 0;
   top: 0;
   z-index: 9999;
+  display: none;
 }
 
 #upload span{
@@ -1667,6 +1666,13 @@ a.cd-panel-close:after {
   font-size: 3rem;
 }
 
+.uploading{
+  overflow: hidden;
+}
+
+.uploading #upload{
+  display: block;
+}
 
 
 

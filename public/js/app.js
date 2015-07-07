@@ -445,8 +445,6 @@ var project = {
 
         this.TaskList = [];
         this.ProjectImage = "";
-        
-        console.log(':::::::::', m.route.param('cid'))
 
         if(typeof m.route.param('cid') != 'undefined')
         {
@@ -461,8 +459,7 @@ var project = {
         //Task create observ
         socket.on('projectAttachmentCreate', function(data){
             console.log("Project attachment Create event fired::", data);
-            // console.log(self.TaskList)
-            // self.TaskList.push(data)
+
             self.ProjectImage = data.id;
             m.redraw(true)
         });
@@ -609,12 +606,13 @@ var project = {
             if(!init)
             {
                 var elms = document.getElementsByTagName("body")[0];
-             
+
+
                 elms.ondragover = function () { 
-                    document.getElementsByTagName("upload").className = 'show';
+
                     this.className = 'uploading'; return false; };
                 elms.ondragend = function () { 
-                    document.getElementsByTagName("upload").className = 'show';
+
                     this.className = ''; return false; };
                 elms.ondrop = function (event) {
                     event.preventDefault && event.preventDefault();
@@ -631,6 +629,8 @@ var project = {
 
                     return false;
                 } 
+                elms.ondragleave = function(){
+                    this.className = '';return false;};
             }
 
         }
@@ -792,20 +792,19 @@ var projectDetails = {
 
         var self = this;
         this.projectDetails = {};
+        this.TaskList = [];
         this.archived = 0;
         //Project create observ
         socket.on('projectCreate', function(data){
             self.projectDetails.SubProjects.push(data);
             m.redraw(true);
-        })  
+        }); 
 
-
-        //Task create observ
+        // Task create observ
         socket.on('taskCreate', function(data){
             self.TaskList.push(data);
             m.redraw(true);
-        })  
-
+        });
 
         this.getProjectDetails = function(){
             m.request({
@@ -842,7 +841,6 @@ var projectDetails = {
                 AJAXERROR();
             })
         }
-
 
         this.updateProjectTitle = function(jsonData){
             m.request({
@@ -889,7 +887,6 @@ var projectDetails = {
                     ctrl.updateProjectTitle(jsonData);
 
                 }, 1000));  
-                
 
             }
         }
@@ -908,10 +905,7 @@ var projectDetails = {
             }
         }
 
-
-
         var totalCompleted = 0;
-        
 
         function archived(elm, init, context){
             if(!init){
@@ -1055,13 +1049,21 @@ var projectDetails = {
 
 
 var settings = {
+    model: function(params){
+        this.firstName  = m.prop(params.firstName);
+        this.middleName  = m.prop(params.middleName);
+        this.lastName   = m.prop(params.lastName);
+        this.email      = m.prop(params.email);
+    },
     controller: function() {
 
+        var self = this;
+        self.accountDetails = {};
 
         this.getUserDetails = function(){
             m.request({method:'get', url: baseUrl + '/api/v1/user/' + bootstrap.Accounts[0].AccountUser.UserId })
-            .then(function(){
-
+            .then(function(resp){
+                self.accountDetails = new settings.model(resp.data);
             },function(){
                 AJAXERROR();
             })
@@ -1111,26 +1113,29 @@ var settings = {
 
 
 
+                            m('form', [
+                                m('fieldset.settings',[
+                                    m('legend', "Personal Details"),
+                                    m('div.settings-group', [
+                                        m('input.form-control[required][readonly][type="text"][placeholder="Email"]', {onchange: m.withAttr("value", ctrl.accountDetails.email), value: ctrl.accountDetails.email() }),
+                                        m('input.form-control[required][type="text"][placeholder="First Name"]', {onchange: m.withAttr("value", ctrl.accountDetails.firstName), value: ctrl.accountDetails.firstName() }),
+                                        m('input.form-control[required][type="text"][placeholder="Last Name"]', {onchange: m.withAttr("value", ctrl.accountDetails.lastName), value: ctrl.accountDetails.lastName() }),
+                                        m('input.btn.btn-sm.btn-primary.form-control[value="Save"][type="submit"]')
+                                    ]),
 
-                            m('fieldset.settings',[
-
-                                m('legend', "Personal Details"),
-                                m('div.settings-group', [
-                                    m('input.form-control[type="text"][placeholder="Email"]'),
-                                    m('input.form-control[type="text"][placeholder="First Name"]'),
-                                    m('input.form-control[type="text"][placeholder="Last Name"]')
-                                ]),
-
-                                m('legend', "Password Details"),
-
-                                m('div.settings-group', [
-                                    m('input.form-control[type="text"][placeholder="Old Password"]'),
-                                    m('input.form-control[type="text"][placeholder="New Password"]'),
-                                    m('input.form-control[type="text"][placeholder="Confirm Password"]')
                                 ])
+                            ]),
 
+                            m('form', [
+                                m('fieldset.settings',[
+                                    m('legend', "Password Details"),
+                                    m('div.settings-group', [
+                                        m('input.form-control[required][type="text"][placeholder="Old Password"]'),
+                                        m('input.form-control[required][type="text"][placeholder="New Password"]'),
+                                        m('input.form-control[required][type="text"][placeholder="Confirm Password"]')
+                                    ])
+                                ])
                             ])
-
 
 
 
@@ -1454,7 +1459,6 @@ var navigation = {
             if(projectResp.data.length)
             {
                 self.ProjectList = projectResp.data;
-                
                 if(typeof m.route.param('pid') != 'undefined')
                 {
                     self.ProjectList.map(function(item){
@@ -1465,8 +1469,6 @@ var navigation = {
                 }else{
                     self.ptitle = "Projects";
                 }
-
-
             }else{
                 self.ptitle = "Projects";
             }
@@ -1562,7 +1564,7 @@ var navigation = {
 
             }
         }
-        return m("nav.navbar.navbar-default.navbar-static-top", {config: loaded}, [
+        return m("nav.navbar.navbar-default.navbar-static-top.navbar-fixed-top", {config: loaded}, [
             m("div.container", [
                 m("div.navbar-header", [
                     m('button[type="button"][data-toggle="collapse"][data-target="#navbar"].navbar-toggle.collapsed', [
