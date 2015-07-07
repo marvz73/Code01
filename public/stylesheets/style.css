@@ -1635,9 +1635,7 @@ a.cd-panel-close:after {
   }
 }
 
-.hover{
-  border: 3px dotted red;
-}
+
 #task,
 #settings,
 #projectdetails,
@@ -1646,6 +1644,28 @@ a.cd-panel-close:after {
   z-index: 9999;
 }
 
+.uploading{
+  overflow: hidden;
+}
+
+#upload{
+  background: rgba(0, 0, 0, 0.9) none repeat scroll 0 0;
+  bottom: 0;
+  left: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 9999;
+}
+
+#upload span{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #fff;
+  font-size: 3rem;
+}
 
 
 

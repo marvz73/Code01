@@ -339,22 +339,19 @@ var task = {
         function markComplete(elm, init, context){
             if(!init){
 
-              
+                // ctrl.detail.completed() = ! ctrl.detail.completed();
 
-
-                ctrl.detail.completed = ! ctrl.detail.completed;
-
-                if(ctrl.detail.completed)
+                if(ctrl.detail.completed())
                 {
+                     ctrl.detail.completed = m.prop(0);
                     ctrl.taskStatus({completed: 0});
                 }
                 else{
-                     ctrl.taskStatus({completed: 1});
+                    ctrl.detail.completed = m.prop(1);
+                    ctrl.taskStatus({completed: 1});
                 }
             }
         }
-
-  console.log('TASK:::::::',ctrl.detail.completed())
 
         return  m("div.cd-panel.from-right#cd-panel", {config: loaded, onclick: hideRightModal}, [
                     m("header.cd-panel-header.no-touch",[
@@ -613,8 +610,12 @@ var project = {
             {
                 var elms = document.getElementsByTagName("body")[0];
              
-                elms.ondragover = function () { this.className = 'hover'; return false; };
-                elms.ondragend = function () { this.className = ''; return false; };
+                elms.ondragover = function () { 
+                    document.getElementsByTagName("upload").className = 'show';
+                    this.className = 'uploading'; return false; };
+                elms.ondragend = function () { 
+                    document.getElementsByTagName("upload").className = 'show';
+                    this.className = ''; return false; };
                 elms.ondrop = function (event) {
                     event.preventDefault && event.preventDefault();
                     this.className = '';
@@ -719,8 +720,12 @@ var subproject = {
             {
                 var elms = document.getElementsByTagName("body")[0];
              
-                elms.ondragover = function () { this.className = 'hover'; return false; };
-                elms.ondragend = function () { this.className = ''; return false; };
+                elms.ondragover = function () { 
+                    document.getElementsByTagName("upload").className = '';
+                    this.className = 'uploading'; return false; };
+                elms.ondragend = function () { 
+                    document.getElementsByTagName("upload").className = 'hide';
+                    this.className = ''; return false; };
                 elms.ondrop = function (event) {
                     event.preventDefault && event.preventDefault();
                     this.className = '';
