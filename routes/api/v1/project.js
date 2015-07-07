@@ -325,17 +325,19 @@ module.exports = function(models, io) {
 
 	  			join(userPromise, accountPromise, projectPromise, function(user, account, project) {
 	  				if(user && account && project){
-		  				return [project, user.hasAccount(account)];
+		  				return [user, project, user.hasAccount(account)];
 		  			} else {
-		  				return [ null, null]
+		  				return [ null, null, null]
 		  			}
 				})
-				.spread(function(project, result){
+				.spread(function(user, project, result){
 					if(result){
 						var attachments = [];
+						var names = "";
 						var oldAttachment = project.getAttachment();
 						
 						req.files.file.forEach(function(element, index, array){
+							names += element.originalname + " ";
 							attachments.push(project.createAttachment({
 								originalName: element.originalname,
 								name: element.name,
@@ -345,12 +347,12 @@ module.exports = function(models, io) {
 								UserId: req.user.id
 							}))
 						})
-						return [ oldAttachment, Promise.all(attachments)];
+						return [ user, project, oldAttachment, Promise.all(attachments), names];
 					} else {
-						return [ null, null];
+						return [ null, null, null, null, null];
 					}
 				})
-				.spread(function(oldAttachment, attachments){
+				.spread(function(user, project, oldAttachment, attachments, names){
 					if(oldAttachment){
 						oldAttachment.destroy();
 						fs.unlinkSync(__dirname + '/../../../uploads/' + oldAttachment.get('name'))
@@ -359,6 +361,11 @@ module.exports = function(models, io) {
 					var _response = {}
 					
 					if(attachments){
+						project.createHistory({
+							action: user.get('fullName') + ' added an attachment. ( ' + names + ')',
+							historyable: 'project',
+							UserId: req.user.id
+						});
 						_response.data =  	{
 												msg : res.__("attachment.success.create"),
 												data : attachments[0],
@@ -382,6 +389,59 @@ module.exports = function(models, io) {
 				.error(function(e){
 					res.status(500).json({
 						msg : res.__("attachment.error.server"),
+						data : null,
+						error : e
+					});	
+				});
+	  		}
+		)
+
+	router.route('/:projectId/histories')
+		.get(
+			function(req, res, next) {
+				var userPromise  = models.User.findById(parseInt(req.user.id));
+	  			var accountPromise = models.Account.findById(parseInt(req.params.accountId));
+	  			var projectPromise = models.Project.findOne({ where: {'id': req.params.projectId, AccountId: req.params.accountId}, include: [ models.User ] });
+
+	  			join(userPromise, accountPromise, projectPromise, function(user, account, project) {
+	  				if(user && account && project){
+		  				return [project, user.hasAccount(account)];
+		  			} else {
+		  				return [ null, null]
+		  			}
+				})
+				.spread(function(project, result){
+					if(project && result){
+						return project.getHistories({where: {historyable: 'project'}})
+					} else {
+						return null;
+					}
+				})
+				.then(function(histories){
+					var _response = {}
+					if(histories){
+						_response.data =  	{
+												msg : res.__("history.success.fetch"),
+												data : histories,
+												error : null
+											}
+						_response.status = 200;
+					} else {
+						_response.data =  	{
+												msg : res.__("history.fail.fetch"),
+												data : null,
+												error : null
+											}	
+						_response.status = 200;
+					}
+					return _response;
+				})
+				.then(function(_response){
+					res.status(_response.status).json(_response.data);
+				})
+				.error(function(e){
+					res.status(500).json({
+						msg : res.__("history.error.server"),
 						data : null,
 						error : e
 					});	

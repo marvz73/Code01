@@ -144,5 +144,10 @@
 			"priviledge": "Insufficient priviledge!",
 			"server": "SERVER ERROR! Please contact system administrator."
 		}
+	},
+	"history": {
+		"success": {
+			"fetch": "history.success.fetch"
+		}
 	}
 }

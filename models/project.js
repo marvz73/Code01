@@ -19,6 +19,13 @@ module.exports = function(sequelize, DataTypes) {
             attachmentable: 'project'
           }
         });
+        Project.hasMany(models.History, {
+          foreignKey: 'historyable_id',
+          constraints: false,
+          scope: {
+            historyable: 'project'
+          }
+        });
       }
     }
   });
