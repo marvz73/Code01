@@ -227,6 +227,16 @@ setTimeout(function(){
             return attr;
         },
 
+
+        parent: function(){
+            var len = this.length;
+            while (len--) {
+                this[len].parentNode.nodeName;
+            }
+
+            return this[0];
+        },
+
         debounce: function(func, wait, immediate){
             var timeout;
             return function() {

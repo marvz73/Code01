@@ -29,18 +29,6 @@ var lastProjectId = 0;
 //------------------------MITHRILJS COMPONENTS---------------------------------------------
 
 var AccountLists = {
-    controller: function(){
-        var self = this;
-
-        this.addAccount = function(){
-            return m.request({method:'post', url: baseUrl + '/api/v1/account', data: {name: 'Account Name'}})
-            .then(function(resp){
-                m.route('/4/' + resp.data.id)
-            }, function(){
-                AJAXERROR();
-            })  
-        };
-    },
     view: function(ctrl, args) {
         if(args.lists.length)
         {
@@ -54,22 +42,17 @@ var AccountLists = {
                 }),
                 m("li.divider"),
                 m("li", [
-                    m("a", {onclick: ctrl.addAccount},  m("i.fa.fa-plus"), " Account",[])
+                    m("a[href='/4/" + accountId + "/"+lastProjectId+"']", {config: m.route}, m("i.fa.fa-info-circle") , " Details",[])
                 ]), 
+                // m("li.divider"),
                 m("li", [
-                    m("a[href='/4/" + m.route.param('aid') + "/"+lastProjectId+"']", {config: m.route}, m("i.fa.fa-info-circle") , " Details",[])
+                    m('a[href="/1000/'+m.route.param('aid')+'/'+lastProjectId+'"]', {config: m.route}, m("i.fa.fa-cog") , " Settings",[])
                 ]), 
 
             ])
         }
         else{
-            return m("ul.dropdown-menu", [  
-                m("li", [
-                    m("a", {onclick: ctrl.addAccount},  m("i.fa.fa-plus"), " Account", [
-                        
-                    ])
-                ])
-            ])
+            return m("ul.dropdown-menu", [])
         }
 
 
@@ -77,13 +60,7 @@ var AccountLists = {
 }
 
 var ProjectLists = {
-    controller: function(){
-        this.addProject = function () {
-            return m.request({method:'post', url: baseUrl + '/api/v1/account/' + accountId + '/project', data: {title: 'Project Title'}}).then(function(){}, function(){
-                AJAXERROR();
-            })
-        };
-    },
+
     view: function(ctrl, args) {
 
         function activeProject(elm, init){
@@ -91,9 +68,12 @@ var ProjectLists = {
             if(!init){
                 if(m.route.param('pid'))
                 {
-                    return m("li", [
-                        m("a[href='/2/"+m.route.param('aid')+"/"+lastProjectId+"']",{config: m.route}, m("i.fa.fa-info-circle"), " Details",[])
-                    ])
+                    return [
+                        m("li.divider"),
+                        m("li", [
+                            m("a[href='/2/"+m.route.param('aid')+"/"+lastProjectId+"']",{config: m.route}, m("i.fa.fa-info-circle"), " Details",[])
+                        ])
+                    ]
                 }
             } 
 
@@ -109,20 +89,13 @@ var ProjectLists = {
                     ])
                 }),
 
-                m("li.divider"),  
-
-                m("li", [
-                    m("a", {onclick: ctrl.addProject},  m("i.fa.fa-plus"), " Project",[])
-                ]),
+                
 
                 activeProject()
             ])
         }
         else{
             return m("ul.dropdown-menu", [  
-                m("li", [
-                    m("a", {onclick: ctrl.addProject}, m("i.fa.fa-plus"), " Project", [])
-                ])
             ])
         }
 
@@ -147,13 +120,17 @@ var AccountUsersLists = {
                 ctrl.assigned(elm.target.parentElement.id);
             }
         }
-
+        
         if(args.lists.length > 0){
             return m("ul.dropdown-menu", [ 
                 args.lists.map(function(item) {
-                    return m("li[id='"+item.id+"']",{onclick: assignee}, [
-                        m("a", item.fullName),
-                    ])
+                    if(args.id != item.id)
+                    {
+                        return m("li[id='"+item.id+"']",{onclick: assignee}, [
+                            m("a", item.fullName),
+                        ])
+                    }
+
                 })
             ]);
         }
@@ -329,12 +306,20 @@ var task = {
                         pid : m.route.param('pid'),
                         tid : m.route.param('tid')
                     }
-                    ctrl.addComment(jsonData);
+                    // ctrl.addComment(jsonData);
                     elm.target.value = '';
                 }
+                console.log(elm)
+
             }
         }
 
+        function addMention(elm, init, context){
+            if(!init){
+                // console.log(elm.target.value)
+                console.log(elm)
+            }
+        }
        
         function markComplete(elm, init, context){
             if(!init){
@@ -366,22 +351,17 @@ m('i.fa.fa-check-square-o.pull-left',{style: ctrl.detail.completed() ? 'display:
                             m("span.dropdown#assignee",{onclick: function(elm, init){
                                 if(!init){
 
-                                    // if(Q("#assignee").hasClass('open'))
-                                    // {   
-                                    //     Q("#assignee").removeClass('open')
-                                    // }else{
-                                    // }
-                                        Q("#assignee").addClass('open')
-                                        ctrl.getUsers(function(res){
-                                            ctrl.usersList = res.data;
-                                        })
+                                    Q("#assignee").addClass('open')
+                                    ctrl.getUsers(function(res){
+                                        ctrl.usersList = res.data;
+                                    })
                                         
                                 }
                             }}, [
-                                m("a[title='" + (ctrl.detail.assignee() ? ctrl.detail.assignee().fullName : "Assignee")  + "']",[
-                                    m("i.fa.fa-user.task-user")
+                                m("a[title='" + (ctrl.detail.assignee() ? ctrl.detail.assignee().fullName : "Assignee")  + "']", [
+                                    m("i.fa.fa-user.task-user", { style: "color:" + (ctrl.detail.assignee() ? "#d95353" : "#777") })
                                 ]),
-                                m.component(AccountUsersLists,{lists: ctrl.usersList}),
+                                m.component(AccountUsersLists,{lists: ctrl.usersList, id : ctrl.detail.assignee() ? ctrl.detail.assignee().id : 0}),
                             ])
 
 
@@ -427,7 +407,7 @@ m('i.fa.fa-check-square-o.pull-left',{style: ctrl.detail.completed() ? 'display:
 
                             ]),
                             m('hr'),
-                            m('input[placeholder="Comment here...."].form-control#taskComment', {onkeypress: addComment})
+                            m('input[placeholder="Comment here...."].form-control#taskComment', {onkeypress: addComment, oninput: addMention})
                             
                             // m("p", "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quam magnam accusamus obcaecati nisi eveniet quo veniam quibusdam veritatis autem accusantium doloribus nam mollitia maxime explicabo nemo quae aspernatur impedit cupiditate dicta molestias consectetur, sint reprehenderit maiores. Tempora, exercitationem, voluptate. Sapiente modi officiis nulla sed ullam, amet placeat, illum necessitatibus, eveniet dolorum et maiores earum tempora, quas iste perspiciatis quibusdam vero accusamus veritatis. Recusandae sunt, repellat incidunt impedit tempore iusto, nostrum eaque necessitatibus sint eos omnis! Beatae, itaque, in. Vel reiciendis consequatur saepe soluta itaque aliquam praesentium, neque tempora. Voluptatibus sit, totam rerum quo ex nemo pariatur tempora voluptatem est repudiandae iusto, architecto perferendis sequi, asperiores dolores doloremque odit. Libero, ipsum fuga repellat quae numquam cumque nobis ipsa voluptates pariatur, a rerum aspernatur aliquid maxime magnam vero dolorum omnis neque fugit laboriosam eveniet veniam explicabo, similique reprehenderit at. Iusto totam vitae blanditiis. Culpa, earum modi rerum velit voluptatum voluptatibus debitis, architecto aperiam vero tempora ratione sint ullam voluptas non! Odit sequi ipsa, voluptatem ratione illo ullam quaerat qui, vel dolorum eligendi similique inventore quisquam perferendis reprehenderit quos officia! Maxime aliquam, soluta reiciendis beatae quisquam. Alias porro facilis obcaecati et id, corporis accusamus? Ab porro fuga consequatur quisquam illo quae quas tenetur.")
                         ])
@@ -592,7 +572,7 @@ var project = {
                     {
                     return m("li#drag-drop.cd-single-point", {"data-id": t.id, "data-index": index, style:{position: 'absolute', left: t.X,  top: t.Y}, config: draggable}, [
                         m("a[href='javascript:void(0)'].cd-btn#cd-btn", [
-                            m("i.fa.fa-map-marker" )
+                            m("i.fa.fa-thumb-tack" )
                         ]),
                         m("div.cd-more-info.cd-top")
                     ])
@@ -927,11 +907,22 @@ var projectDetails = {
 
                         if( (val.completed == 0 && ctrl.archived == 0) || (val.completed == 1 && ctrl.archived == 1))
                         {
-                            return m('li',[
-                                m('a[href="/3/' + m.route.param('aid') + '/' + m.route.param('pid') + '/' + val.id+'"]', {config: m.route}, 'Issue #'+val.id,[
-                                    m('span.pull-right', val.createdAt)
-                                ])
-                            ]);
+                            if(val.completed == 1 && ctrl.archived == 1)
+                            {
+                                return m('li', [
+                                    m('a[role="disable"][href="/3/' + m.route.param('aid') + '/' + m.route.param('pid') + '/' + val.id+'"]', {config: m.route}, 'Issue #'+val.id,[
+                                    
+                                        m('span.pull-right', val.createdAt)
+                                    ])
+                                ]);  
+                            }else{
+                                return m('li', [
+                                    m('a[href="/3/' + m.route.param('aid') + '/' + m.route.param('pid') + '/' + val.id+'"]', {config: m.route}, 'Issue #'+val.id,[
+                                    
+                                        m('span.pull-right', val.createdAt)
+                                    ])
+                                ]);  
+                            }
                         }else{
                             totalCompleted++;
                             ctrl.detail.progress = ((totalCompleted / sharedProjectTask.length) * 100);
@@ -1029,15 +1020,12 @@ var projectDetails = {
 
                                 ]),
                                 m('ul.unstyled.project-task-list', [
-
                                     projectUncompletedTask(),
-                                    // projectCompletedTask()
-
                                 ]),
 
-                                m('p',''),
+                                // m('p',''),
 
-                                projectSubTaskContainer()
+                                // projectSubTaskContainer()
 
                             ])
                         ])
@@ -1511,6 +1499,21 @@ var navigation = {
                 AJAXERROR();
             });
         };
+
+        this.addAccount = function(){
+            return m.request({method:'post', url: baseUrl + '/api/v1/account', data: {name: 'Account Name'}})
+            .then(function(resp){
+                m.route('/4/' + resp.data.id)
+            }, function(){
+                AJAXERROR();
+            })  
+        };
+
+        this.addProject = function () {
+            return m.request({method:'post', url: baseUrl + '/api/v1/account/' + accountId + '/project', data: {title: 'Project Title'}}).then(function(){}, function(){
+                AJAXERROR();
+            })
+        };
     },
     view: function(ctrl) {
 
@@ -1557,14 +1560,23 @@ var navigation = {
             }
         }
 
-        function loaded(elm, init){
+        function projectLoaded(elm, init){
             if(!init){
-            
-                console.log(ctrl.titles)
+                if(m.route.param('pid'))
+                {
+                    return m('li',[
+                        m('a[title="Pins"][role="button"]', { onclick:  ctrl.addTask },[
+                            m('i.fa.fa-thumb-tack',{style: "color:#e84a64;font-size: 1.4rem"})
+                        ])
+                    ]) 
+                }else{
+                    return;
+                }
+
 
             }
         }
-        return m("nav.navbar.navbar-default.navbar-static-top.navbar-fixed-top", {config: loaded}, [
+        return m("nav.navbar.navbar-default.navbar-static-top.navbar-fixed-top", [
             m("div.container", [
                 m("div.navbar-header", [
                     m('button[type="button"][data-toggle="collapse"][data-target="#navbar"].navbar-toggle.collapsed', [
@@ -1585,23 +1597,59 @@ var navigation = {
                     ]),
 
                     m('ul.nav.navbar-nav.pull-right', [
-                        m('li',[
-                            m('a[title="Pins"]', { onclick:  ctrl.addTask },[
-                                m('i.fa.fa-thumb-tack',{style: "font-size: 1.4rem"})
+
+                        projectLoaded(),
+
+                        m('li.dropdown#quick-add', { 
+
+                            onclick: function(elm, init){
+                                if(!init){
+                                    var id = Q('#quick-add')
+                                    Q(".dropdown:not(#quick-add)").removeClass('open');
+                                    if(id.hasClass('open'))
+                                    {
+                                        id.removeClass('open')
+                                    }
+                                    else{
+                                        id.addClass('open')  
+                                    }
+                                }
+                            }
+                            // onmouseout: function(elm, init){
+                            //     if(!init){ 
+                            //         Q('#quick-add').removeClass('open')
+                            //     }
+                            // }
+
+                        },[
+                            m('a[role="button"][title="Quick Add"]' ,[
+                                m('i.fa.fa-plus-circle',{style: "color: #6BC24B;font-size: 1.4rem"})
+                            ]),
+                            m('ul.dropdown-menu',[
+                                m('li', [
+                                    m('a[role="button"]','Project')
+                                ]),
+                                m('li', [
+                                    m('a[role="button"]','Account')
+                                ])
                             ])
                         ]),
                         m('li.dropdown#project-dropdown', { 
-                            onmouseover: function(elm, init){
-                                 Q(".dropdown").removeClass('open');
+
+                            onclick: function(elm, init){
                                 if(!init){
-                                    Q('#project-dropdown').addClass('open')
-                                }
-                            },
-                            onmouseout: function(elm, init){
-                                if(!init){ 
-                                    Q('#project-dropdown').removeClass('open')
+                                    var id = Q('#project-dropdown')
+                                    Q(".dropdown:not(#project-dropdown)").removeClass('open');
+                                    if(id.hasClass('open'))
+                                    {
+                                        id.removeClass('open')
+                                    }
+                                    else{
+                                        id.addClass('open')  
+                                    }
                                 }
                             }
+
                         }, [
 
                             m('a[role="button"].dropdown-toggle' , ctrl.ptitle + " ", [
@@ -1611,34 +1659,53 @@ var navigation = {
                             m.component(ProjectLists, {lists: ctrl.ProjectList}),
 
                         ]),
-                        m('li.dropdown#account-dropdown', {
-                            onmouseover: function(elm, init){
-                                 Q(".dropdown").removeClass('open');
+                        // m('li.dropdown#account-dropdown', {
+
+                        //     onmouseover: function(elm, init){
+                        //          Q(".dropdown").removeClass('open');
+                        //         if(!init){
+                        //             Q('#account-dropdown').addClass('open')
+                        //         }
+                        //     },
+                        //     onmouseout: function(elm, init){
+                        //         if(!init){ 
+                        //             Q('#account-dropdown').removeClass('open')
+                        //         }
+                        //     }
+
+                        // }, [
+
+                        //     m('a[role="button"].dropdown-toggle', ctrl.atitle + " ", [
+                        //         m('span.caret')
+                        //     ]),
+
+                        //     m.component(AccountLists, {lists: ctrl.AccountList}),
+
+                        // ]),
+
+// [href="/1000/'+m.route.param('aid')+'/'+lastProjectId+'"]',{config: m.route},
+                        m('li.dropdown#user-dropdown', {
+                            onclick: function(elm, init){
                                 if(!init){
-                                    Q('#account-dropdown').addClass('open')
-                                }
-                            },
-                            onmouseout: function(elm, init){
-                                if(!init){ 
-                                    Q('#account-dropdown').removeClass('open')
+                                    var id = Q('#user-dropdown')
+                                    Q(".dropdown:not(#user-dropdown)").removeClass('open');
+                                    if(id.hasClass('open'))
+                                    {
+                                        id.removeClass('open')
+                                    }
+                                    else{
+                                        id.addClass('open')  
+                                    }
                                 }
                             }
                         }, [
-
-                            m('a[role="button"].dropdown-toggle', ctrl.atitle + " ", [
-                                m('span.caret')
-                            ]),
-
-                            m.component(AccountLists, {lists: ctrl.AccountList}),
-
-                        ]),
-                        m('li.dropdown#user-dropdown',  [
-                            m('a[role="button"][href="/1000/'+m.route.param('aid')+'/'+lastProjectId+'"]',{config: m.route}, bootstrap.fullName + " ", [
+                            m('a[role="button"]', bootstrap.fullName + " ", [
                                 m('span.fa.fa-user.pull-left',{style:"font-size: 1.4rem"}),
-                            ])
+                            ]),
+                            m.component(AccountLists, {lists: ctrl.AccountList}),
                         ]),
 
-                        m('li.dropdown#user-dropdown',  [
+                        m('li.dropdown',  [
                             m('a[role="button"][href="/logout"]', "", [
                                 m('span.fa.fa-power-off.pull-left',{style:"font-size: 1.4rem"}),
                             ])

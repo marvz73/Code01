@@ -205,7 +205,7 @@ header h1 {
   display: block;
   width: 30px;
   height: 30px;
-    font-size: 35px;
+    font-size: 25px;
   /*border-radius: inherit;*/
   /*background: #d95353;*/
   /*box-shadow: 0 0 10px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.3);*/
@@ -1674,6 +1674,9 @@ a.cd-panel-close:after {
   display: block;
 }
 
+[role=disable]{
+  background-color:#eee !important;
+}
 
 
 
