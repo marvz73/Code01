@@ -150,6 +150,8 @@ var AccountUsersLists = {
 // task module
 var task = {
     model: function(params) {
+
+        this.atMentionUsers = m.prop(params.userMention);
         this.completed   =  m.prop(params.completed);
         this.title       =  m.prop(params.title);
         this.description =  m.prop(params.description);
@@ -163,6 +165,7 @@ var task = {
         this.TaskDetails = {};
         this.TaskComments = [];
         this.usersList = [];
+        this.atMention = false;
         //Task comment observ
         socket.on('taskCommentCreate', function(data){
             self.TaskComments.push(data);
@@ -214,7 +217,7 @@ var task = {
                 url: baseUrl + '/api/v1/account/' +m.route.param('aid')+ '/project/' +m.route.param('pid')+ '/task/' + m.route.param('tid')
             })
             .then(function(){
-                
+
             }, function(){
                 AJAXERROR();
             });
@@ -242,13 +245,11 @@ var task = {
             })
         }
 
-
     },
     view: function(ctrl) {
         
         function loaded(elm, init, context){
             if( !init ){
-
                 window.document.getElementById('taskDesc').addEventListener('keypress', Q.debounce(function(params){
                     var jsonData = {
                         desc: this.value
@@ -299,6 +300,7 @@ var task = {
 
         function addComment(elm, init, context){
             if(!init){
+
                 if(elm.keyCode == 13)
                 {
                     var jsonData = {
@@ -309,15 +311,80 @@ var task = {
                     // ctrl.addComment(jsonData);
                     elm.target.value = '';
                 }
-                console.log(elm)
 
+//Fire backspace keypress
+var input = document.getElementById('taskComment');
+input.onkeydown = function() {
+    var key = event.keyCode || event.charCode;
+    console.log(key)
+    if( key == 8 || key == 46 )
+        return false;
+};
+
+                setTimeout(function(){
+
+                    if(elm.keyCode == 64){
+                        ctrl.atMention = true;
+                    }
+
+                    if(ctrl.atMention == true)
+                    {
+
+                        var comments = elm.target.value;
+                        var lastChar = comments.charAt(comments.length - 1).toUpperCase();
+
+                        if(lastChar != '@' && lastChar != comments.charAt(comments.length - 1).toLowerCase()){
+                            ctrl.atMention = true;
+                        }else{
+
+                            if(lastChar != comments.charAt(0).toLowerCase())
+                            {
+                                ctrl.atMention = false;
+                                m.redraw(true)
+                            } 
+                        }
+                    }
+
+                }, 100)
             }
         }
 
         function addMention(elm, init, context){
             if(!init){
-                // console.log(elm.target.value)
-                console.log(elm)
+
+                // if(ctrl.atMention == true)
+                // {
+                //     var comments = elm.target.value;
+                //     var lastChar = comments.charAt(comments.length - 1).toUpperCase();
+
+                //     if(lastChar != '@' && lastChar != comments.charAt(comments.length - 1).toLowerCase()){
+                //         // ctrl.atMention = true;
+                //     }else{
+                //         if(lastChar != comments.charAt(0).toLowerCase())
+                //         {
+                //             ctrl.atMention = false;
+                //         } 
+                //     }
+                // }
+            }
+        }
+
+        function atMention(elm, init, context){
+            if(!init){
+                
+
+                if(ctrl.atMention == true)
+                {
+
+                    // ctrl.getUsers(function(res){
+                    //     console.log(res)
+                    // });
+
+console.log(123);
+
+                    return m("h1", "Hello");
+                    
+                }
             }
         }
        
@@ -407,8 +474,10 @@ m('i.fa.fa-check-square-o.pull-left',{style: ctrl.detail.completed() ? 'display:
 
                             ]),
                             m('hr'),
-                            m('input[placeholder="Comment here...."].form-control#taskComment', {onkeypress: addComment, oninput: addMention})
-                            
+m('input[placeholder="Comment here...."].form-control#taskComment', {onkeypress: addComment}),
+
+atMention()
+
                             // m("p", "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quam magnam accusamus obcaecati nisi eveniet quo veniam quibusdam veritatis autem accusantium doloribus nam mollitia maxime explicabo nemo quae aspernatur impedit cupiditate dicta molestias consectetur, sint reprehenderit maiores. Tempora, exercitationem, voluptate. Sapiente modi officiis nulla sed ullam, amet placeat, illum necessitatibus, eveniet dolorum et maiores earum tempora, quas iste perspiciatis quibusdam vero accusamus veritatis. Recusandae sunt, repellat incidunt impedit tempore iusto, nostrum eaque necessitatibus sint eos omnis! Beatae, itaque, in. Vel reiciendis consequatur saepe soluta itaque aliquam praesentium, neque tempora. Voluptatibus sit, totam rerum quo ex nemo pariatur tempora voluptatem est repudiandae iusto, architecto perferendis sequi, asperiores dolores doloremque odit. Libero, ipsum fuga repellat quae numquam cumque nobis ipsa voluptates pariatur, a rerum aspernatur aliquid maxime magnam vero dolorum omnis neque fugit laboriosam eveniet veniam explicabo, similique reprehenderit at. Iusto totam vitae blanditiis. Culpa, earum modi rerum velit voluptatum voluptatibus debitis, architecto aperiam vero tempora ratione sint ullam voluptas non! Odit sequi ipsa, voluptatem ratione illo ullam quaerat qui, vel dolorum eligendi similique inventore quisquam perferendis reprehenderit quos officia! Maxime aliquam, soluta reiciendis beatae quisquam. Alias porro facilis obcaecati et id, corporis accusamus? Ab porro fuga consequatur quisquam illo quae quas tenetur.")
                         ])
                     ])
