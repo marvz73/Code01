@@ -151,12 +151,12 @@ var AccountUsersLists = {
 var task = {
     model: function(params) {
 
-        this.atMentionUsers = m.prop(params.userMention);
-        this.completed   =  m.prop(params.completed);
-        this.title       =  m.prop(params.title);
-        this.description =  m.prop(params.description);
-        this.comments    =  m.prop(params.comments);
-        this.assignee    =  m.prop(params.assignee);
+        this.userMention =  m.prop(params.userMention);
+        this.completed      =  m.prop(params.completed);
+        this.title          =  m.prop(params.title);
+        this.description    =  m.prop(params.description);
+        this.comments       =  m.prop(params.comments);
+        this.assignee       =  m.prop(params.assignee);
     },
     controller: function() {
 
@@ -165,7 +165,9 @@ var task = {
         this.TaskDetails = {};
         this.TaskComments = [];
         this.usersList = [];
+        this.userMention = '';
         this.atMention = false;
+        this.mentionNotFound = false;
         //Task comment observ
         socket.on('taskCommentCreate', function(data){
             self.TaskComments.push(data);
@@ -241,9 +243,15 @@ var task = {
                 method:'get', 
                 url: baseUrl + '/api/v1/account/'+m.route.param('aid')+'/users'
             }).then(function(resp){
-               callback(resp);
-            })
+                callback(resp);
+            });
         }
+
+        this.getUsers(function(res){
+            console.log(res)
+            self.atMentionUsers = new task.model({userMention: res.data});
+        })
+
 
     },
     view: function(ctrl) {
@@ -298,9 +306,10 @@ var task = {
             };
         };
 
+
         function addComment(elm, init, context){
             if(!init){
-
+      
                 if(elm.keyCode == 13)
                 {
                     var jsonData = {
@@ -312,28 +321,22 @@ var task = {
                     elm.target.value = '';
                 }
 
-//Fire backspace keypress
-var input = document.getElementById('taskComment');
-input.onkeydown = function() {
-    var key = event.keyCode || event.charCode;
-    console.log(key)
-    if( key == 8 || key == 46 )
-        return false;
-};
+                var deferred = m.deferred();
 
                 setTimeout(function(){
-
-                    if(elm.keyCode == 64){
+                   
+                    if(elm.keyCode == 64 || elm.charCode == 64){
                         ctrl.atMention = true;
                     }
 
                     if(ctrl.atMention == true)
                     {
-
                         var comments = elm.target.value;
                         var lastChar = comments.charAt(comments.length - 1).toUpperCase();
-
                         if(lastChar != '@' && lastChar != comments.charAt(comments.length - 1).toLowerCase()){
+                            
+                            ctrl.userMention = elm.target.value;
+                            m.redraw(true);
                             ctrl.atMention = true;
                         }else{
 
@@ -345,28 +348,36 @@ input.onkeydown = function() {
                         }
                     }
 
-                }, 100)
+                    // Fire backspace keypress
+                    var input = document.getElementById('taskComment');
+                    input.onkeydown = function(e) {
+                        var key = e.keyCode || e.charCode;
+                        console.log(key)
+                        if( key == 8 || key == 46 || key == 27)
+                        {
+                            // ctrl.atMention = false;
+                        }
+
+                        if( key == 38 || key == 40)
+                        {
+
+                            var userLists = document.getElementById('mentionedUsers');
+                            var x = document.getElementById("mentionedUsers").nextSibling;
+
+                            console.log(Q(".mentionedUser").next(0))
+
+                            return false;
+                        }
+
+                    };
+
+                }, 100);
+
             }
         }
 
-        function addMention(elm, init, context){
-            if(!init){
+        function addMention(elm){
 
-                // if(ctrl.atMention == true)
-                // {
-                //     var comments = elm.target.value;
-                //     var lastChar = comments.charAt(comments.length - 1).toUpperCase();
-
-                //     if(lastChar != '@' && lastChar != comments.charAt(comments.length - 1).toLowerCase()){
-                //         // ctrl.atMention = true;
-                //     }else{
-                //         if(lastChar != comments.charAt(0).toLowerCase())
-                //         {
-                //             ctrl.atMention = false;
-                //         } 
-                //     }
-                // }
-            }
         }
 
         function atMention(elm, init, context){
@@ -376,14 +387,32 @@ input.onkeydown = function() {
                 if(ctrl.atMention == true)
                 {
 
-                    // ctrl.getUsers(function(res){
-                    //     console.log(res)
-                    // });
+                    var userList = ctrl.atMentionUsers.userMention();
 
-console.log(123);
 
-                    return m("h1", "Hello");
-                    
+                    if(ctrl.mentionNotFound)
+                        return;
+
+                    return m('div.dropdown.open#mentionedUsers', [
+
+                        m('ul.dropdown-menu', [
+                            userList.filter(function(val){
+                                var filterValue = val.firstName;
+                                var inputValue = ctrl.userMention.substr(1);
+
+                                return filterValue.substr(0, inputValue.length).toLowerCase() === inputValue.toLowerCase();
+
+                            }).map( function(val, index){
+
+                                return m('li.mentionedUser', [
+                                    m('a', val.firstName + " " + val.lastName)
+                                ]);
+
+                            })
+                            
+                        ])
+                    ]);
+
                 }
             }
         }

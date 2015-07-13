@@ -194,6 +194,37 @@ setTimeout(function(){
 
         }, 
 
+        prev: function(){
+            var len = this.length;
+            while (len--) {
+                this[len].previousSibling;
+            }
+            return this;
+        },
+
+        next: function (index) {
+            var len = this.length;
+            
+            var elm = this;
+
+
+
+            if(typeof index != 'number')
+            {
+                while (len--) {
+                    elm = this[len].nextSibling;
+                }
+                return elm;
+            }
+            else
+            {
+                while (len--) {
+                    elm[len] = elm[len].nextSibling;
+                }
+                return elm[0];
+            }
+        },
+
         hasClass: function (cls) {
             var len = this.length;
             var bool = false;
