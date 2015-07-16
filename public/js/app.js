@@ -399,8 +399,14 @@ var task = {
                             userList.filter(function(val){
                                 var filterValue = val.firstName;
                                 var inputValue = ctrl.userMention.substr(1);
+                                if(filterValue.substr(0, inputValue.length).toLowerCase() !== inputValue.toLowerCase()){
+                                    ctrl.mentionNotFound = true;
+                                    return false;
+                                }else{
+                                    return true;
+                                }
 
-                                return filterValue.substr(0, inputValue.length).toLowerCase() === inputValue.toLowerCase();
+                                // return filterValue.substr(0, inputValue.length).toLowerCase() === inputValue.toLowerCase();
 
                             }).map( function(val, index){
 
@@ -412,6 +418,10 @@ var task = {
                             
                         ])
                     ]);
+
+
+
+
 
                 }
             }
